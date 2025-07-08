@@ -1,3 +1,4 @@
+import DefaultHeader from "@/components/DefaultHeader";
 import { useLocalSearchParams, useNavigation } from "expo-router";
 import { useEffect } from "react";
 import { Text, View } from "react-native";
@@ -11,8 +12,11 @@ export default function Chat() {
     console.log(id);
   }, []);
   return (
-    <View>
-      <Text>Hello Chat #{id}</Text>
-    </View>
+    <>
+      <DefaultHeader></DefaultHeader>
+      <View>
+        <Text>Hello Chat #{id}</Text>
+      </View>
+    </>
   );
 }
