@@ -1,6 +1,12 @@
 import { SampleCoordinateData } from "@/dev/SampleData";
 import { useState } from "react";
-import { Dimensions, StyleSheet, Text, View } from "react-native";
+import {
+  Dimensions,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 interface Coord {
   lat: number;
@@ -46,12 +52,16 @@ export default function NearbyUserViewer() {
 
   const getRadius = (avatar: Coord, self: Coord) => {
     const dist = haversineDistance(avatar, self);
-    console.log(dist);
     if (dist < MaxRange / 2) {
       return (userViewerSize / 2) * (0.3 + 0.1 * Math.random());
     } else {
       return (userViewerSize / 2) * (0.7 + 0.1 * Math.random());
     }
+  };
+
+  const onPressNearbyUser = (index: number) => {
+    console.log(index);
+    // Chat... User Profile...
   };
 
   return (
@@ -64,12 +74,18 @@ export default function NearbyUserViewer() {
       }}
     >
       {avatarCoordList.map((value, index) => (
-        <NearbyUser
+        <TouchableOpacity
           key={index}
-          screenWidth={userViewerSize}
-          radius={getRadius(value, selfCoord)}
-          angle={(2 * Math.PI * index) / avatarCoordList.length}
-        />
+          onPress={() => {
+            onPressNearbyUser(index);
+          }}
+        >
+          <NearbyUser
+            screenWidth={userViewerSize}
+            radius={getRadius(value, selfCoord)}
+            angle={(2 * Math.PI * index) / avatarCoordList.length}
+          />
+        </TouchableOpacity>
       ))}
     </View>
   );
@@ -79,12 +95,9 @@ function NearbyUser({ screenWidth, radius, angle }: NearbyUserProp) {
   const getPosition = ({ screenWidth, radius, angle }: NearbyUserProp) => {
     const top = screenWidth / 2 - radius * Math.sin(angle) - 25;
     const left = screenWidth / 2 - radius * Math.cos(angle) - 25;
-
-    return {
-      top: top,
-      left: left,
-    };
+    return { top: top, left: left };
   };
+
   return (
     <View
       style={{
