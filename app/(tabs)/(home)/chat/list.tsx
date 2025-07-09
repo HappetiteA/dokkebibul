@@ -2,7 +2,7 @@ import DefaultHeader from "@/components/DefaultHeader";
 import { Link } from "expo-router";
 import { Text, View } from "react-native";
 
-export default function ChatList() {
+export default function ChatListScreen() {
   return (
     <>
       <DefaultHeader title="Chat List"></DefaultHeader>

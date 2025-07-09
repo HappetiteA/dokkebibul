@@ -1,7 +1,7 @@
 import DefaultHeader from "@/components/DefaultHeader";
 import { Text, View } from "react-native";
 
-export default function Profile() {
+export default function ProfileScreen() {
   return (
     <>
       <DefaultHeader title="Profile"></DefaultHeader>

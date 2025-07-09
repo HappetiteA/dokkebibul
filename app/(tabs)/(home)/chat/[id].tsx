@@ -3,7 +3,7 @@ import { useLocalSearchParams, useNavigation } from "expo-router";
 import { useEffect } from "react";
 import { Text, View } from "react-native";
 
-export default function Chat() {
+export default function ChatScreen() {
   const navigation = useNavigation();
   const { id } = useLocalSearchParams();
 

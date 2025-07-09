@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from "react-native";
 import { Link } from "expo-router";
 
-export default function TabOneScreen() {
+export default function MainScreen() {
   return (
     <View style={styles.container}>
       <View>

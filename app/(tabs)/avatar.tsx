@@ -1,7 +1,7 @@
 import DefaultHeader from "@/components/DefaultHeader";
 import { Text, View } from "react-native";
 
-export default function Avatar() {
+export default function AvatarScreen() {
   return (
     <>
       <DefaultHeader title="Avatar"></DefaultHeader>
