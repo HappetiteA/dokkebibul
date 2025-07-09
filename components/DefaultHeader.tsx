@@ -1,20 +1,22 @@
 import { useRouter } from "expo-router";
-import { Button, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 interface Prop {
   title?: string;
 }
 
 export default function DefaultHeader({ title }: Prop) {
   const router = useRouter();
+  const onPressBackBtn = () => {
+    if (router.canGoBack()) {
+      router.back();
+    }
+  };
   return (
     <View style={styles.header}>
       <View style={styles.container}>
-        <Button
-          title="Back"
-          onPress={() => {
-            router.back();
-          }}
-        ></Button>
+        <TouchableOpacity onPress={onPressBackBtn}>
+          <Text>Back</Text>
+        </TouchableOpacity>
         {title != null ? <Text style={styles.title}>{title}</Text> : <></>}
       </View>
     </View>
@@ -30,11 +32,10 @@ const styles = StyleSheet.create({
     marginTop: 50,
     height: 50,
     flexDirection: "row",
-    textAlignVertical: "center",
+    alignItems: "center",
+    paddingHorizontal: 20,
   },
   title: {
     marginLeft: 10,
-    marginVertical: "auto",
-    fontSize: 24,
   },
 });
