@@ -1,7 +1,7 @@
 import ChatHistory from "@/components/ChatHistory";
 import DefaultHeader from "@/components/DefaultHeader";
 import { ChatLog } from "@/components/interfaces";
-import { SampleData } from "@/dev/SampleChatData";
+import { SampleChatData } from "@/dev/SampleData";
 import { useLocalSearchParams, useNavigation } from "expo-router";
 import { useEffect, useState } from "react";
 import { Button, StyleSheet, Text, TextInput, View } from "react-native";
@@ -23,7 +23,7 @@ export default function ChatScreen() {
 
   useEffect(() => {
     navigation.setOptions({ title: `Chat #${id}` });
-    setChat(SampleData);
+    setChat(SampleChatData);
   }, []);
   return (
     <>

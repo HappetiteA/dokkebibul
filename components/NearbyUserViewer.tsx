@@ -1,3 +1,5 @@
+import { SampleCoordinateData } from "@/dev/SampleData";
+import { useState } from "react";
 import { Dimensions, StyleSheet, Text, View } from "react-native";
 
 interface Coord {
@@ -35,15 +37,12 @@ const MaxRange = 100;
 export default function NearbyUserViewer() {
   const { width, height } = Dimensions.get("window");
   const userViewerSize = Math.min(width, height) - 20;
-  const self = { lat: 37.1234, lon: 127.5678 };
-  const avatars: Array<Coord> = [
-    { lat: 37.1239, lon: 127.5675 },
-    { lat: 37.1236, lon: 127.568 },
-    { lat: 37.1232, lon: 127.5679 },
-    { lat: 37.1243, lon: 127.5681 },
-    { lat: 37.123, lon: 127.5682 },
-    { lat: 37.1237, lon: 127.567 },
-  ];
+  const [selfCoord, setSelfCoord] = useState<Coord>(
+    SampleCoordinateData.selfCoord
+  );
+  const [avatarCoordList, setAvatarCoordList] = useState<Array<Coord>>(
+    SampleCoordinateData.avatarCoordList
+  );
 
   const getRadius = (avatar: Coord, self: Coord) => {
     const dist = haversineDistance(avatar, self);
@@ -64,12 +63,12 @@ export default function NearbyUserViewer() {
         borderRadius: userViewerSize / 2,
       }}
     >
-      {avatars.map((value, index) => (
+      {avatarCoordList.map((value, index) => (
         <NearbyUser
           key={index}
           screenWidth={userViewerSize}
-          radius={getRadius(value, self)}
-          angle={(2 * Math.PI * index) / avatars.length}
+          radius={getRadius(value, selfCoord)}
+          angle={(2 * Math.PI * index) / avatarCoordList.length}
         />
       ))}
     </View>

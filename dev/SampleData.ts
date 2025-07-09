@@ -1,4 +1,4 @@
-export const SampleData = [
+export const SampleChatData = [
   {
     date: "2025-07-07",
     chat: [
@@ -24,3 +24,15 @@ export const SampleData = [
     ],
   },
 ];
+
+export const SampleCoordinateData = {
+  selfCoord: { lat: 37.1234, lon: 127.5678 },
+  avatarCoordList: [
+    { lat: 37.1239, lon: 127.5675 },
+    { lat: 37.1236, lon: 127.568 },
+    { lat: 37.1232, lon: 127.5679 },
+    { lat: 37.1243, lon: 127.5681 },
+    { lat: 37.123, lon: 127.5682 },
+    { lat: 37.1237, lon: 127.567 },
+  ],
+};
