@@ -7,16 +7,14 @@ interface ChatHistoryProp {
 export default function ChatHistory({ chat }: ChatHistoryProp) {
   const ShowChatList = (dailyChat: DailyChat) => {
     return (
-      <>
-        <View>
-          <Text>{dailyChat.date}</Text>
-          {dailyChat.chat.map((value, index) => (
-            <Text key={index}>
-              {value.sender}({value.time}) : {value.message}
-            </Text>
-          ))}
-        </View>
-      </>
+      <View>
+        <Text>{dailyChat.date}</Text>
+        {dailyChat.chat.map((value, index) => (
+          <Text key={index}>
+            {value.sender}({value.time}) : {value.message}
+          </Text>
+        ))}
+      </View>
     );
   };
 
