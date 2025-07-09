@@ -9,4 +9,5 @@ export interface SingleChat {
   sender: string;
   message: string;
   time: string;
+  AIgenerated: boolean;
 }

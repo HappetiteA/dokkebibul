@@ -30,7 +30,7 @@ export default function ChatScreen() {
       <DefaultHeader></DefaultHeader>
       <View>
         <Text>Hello Chat #{id}</Text>
-        <ChatHistory chat={chat} />
+        <ChatHistory chat={chat} showAI={true} />
       </View>
       <View>
         <TextInput
