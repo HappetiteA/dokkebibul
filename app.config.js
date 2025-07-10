@@ -1,11 +1,13 @@
-{
+import 'dotenv/config'
+
+export default {
   "expo": {
     "name": "snu-happetite-dokkaebibul",
     "slug": "snu-happetite-dokkaebibul",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "snuhappetitedokkaebibul",
+    "scheme": process.env.APP_SCHEME,
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
@@ -16,7 +18,7 @@
     "ios": {
       "supportsTablet": true,
       "usesAppleSignIn": true,
-      "bundleIdentifier": "com.1n1tial.snuhappetitedokkaebibul",
+      "bundleIdentifier": process.env.IOS_BUNDLE_ID,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -28,11 +30,11 @@
       },
       "config": {
         "googleSignIn": {
-          "certificateHash": "20:C7:27:42:EF:9D:A2:78:0D:E6:67:19:36:ED:A9:1A:8B:F1:0A:7C"
+          "certificateHash": process.env.ANDROID_GOOGLE_SHA1
         }
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.dokkaebibul.snu_happetite"
+      "package": process.env.ANDROID_PACKAGE
     },
     "web": {
       "bundler": "metro",
@@ -46,7 +48,7 @@
       [
         "@react-native-google-signin/google-signin",
         {
-          "iosUrlScheme": "com.googleusercontent.apps.537703566025-31nn1n7g9rn5edmuddu20o64d97ugkqm"
+          "iosUrlScheme": process.env.IOS_URL_SCHEME
         }
       ]
     ],
@@ -56,7 +58,7 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "1ccf4016-c9be-4888-bd21-1daada06222b"
+        "projectId": process.env.EAS_PROJECT_ID
       }
     },
     "owner": "1n1tial"
