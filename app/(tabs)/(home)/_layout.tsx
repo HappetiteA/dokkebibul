@@ -1,10 +1,8 @@
-import { ThemeProvider } from "@react-navigation/native";
 import { Stack } from "expo-router";
-import { Text, View } from "react-native";
 
 export default function DefaultLayout() {
   return (
-    <Stack>
+    <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen
         name="index"
         options={{

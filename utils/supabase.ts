@@ -6,7 +6,7 @@ import { createClient, processLock } from '@supabase/supabase-js'
 const supabaseUrl = process.env.SUPABASE_URL || '';
 const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || '';
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+export const supabase = createClient("https://slstnesnhgwtcaxyajjx.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNsc3RuZXNuaGd3dGNheHlhamp4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2MDIzNDMsImV4cCI6MjA2NzE3ODM0M30.xyJndsrV2NO87ZPyVQtK0Gup9F-PLgy_3IUE1-ZI2C4", {
   auth: {
     storage: AsyncStorage,
     autoRefreshToken: true,
