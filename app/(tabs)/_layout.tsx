@@ -5,12 +5,13 @@ import { Pressable } from "react-native";
 
 export default function TabLayout() {
   return (
-    <Tabs>
+    <Tabs screenOptions={{ headerShown: false }}>
       <Tabs.Screen
         name="avatar"
         options={{
           tabBarLabel: "avatar",
           title: "avatar",
+          headerShown: false,
         }}
       />
       <Tabs.Screen
@@ -25,6 +26,7 @@ export default function TabLayout() {
         options={{
           tabBarLabel: "profile",
           title: "profile",
+          headerShown: false,
         }}
       />
     </Tabs>
