@@ -1,5 +1,6 @@
 import DefaultHeader from "@/components/DefaultHeader";
-import { Text, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
+import { handleLogout } from "@/utils/auth";
 
 export default function ProfileScreen() {
   return (
@@ -7,7 +8,12 @@ export default function ProfileScreen() {
       <DefaultHeader title="Profile"></DefaultHeader>
       <View>
         <Text>Hello Profile</Text>
-      </View>
+        <TouchableOpacity
+        onPress={handleLogout}
+      >
+        <Text>log out</Text>
+      </TouchableOpacity>
+    </View>
     </>
   );
 }
