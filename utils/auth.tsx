@@ -83,10 +83,8 @@ export const handleAppleLogin = async () => {
 export const GoogleLoginButton = () => {
   const router = useRouter();
   GoogleSignin.configure({
-    webClientId:
-      process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
-    iosClientId:
-      process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
+    webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+    iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
   });
 
   return (
@@ -97,7 +95,7 @@ export const GoogleLoginButton = () => {
         try {
           await GoogleSignin.hasPlayServices();
           const userInfo = await GoogleSignin.signIn();
-          if (userInfo.data.idToken) {
+          if (userInfo.data?.idToken) {
             const {
               data: { user },
               error,

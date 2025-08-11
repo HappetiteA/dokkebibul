@@ -1,7 +1,4 @@
-import DefaultHeader from "@/components/DefaultHeader";
-import { Text, TouchableOpacity, View } from "react-native";
-import useCurrentLocation from "@/utils/useCurrentLocation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import * as Location from "expo-location";
 
 interface ILocation {
@@ -14,11 +11,11 @@ interface IUseCurrentLocation {
   errorMsg: string | null;
 }
 
-export default function AvatarScreen() {
+export default function useCurrentLocation(): IUseCurrentLocation {
   const [location, setLocation] = useState<ILocation | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const PlaceAvatar = () => {
+  useEffect(() => {
     (async () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
@@ -37,19 +34,7 @@ export default function AvatarScreen() {
         console.error(error);
       }
     })();
+  }, []);
 
-    console.log(location);
-  };
-
-  return (
-    <>
-      <DefaultHeader title="Avatar"></DefaultHeader>
-      <View>
-        <Text>Hello Avatar</Text>
-        <TouchableOpacity onPress={PlaceAvatar}>
-          <Text>Place Avatar</Text>
-        </TouchableOpacity>
-      </View>
-    </>
-  );
+  return { location, errorMsg };
 }
