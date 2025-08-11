@@ -2,6 +2,7 @@ import {
   Button,
   Dimensions,
   Image,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -9,6 +10,7 @@ import {
 } from "react-native";
 import { Link, useRouter } from "expo-router";
 import NearbyUserViewer from "@/components/NearbyUserViewer";
+import ChatListElement from "@/components/ChatListElement";
 
 export default function MainScreen() {
   return (
@@ -19,6 +21,11 @@ export default function MainScreen() {
         <Link href={"/chat/list"} asChild>
           <Text>Show Chat Room List</Text>
         </Link>
+        <ScrollView style={styles.chatList}>
+          {["asdf", "ewfd", "awegdv"].map((value, index) => (
+            <ChatListElement id={value} key={index} />
+          ))}
+        </ScrollView>
       </View>
     </>
   );
@@ -84,5 +91,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
+  },
+  chatList: {
+    width: "100%",
+    paddingHorizontal: 10,
   },
 });
