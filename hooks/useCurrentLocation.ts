@@ -9,11 +9,17 @@ interface ILocation {
 interface IUseCurrentLocation {
   location: ILocation | null;
   errorMsg: string | null;
+  refreshLocation: Function;
 }
 
 export default function useCurrentLocation(): IUseCurrentLocation {
   const [location, setLocation] = useState<ILocation | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [trigger, setTrigger] = useState<boolean>(true);
+
+  const refreshLocation = () => {
+    setTrigger((c) => !c);
+  };
 
   useEffect(() => {
     (async () => {
@@ -34,7 +40,7 @@ export default function useCurrentLocation(): IUseCurrentLocation {
         console.error(error);
       }
     })();
-  }, []);
+  }, [trigger]);
 
-  return { location, errorMsg };
+  return { location, errorMsg, refreshLocation };
 }
