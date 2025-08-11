@@ -15,29 +15,10 @@ interface IUseCurrentLocation {
 }
 
 export default function AvatarScreen() {
-  const [location, setLocation] = useState<ILocation | null>(null);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  //const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const { location, errorMsg } = useCurrentLocation();
 
   const PlaceAvatar = () => {
-    (async () => {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        setErrorMsg("Location Permission Denied");
-        return;
-      }
-
-      try {
-        const { coords } = await Location.getCurrentPositionAsync({});
-        setLocation({
-          latitude: coords.latitude,
-          longitude: coords.longitude,
-        });
-      } catch (error) {
-        setErrorMsg("Cannot Get Location");
-        console.error(error);
-      }
-    })();
-
     console.log(location);
   };
 
