@@ -1,4 +1,5 @@
 import { SampleCoordinateData } from "@/dev/SampleData";
+import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
   Dimensions,
@@ -43,6 +44,7 @@ const MaxRange = 100;
 export default function NearbyUserViewer() {
   const { width, height } = Dimensions.get("window");
   const userViewerSize = Math.min(width, height) - 20;
+  const router = useRouter();
   const [selfCoord, setSelfCoord] = useState<Coord>(
     SampleCoordinateData.selfCoord
   );
@@ -60,8 +62,11 @@ export default function NearbyUserViewer() {
   };
 
   const onPressNearbyUser = (index: number) => {
-    console.log(index);
     // Chat... User Profile...
+    router.navigate({
+      pathname: "/(tabs)/other-profile",
+      params: { user_id: index },
+    });
   };
 
   return (

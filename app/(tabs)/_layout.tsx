@@ -20,9 +20,16 @@ export default function TabLayout() {
         }}
       />
       <Stack.Screen
-        name="profile"
+        name="my-profile"
         options={{
-          title: "profile",
+          title: "my-profile",
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="other-profile"
+        options={{
+          title: "other-profile",
           headerShown: false,
         }}
       />
