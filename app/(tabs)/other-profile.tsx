@@ -1,11 +1,28 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import headerStyle from "@/components/style/headerStyle";
+import { useState } from "react";
+
+interface IParams {
+  user_id: string;
+}
 
 export default function OtherProfileScreen() {
+  const router = useRouter();
   const { user_id } = useLocalSearchParams();
-  console.log(user_id);
+  if (Array.isArray(user_id)) {
+    return null;
+  }
 
+  const [follow, setFollow] = useState(false);
+
+  const onFollowBtnPressed = () => {
+    setFollow((c) => !c);
+  };
+
+  const onChatBtnPressed = () => {
+    router.navigate({ pathname: "/chat/[id]", params: { id: user_id } });
+  };
   return (
     <>
       <OtherProfileScreenHeader />
@@ -16,10 +33,10 @@ export default function OtherProfileScreen() {
         <Text>Account Info</Text>
 
         <View style={styles.horizontalBtn}>
-          <TouchableOpacity>
-            <Text>팔로우</Text>
+          <TouchableOpacity onPress={onFollowBtnPressed}>
+            <Text>{follow ? "팔로우 취소" : "팔로우"}</Text>
           </TouchableOpacity>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={onChatBtnPressed}>
             <Text>대화하기</Text>
           </TouchableOpacity>
         </View>
