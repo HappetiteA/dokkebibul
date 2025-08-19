@@ -57,7 +57,7 @@ export const handleAppleLogin = async () => {
           }
         } else {
           if (!profile.is_initialized) router.replace("/onboarding");
-          else router.replace("/(tabs)/(home)");
+          else router.replace("/(home)");
         }
       } else {
         Alert.alert("Login failed: ", JSON.stringify(error));
@@ -129,7 +129,7 @@ export const GoogleLoginButton = () => {
                 }
               } else {
                 if (!profile.is_initialized) router.replace("/onboarding");
-                else router.replace("/(tabs)/(home)");
+                else router.replace("/(home)");
               }
             } else {
               Alert.alert("Login failed: ", JSON.stringify(error));

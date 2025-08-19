@@ -64,7 +64,7 @@ export default function NearbyUserViewer() {
   const onPressNearbyUser = (index: number) => {
     // Chat... User Profile...
     router.navigate({
-      pathname: "/(tabs)/other-profile",
+      pathname: "/(home)/other-profile",
       params: { user_id: index },
     });
   };

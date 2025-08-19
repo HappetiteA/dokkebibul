@@ -24,7 +24,7 @@ export default function OnBoarding() {
       console.log(error);
       return;
     }
-    router.replace("/(tabs)/(home)");
+    router.replace("/(home)");
   };
   return (
     <View>
