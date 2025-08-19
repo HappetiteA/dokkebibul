@@ -11,8 +11,13 @@ import {
 import { Link, useRouter } from "expo-router";
 import NearbyUserViewer from "@/components/NearbyUserViewer";
 import ChatListElement from "@/components/ChatListElement";
+import Modal from "@/components/Modal";
+import { useState } from "react";
 
 export default function MainScreen() {
+  const [modalOpen, setModalOpen] = useState(false);
+  const onModalOpen = () => {};
+
   return (
     <>
       <MainScreenHeader />
@@ -23,10 +28,36 @@ export default function MainScreen() {
         </Link>
         <ScrollView style={styles.chatList}>
           {["asdf", "ewfd", "awegdv"].map((value, index) => (
-            <ChatListElement id={value} key={index} />
+            <ChatListElement
+              id={value}
+              key={index}
+              onLongPress={() => {
+                setModalOpen(true);
+              }}
+            />
           ))}
         </ScrollView>
       </View>
+
+      <Modal
+        isOpen={modalOpen}
+        onClose={() => {
+          setModalOpen(false);
+        }}
+        children={
+          <View>
+            <Button title={"채팅방 나가기"} />
+            <Button title={"차단하기"} />
+            <Button title={"신고하기"} />
+            <Button
+              title={"확인"}
+              onPress={() => {
+                setModalOpen(false);
+              }}
+            />
+          </View>
+        }
+      />
     </>
   );
 }

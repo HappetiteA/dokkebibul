@@ -3,12 +3,16 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 interface IChatListElementProp {
   id: string;
+  onLongPress: () => void;
 }
 
-export default function ChatListElement({ id }: IChatListElementProp) {
+export default function ChatListElement({
+  id,
+  onLongPress,
+}: IChatListElementProp) {
   return (
     <Link href={{ pathname: "/chat/[id]", params: { id: id } }} asChild>
-      <TouchableOpacity style={styles.container}>
+      <TouchableOpacity style={styles.container} onLongPress={onLongPress}>
         <Text>Chat Room #{id}</Text>
       </TouchableOpacity>
     </Link>
