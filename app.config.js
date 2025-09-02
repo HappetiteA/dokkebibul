@@ -58,6 +58,7 @@ export default {
     "extra": {
       "router": {},
       "eas": {
+        "projectId": "54157097-feaf-4da9-a259-32b5eab2352b"
       }
     },
     "owner": "happetitea"
