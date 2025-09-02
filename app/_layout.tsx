@@ -56,6 +56,7 @@ function RootLayoutNav() {
         <Stack.Screen name="onboarding" options={{ headerShown: false }} />
         <Stack.Screen name="login" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="(chats)" />
       </Stack>
     </SafeAreaProvider>
   );

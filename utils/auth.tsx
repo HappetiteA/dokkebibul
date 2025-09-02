@@ -30,38 +30,23 @@ export const handleAppleLogin = async () => {
       console.log(JSON.stringify({ error, user }, null, 2));
       if (!error && user) {
         // User is signed in.
-        const { data: profile, error } = await supabase
+        const { data: profile, error: profileError } = await supabase
           .from("profiles")
           .select("id, is_initialized")
           .eq("id", user.id)
           .maybeSingle();
         if (!profile) {
-          const fullName = `${credential.fullName?.givenName ?? ""} ${
-            credential.fullName?.familyName ?? ""
-          }`.trim();
-
-          const { error: upsertError } = await supabase
-            .from("profiles")
-            .upsert({
-              id: user.id,
-              full_name: fullName || null,
-              is_initialized: false,
-            });
-
-          if (upsertError) {
-            console.error(
-              "Failed to insert profile, please try again: ",
-              upsertError
-            );
-            router.replace("/login");
-          }
-        } else {
-          if (!profile.is_initialized) router.replace("/onboarding");
-          else router.replace("/(tabs)/(home)");
+          Alert.alert("Profile missing", "Please try again later, or contact developer."); return;
+        } 
+        if (profileError) {
+          Alert.alert("Failed to fetch profile information: ", JSON.stringify(profileError)); return;
         }
+        if (!profile.is_initialized) {
+          router.replace("/onboarding");
+        }
+        else router.replace("/(tabs)/(home)");
       } else {
         Alert.alert("Login failed: ", JSON.stringify(error));
-        console.log("Login failed: ", JSON.stringify(error));
       }
     } else {
       throw new Error("No identityToken.");
@@ -71,11 +56,9 @@ export const handleAppleLogin = async () => {
     if (err.code === "ERR_REQUEST_CANCELED") {
       // handle that the user canceled the sign-in flow
       Alert.alert("Login failed: ", err.code);
-      console.log("Login failed: ", err.code);
     } else {
       // handle other errors
       Alert.alert("Login failed: ", err.code);
-      console.log("Login failed: ", err.code);
     }
   }
 };
@@ -108,27 +91,16 @@ export const GoogleLoginButton = () => {
             console.log(error, user);
             if (!error && user) {
               // User is signed in.
-              const { data: profile, error } = await supabase
+              const { data: profile, error: profileError } = await supabase
                 .from("profiles")
                 .select("id, is_initialized")
                 .eq("id", user.id)
                 .maybeSingle();
+              if (profileError) {
+                Alert.alert("Failed to fetch profile information: ", JSON.stringify(profileError)); return;
+              }
               if (!profile) {
-                const { error: upsertError } = await supabase
-                  .from("profiles")
-                  .upsert({
-                    id: user.id,
-                    full_name: null,
-                    is_initialized: false,
-                  });
-
-                if (upsertError) {
-                  console.error(
-                    "Failed to insert profile, please try again: ",
-                    upsertError
-                  );
-                  router.replace("/login");
-                }
+                Alert.alert("Profile missing", "Please try again later, or contact developer."); return;
               } else {
                 if (!profile.is_initialized) router.replace("/onboarding");
                 else router.replace("/(tabs)/(home)");

@@ -2,6 +2,7 @@
 
 .env
 app.json
+app.config.js
 
 # dependencies
 node_modules/
