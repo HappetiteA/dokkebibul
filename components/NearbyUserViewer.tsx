@@ -1,6 +1,6 @@
 import { SampleCoordinateData } from "@/dev/SampleData";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import React, { useState } from "react";
 import {
   Dimensions,
   StyleSheet,
@@ -18,6 +18,7 @@ interface NearbyUserProp {
   screenWidth: number;
   radius: number;
   angle: number;
+  children: React.ReactNode;
 }
 
 function haversineDistance(A: Coord, B: Coord): number {
@@ -78,6 +79,14 @@ export default function NearbyUserViewer() {
         borderRadius: userViewerSize / 2,
       }}
     >
+      <TouchableOpacity>
+        <NearbyUser
+          screenWidth={userViewerSize}
+          radius={0}
+          angle={0}
+          children={<Text>Me</Text>}
+        />
+      </TouchableOpacity>
       {avatarCoordList.map((value, index) => (
         <TouchableOpacity
           key={index}
@@ -89,6 +98,7 @@ export default function NearbyUserViewer() {
             screenWidth={userViewerSize}
             radius={getRadius(value, selfCoord)}
             angle={(2 * Math.PI * index) / avatarCoordList.length}
+            children={<Text>User</Text>}
           />
         </TouchableOpacity>
       ))}
@@ -96,8 +106,14 @@ export default function NearbyUserViewer() {
   );
 }
 
-function NearbyUser({ screenWidth, radius, angle }: NearbyUserProp) {
-  const getPosition = ({ screenWidth, radius, angle }: NearbyUserProp) => {
+interface getPosInput {
+  screenWidth: number;
+  radius: number;
+  angle: number;
+}
+
+function NearbyUser({ screenWidth, radius, angle, children }: NearbyUserProp) {
+  const getPosition = ({ screenWidth, radius, angle }: getPosInput) => {
     const top = screenWidth / 2 - radius * Math.sin(angle) - 25;
     const left = screenWidth / 2 - radius * Math.cos(angle) - 25;
     return { top: top, left: left };
@@ -110,7 +126,7 @@ function NearbyUser({ screenWidth, radius, angle }: NearbyUserProp) {
         ...getPosition({ screenWidth, radius, angle }),
       }}
     >
-      <Text>USER</Text>
+      {children}
     </View>
   );
 }
