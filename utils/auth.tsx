@@ -80,6 +80,9 @@ export const GoogleLoginButton = () => {
         try {
           await GoogleSignin.hasPlayServices();
           const userInfo = await GoogleSignin.signIn();
+          if (!userInfo.data) {
+            Alert.alert("Failed to fetch profile information"); return;
+          }
           if (userInfo.data.idToken) {
             const {
               data: { user },

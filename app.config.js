@@ -51,7 +51,19 @@ export default {
         {
           "iosUrlScheme": "com.googleusercontent.apps.537703566025-31nn1n7g9rn5edmuddu20o64d97ugkqm"
         }
-      ]
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#232323",
+          "image": "./assets/images/splash-icon.png",
+          "dark": {
+            "image": "./assets/images/splash-icon-dark.png",
+            "backgroundColor": "#000000"
+          },
+          "imageWidth": 200
+        }
+      ],
     ],
     "experiments": {
       "typedRoutes": true
