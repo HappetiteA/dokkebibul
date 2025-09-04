@@ -1,8 +1,8 @@
 # Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
 
 .env
-app.json
-app.config.js
+# app.json
+# app.config.js
 
 # dependencies
 node_modules/
