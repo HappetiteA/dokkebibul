@@ -2,6 +2,9 @@
   "name": "snu-happetite-dokkaebibul",
   "main": "expo-router/entry",
   "version": "1.0.0",
+  "expo": {
+    "entryPoint": "./app.config.js"
+  },
   "scripts": {
     "start": "expo start",
     "android": "expo run:android",
