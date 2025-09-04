@@ -68,7 +68,7 @@ import * as AppleAuthentication from 'expo-apple-authentication'
 import { handleAppleLogin, GoogleLoginButton } from '@/utils/auth'
 
 
-export default function LogIn() {
+export default function SignIn() {
   if (Platform.OS === 'ios')
     return (
       <View>

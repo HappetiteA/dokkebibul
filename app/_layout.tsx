@@ -12,15 +12,21 @@ export default function Root() {
 }
 
 function RootNavigator() {
-  const { session } = useAuth();
+  const { session, profile } = useAuth();
+
+  let isGuard = false;
+
+  if (session) {
+    if (profile) isGuard = true;
+  }
 
   return (
     <Stack>
-      <Stack.Protected guard={session}>
+      <Stack.Protected guard={isGuard}>
         <Stack.Screen name="(app)" />
       </Stack.Protected>
 
-      <Stack.Protected guard={!session}>
+      <Stack.Protected guard={!isGuard}>
         <Stack.Screen name="sign-in" />
       </Stack.Protected>
     </Stack>
