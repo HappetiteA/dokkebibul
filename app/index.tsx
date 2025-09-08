@@ -36,7 +36,7 @@ export default function Splash() {
       if (!profile.is_initialized) {
         router.replace("/onboarding");
       } else {
-        router.replace("/(home)");
+        router.replace("/(tabs)/(home)");
       }
     };
 

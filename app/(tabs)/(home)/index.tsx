@@ -66,7 +66,7 @@ export default function MainScreen() {
 function MainScreenHeader() {
   const router = useRouter();
   const onProfileClick = () => {
-    router.navigate("/(home)/my-profile");
+    router.navigate("/(tabs)/my-profile");
   };
 
   return (

@@ -7,16 +7,15 @@ export default function TabLayout() {
   return (
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen
-        name="index"
-        options={{
-          title: "home",
-        }}
-      />
-      <Stack.Screen name="chat/list" options={{ title: "Chat List" }} />
-      <Stack.Screen
         name="avatar"
         options={{
           title: "avatar",
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="(home)"
+        options={{
           headerShown: false,
         }}
       />
