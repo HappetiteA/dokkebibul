@@ -1,34 +1,41 @@
-import { Stack } from 'expo-router';
-import { useAuth, AuthProvider } from '@/utils/AuthContext';
-import { SplashScreenController } from '@/components/SplashScreenController';
+import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { useEffect } from "react";
+import { useFonts } from "expo-font";
+import { Stack } from "expo-router";
+import { AuthProvider } from "@/utils/AuthContext";
+import { SplashScreenController } from "@/components/SplashScreenController";
 
-export default function Root() {
+export {
+  ErrorBoundary,
+} from "expo-router";
+
+export const unstable_settings = {
+  initialRouteName: "/(app)/(tabs)/(home)",
+};
+
+export default function RootLayout() {
+
+  const [fontLoaded, fontError] = useFonts({
+    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
+    ...FontAwesome.font,
+  });
+  
+  useEffect(() => {
+    if (fontError) throw fontError;
+  }, [fontError]);
+  
+  if (!fontLoaded) {
+    return null;
+  }
+  
+  return <RootLayoutNav />;
+}
+
+function RootLayoutNav() {
   return (
     <AuthProvider>
       <SplashScreenController />
-      <RootNavigator />
+      <Stack screenOptions={{ headerShown: false }} />
     </AuthProvider>
-  );
-}
-
-function RootNavigator() {
-  const { session, profile } = useAuth();
-
-  let isGuard = false;
-
-  if (session) {
-    if (profile) isGuard = true;
-  }
-
-  return (
-    <Stack>
-      <Stack.Protected guard={isGuard}>
-        <Stack.Screen name="(app)" />
-      </Stack.Protected>
-
-      <Stack.Protected guard={!isGuard}>
-        <Stack.Screen name="sign-in" />
-      </Stack.Protected>
-    </Stack>
   );
 }

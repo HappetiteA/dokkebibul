@@ -1,16 +1,8 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import { supabase } from "@/utils/supabase";
+import { Alert, AppState, Platform } from "react-native";
 import { Session, User } from "@supabase/supabase-js";
-import { Profile } from "@/utils/types";
-
-
-type AuthContextType = {
-  user: User | null;
-  session: Session | null;
-  profile: Profile | null;
-  loading: boolean;
-  signOut: () => Promise<void>;
-};
+import { supabase } from "@/utils/supabase";
+import { Profile, AuthContextType } from "@/utils/types";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -18,53 +10,95 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, newSession) => {
+      setSession(newSession ?? null);
+      setUser(newSession?.user ?? null);
+    });
+
+    return () => listener.subscription.unsubscribe();
+  }, []);
 
   useEffect(() => {
     const init = async () => {
-        const { data: { session }, } = await supabase.auth.getSession();
-        setSession(session);
-        setUser(session?.user ?? null);
-        if (session?.user) {
-            await loadProfile(session?.user.id);
-        } else {
-            setProfile(null);
-        }
-        setLoading(false);
-    }
+      try {
+        const {
+          data: { session: initialSession },
+          error,
+        } = await supabase.auth.getSession();
+
+        if (error) console.error("getSession error:", error);
+
+        setSession(initialSession ?? null);
+        setUser(initialSession?.user ?? null);
+      } catch (err) {
+        console.error("Auth init error:", err);
+      }
+    };
 
     init();
-
-    const { data: listener } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        if (session?.user) {
-            await loadProfile(session?.user.id);
-        } else {
-            setProfile(null);
-        }
-      }
-    );
-
-    return () => {
-      listener.subscription.unsubscribe();
-    };
   }, []);
 
-  const loadProfile = async (userId: string) => {
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", userId)
-      .single();
-
-    if (!error && data) {
-      setProfile(data);
-    } else {
+  useEffect(() => {
+    if (!session?.user) {
       setProfile(null);
+      setLoading(false);
+      return;
     }
-  };
+
+    const fetchProfile = async () => {
+      setLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", session.user.id)
+          .maybeSingle();
+
+        if (error) {
+          console.error("Profile fetch error:", error);
+          setProfile(null);
+        } else if (!data) {
+          const { data: newProfile, error: insertError } = await supabase
+            .from("profiles")
+            .insert({ id: session.user.id, is_initialized: false })
+            .select()
+            .single();
+
+          if (insertError) {
+            console.error("Profile creation error:", insertError);
+            setProfile(null);
+          } else {
+            setProfile(newProfile);
+          }
+        } else {
+          setProfile(data);
+        }
+      } catch (err) {
+        console.error("Unexpected profile fetch error:", err);
+        setProfile(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, [session]);
+
+
+  useEffect(() => {
+    if (Platform.OS === "web") return;
+
+    const listener = AppState.addEventListener("change", (state) => {
+      if (state === "active") supabase.auth.startAutoRefresh();
+      else supabase.auth.stopAutoRefresh();
+    });
+
+    return () => listener.remove();
+  }, []);
+
 
   const signOut = async () => {
     await supabase.auth.signOut();
@@ -72,7 +106,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, profile, loading, signOut }}>
+    <AuthContext.Provider value={{ user, session, profile, loading, setProfile, signOut }}>
       {children}
     </AuthContext.Provider>
   );
