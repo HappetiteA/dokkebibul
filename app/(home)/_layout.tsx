@@ -3,7 +3,7 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Link, Stack } from "expo-router";
 import { Pressable } from "react-native";
 
-export default function HomeLayout() {
+export default function TabLayout() {
   return (
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen
