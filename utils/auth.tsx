@@ -8,37 +8,34 @@ export const useAuthActions = () => {
   const { setProfile, signOut } = useAuth();
 
   const loginWithGoogle = async (redirectTo?: string) => {
-    try {
-      if (Platform.OS === "web") {
-        await supabase.auth.signInWithOAuth({
-          provider: "google",
-          options: { redirectTo: redirectTo || window.location.origin },
-        });
-      } else {
-        GoogleSignin.configure({
-          webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
-          iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
-        });
 
-        await GoogleSignin.hasPlayServices();
-        const userInfo = await GoogleSignin.signIn();
+    if (Platform.OS === "web") {
+      await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: { redirectTo: redirectTo || window.location.origin },
+      });
+    } else {
+      GoogleSignin.configure({
+        webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+        iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
+      });
 
-        if (!userInfo.data) throw new Error("Google user data missing");
-        if (!userInfo.data.idToken) throw new Error("Google user ID token missing");
+      await GoogleSignin.hasPlayServices();
+      const userInfo = await GoogleSignin.signIn();
 
-        const { data: { user }, error } = await supabase.auth.signInWithIdToken({
-          provider: "google",
-          token: userInfo.data.idToken,
-        });
+      if (!userInfo.data) throw new Error("Google user data missing");
+      if (!userInfo.data.idToken) throw new Error("Google user ID token missing");
 
-        if (error || !user) throw error || new Error("Google login failed");
+      const { data: { user }, error } = await supabase.auth.signInWithIdToken({
+        provider: "google",
+        token: userInfo.data.idToken,
+      });
 
-        await ensureProfile(user.id);
-      }
-    } catch (err: any) {
-      Alert.alert("Login failed", err.message || JSON.stringify(err));
-      console.error(err);
+      if (error || !user) throw error || new Error("Google login failed");
+
+      await ensureProfile(user.id);
     }
+
   };
 
   const loginWithApple = async () => {
@@ -47,28 +44,24 @@ export const useAuthActions = () => {
       return;
     }
 
-    try {
-      const credential = await AppleAuthentication.signInAsync({
-        requestedScopes: [
-          AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
-          AppleAuthentication.AppleAuthenticationScope.EMAIL,
-        ],
-      });
+    const credential = await AppleAuthentication.signInAsync({
+      requestedScopes: [
+        AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+        AppleAuthentication.AppleAuthenticationScope.EMAIL,
+      ],
+    });
 
-      if (!credential.identityToken) throw new Error("No identity token returned by Apple");
+    if (!credential.identityToken) throw new Error("No identity token returned by Apple");
 
-      const { data: { user }, error } = await supabase.auth.signInWithIdToken({
-        provider: "apple",
-        token: credential.identityToken,
-      });
+    const { data: { user }, error } = await supabase.auth.signInWithIdToken({
+      provider: "apple",
+      token: credential.identityToken,
+    });
 
-      if (error || !user) throw error || new Error("Apple login failed");
+    if (error || !user) throw error || new Error("Apple login failed");
 
-      await ensureProfile(user.id);
-    } catch (err: any) {
-      Alert.alert("Login failed", err.message || JSON.stringify(err));
-      console.error(err);
-    }
+    await ensureProfile(user.id);
+
   };
 
   const logout = signOut

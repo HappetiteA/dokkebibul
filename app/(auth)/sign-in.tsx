@@ -1,4 +1,4 @@
-import { Platform, TouchableOpacity, View, Text } from 'react-native'
+import { Platform, TouchableOpacity, View, Text, Alert } from 'react-native'
 import { useAuthActions } from '@/utils/auth'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRouter } from 'expo-router'
@@ -13,16 +13,26 @@ export default function SignIn() {
       <View>
         <TouchableOpacity
           onPress={async () => {
-            await loginWithGoogle();
-            router.replace('/(app)/(tabs)/(home)');
+            try {
+              await loginWithGoogle();
+              router.replace('/(app)/(tabs)/(home)');
+            } catch (err: any) {
+              Alert.alert("Login failed", err.message || JSON.stringify(err));
+              console.error(err);
+            }
           }}
         >
           <Text>Sign in With Google</Text>
         </TouchableOpacity>
         {(Platform.OS === 'ios') ? <TouchableOpacity
           onPress={async () => {
-            await loginWithApple();
-            router.replace('/(app)/(tabs)/(home)');
+            try {
+              await loginWithApple();
+              router.replace('/(app)/(tabs)/(home)');
+            } catch (err: any) {
+              Alert.alert("Login failed", err.message || JSON.stringify(err));
+              console.error(err);
+            }
           }}
         >
           <Text>Sign in With Apple</Text>
