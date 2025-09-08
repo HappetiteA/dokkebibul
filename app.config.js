@@ -30,7 +30,7 @@ export default {
       },
       "config": {
         "googleSignIn": {
-          "certificateHash": "20:C7:27:42:EF:9D:A2:78:0D:E6:67:19:36:ED:A9:1A:8B:F1:0A:7C"
+          "certificateHash": "AB:5E:5A:25:18:D4:37:5C:5A:1C:56:0E:03:6B:FD:7C:0D:00:CE:C5"
         }
       },
       "edgeToEdgeEnabled": true,
