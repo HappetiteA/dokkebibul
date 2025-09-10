@@ -5,7 +5,7 @@ import { supabase } from "@/utils/supabase";
 import { useAuth } from "@/utils/AuthContext";
 
 export const useAuthActions = () => {
-  const { setProfile, signOut } = useAuth();
+  const { signOut } = useAuth();
 
   const loginWithGoogle = async (redirectTo?: string) => {
 
@@ -32,8 +32,6 @@ export const useAuthActions = () => {
       });
 
       if (error || !user) throw error || new Error("Google login failed");
-
-      await ensureProfile(user.id);
     }
 
   };
@@ -59,33 +57,9 @@ export const useAuthActions = () => {
     });
 
     if (error || !user) throw error || new Error("Apple login failed");
-
-    await ensureProfile(user.id);
-
   };
 
   const logout = signOut
-
-  const ensureProfile = async (userId: string) => {
-    const { data: profile, error } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", userId)
-      .maybeSingle();
-
-    if (!profile) {
-      const { data: newProfile, error: insertError } = await supabase
-        .from("profiles")
-        .insert({ id: userId, is_initialized: false })
-        .select()
-        .single();
-
-      if (insertError) throw insertError;
-      setProfile(newProfile);
-    } else {
-      setProfile(profile);
-    }
-  };
 
   return { loginWithGoogle, loginWithApple, logout };
 };

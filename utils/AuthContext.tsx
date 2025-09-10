@@ -78,25 +78,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const { data, error } = await supabase
           .from("profiles")
           .select("*")
-          .eq("id", session.user.id)
+          .eq("user_id", session.user.id)
           .maybeSingle();
 
         if (error) {
           console.error("Profile fetch error:", error);
           setProfile(null);
         } else if (!data) {
-          const { data: newProfile, error: insertError } = await supabase
-            .from("profiles")
-            .insert({ id: session.user.id, is_initialized: false })
-            .select()
-            .single();
-
-          if (insertError) {
-            console.error("Profile creation error:", insertError);
-            setProfile(null);
-          } else {
-            setProfile(newProfile);
-          }
+          console.log("Profile not initialized: redirecting to onboarding...")
+          setProfile(null)
         } else {
           setProfile(data);
         }

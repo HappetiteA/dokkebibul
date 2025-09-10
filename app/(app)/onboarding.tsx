@@ -11,20 +11,11 @@ export default function OnBoarding() {
     } = await supabase.auth.getSession();
     if (!session || sessionError || !session.user) {
       Alert.alert("Error", "User session not found, redirecting to login...");
-      router.replace("/login");
+      router.replace("/(auth)/sign-in");
       return;
     }
     const user = session.user;
-    const { error } = await supabase
-      .from("profiles")
-      .update({ is_initialized: true })
-      .eq("id", user.id);
-    if (error) {
-      Alert.alert("Error", "Failed to update user profile");
-      console.log(error);
-      return;
-    }
-    router.replace("/(tabs)/(home)");
+    router.replace("/(app)/(tabs)/(home)");
   };
   return (
     <View>

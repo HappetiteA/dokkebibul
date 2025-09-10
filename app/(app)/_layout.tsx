@@ -2,13 +2,17 @@ import { Stack, Redirect, usePathname } from "expo-router";
 import { useAuth } from "@/utils/AuthContext";
 
 export default function AppLayout() {
-  const { profile, loading } = useAuth();
+  const { user, profile, loading } = useAuth();
   const pathname = usePathname();
 
   if (loading) return null;
 
-  if (!profile && !pathname.startsWith('/sign-in')) {
+  if (!user && !pathname.startsWith('/sign-in')) {
     return <Redirect href="/sign-in" />;
+  }
+
+  if (user && !profile && !pathname.startsWith('/onboarding')) {
+    return <Redirect href="/(app)/onboarding" />;
   }
 
   return (
