@@ -7,7 +7,7 @@ export default function AppLayout() {
 
   if (loading) return null;
 
-  if (!profile && pathname.startsWith('/(app)')) {
+  if (!profile && !pathname.startsWith('/sign-in')) {
     return <Redirect href="/sign-in" />;
   }
 

@@ -15,6 +15,7 @@ export default function ProfileScreen() {
       <View>
         <Text>Hello Profile</Text>
         <Text>{profile?.id}</Text>
+        <Text>{!!profile ? 1 : 0}</Text>
         <TouchableOpacity
         onPress={async () => {
           try {

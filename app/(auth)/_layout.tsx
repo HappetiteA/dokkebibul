@@ -11,7 +11,7 @@ export default function SignInLayout() {
 
   if (loading) return null;
   
-  if (profile && pathname.startsWith('/(auth)')) {
+  if (profile && pathname.startsWith('/sign-in')) {
     return <Redirect href="/(app)/(tabs)/(home)" />;
   }
 

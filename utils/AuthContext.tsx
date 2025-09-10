@@ -16,6 +16,30 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const { data: listener } = supabase.auth.onAuthStateChange((_event, newSession) => {
       setSession(newSession ?? null);
       setUser(newSession?.user ?? null);
+      switch (_event) {
+        case "INITIAL_SESSION":
+          break;
+
+        case "SIGNED_IN":
+          console.log("User signed in:", newSession?.user?.id);
+          break;
+
+        case "SIGNED_OUT":
+          console.log("User signed out or refresh token invalid");
+          setProfile(null);
+          break;
+
+        case "TOKEN_REFRESHED":
+          console.log("Token was refreshed successfully");
+          break;
+  ``
+        case "USER_UPDATED":
+          console.log("User profile updated:", newSession?.user);
+          break;
+
+        default:
+          console.log("Unhandled event:", _event);
+      }
     });
 
     return () => listener.subscription.unsubscribe();
