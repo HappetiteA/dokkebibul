@@ -1,8 +1,9 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import { Alert, AppState, Platform } from "react-native";
+import { AppState, Platform } from "react-native";
 import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/utils/supabase";
 import { Profile, AuthContextType } from "@/utils/types";
+import { getPushTokenAsync, sendTokenToDBAsync } from "./registerPushToken";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -112,6 +113,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     return () => listener.remove();
   }, []);
+
+  useEffect(() => {
+    if (user && profile) {
+      getPushTokenAsync()
+        .then(token => 
+          {
+            token && sendTokenToDBAsync(user.id, token);
+          }
+        )
+        .catch((err: any) => console.error("Push token error: ", err))
+    }
+  }, [user, profile]);
 
 
   const signOut = async () => {
