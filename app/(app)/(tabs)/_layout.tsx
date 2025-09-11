@@ -1,34 +1,38 @@
 import React from "react";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { Link, Tabs } from "expo-router";
+import { Link, Stack } from "expo-router";
 import { Pressable } from "react-native";
 
 export default function TabLayout() {
   return (
-    <Tabs screenOptions={{ headerShown: false }}>
-      <Tabs.Screen
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen
         name="avatar"
         options={{
-          tabBarLabel: "avatar",
           title: "avatar",
           headerShown: false,
         }}
       />
-      <Tabs.Screen
+      <Stack.Screen
         name="(home)"
         options={{
-          tabBarLabel: "home",
           headerShown: false,
         }}
       />
-      <Tabs.Screen
-        name="profile"
+      <Stack.Screen
+        name="my-profile"
         options={{
-          tabBarLabel: "profile",
-          title: "profile",
+          title: "my-profile",
           headerShown: false,
         }}
       />
-    </Tabs>
+      <Stack.Screen
+        name="other-profile"
+        options={{
+          title: "other-profile",
+          headerShown: false,
+        }}
+      />
+    </Stack>
   );
 }
