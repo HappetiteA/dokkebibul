@@ -8,13 +8,16 @@ export default function ChatListScreen() {
       <DefaultHeader title="Chat List"></DefaultHeader>
       <View>
         <Text>Hello Chat List</Text>
-        <Link href={{ pathname: "/chat/[id]", params: { id: 1 } }} asChild>
+        <Link href={{ pathname: "/chat/[id]", params: { id: "asdf" } }} asChild>
           <Text>Chat Room #1</Text>
         </Link>
-        <Link href={{ pathname: "/chat/[id]", params: { id: 2 } }} asChild>
+        <Link href={{ pathname: "/chat/[id]", params: { id: "ewfd" } }} asChild>
           <Text>Chat Room #2</Text>
         </Link>
-        <Link href={{ pathname: "/chat/[id]", params: { id: 3 } }} asChild>
+        <Link
+          href={{ pathname: "/chat/[id]", params: { id: "awegdv" } }}
+          asChild
+        >
           <Text>Chat Room #3</Text>
         </Link>
       </View>

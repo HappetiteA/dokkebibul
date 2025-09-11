@@ -1,4 +1,4 @@
-import 'dotenv/config'
+import "dotenv/config";
 
 export default {
   "expo": {
@@ -23,10 +23,10 @@ export default {
         "ITSAppUsesNonExemptEncryption": false
       }
     },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+    android: {
+      adaptiveIcon: {
+        foregroundImage: "./assets/images/adaptive-icon.png",
+        backgroundColor: "#ffffff",
       },
       "config": {
         "googleSignIn": {
@@ -36,12 +36,12 @@ export default {
       "edgeToEdgeEnabled": true,
       "package": process.env.ANDROID_PACKAGE
     },
-    "web": {
-      "bundler": "metro",
-      "output": "static",
-      "favicon": "./assets/images/favicon.png"
+    web: {
+      bundler: "metro",
+      output: "static",
+      favicon: "./assets/images/favicon.png",
     },
-    "plugins": [
+    plugins: [
       "expo-router",
       "expo-build-properties",
       "expo-apple-authentication",
@@ -54,18 +54,18 @@ export default {
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#232323",
-          "image": "./assets/images/splash-icon.png",
-          "dark": {
-            "image": "./assets/images/splash-icon-dark.png",
-            "backgroundColor": "#000000"
+          backgroundColor: "#232323",
+          image: "./assets/images/splash-icon.png",
+          dark: {
+            image: "./assets/images/splash-icon-dark.png",
+            backgroundColor: "#000000",
           },
-          "imageWidth": 200
-        }
+          imageWidth: 200,
+        },
       ],
     ],
-    "experiments": {
-      "typedRoutes": true
+    experiments: {
+      typedRoutes: true,
     },
     "extra": {
       "router": {},
@@ -73,6 +73,6 @@ export default {
         "projectId": process.env.EXPO_PUBLIC_EAS_PROJECT_ID
       }
     },
-    "owner": "happetitea"
-  }
-}
+    owner: "happetitea",
+  },
+};
