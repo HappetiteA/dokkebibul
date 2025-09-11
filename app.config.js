@@ -7,7 +7,7 @@ export default {
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": process.env.APP_SCHEME,
+    "scheme": "dokkebibul",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
@@ -18,7 +18,7 @@ export default {
     "ios": {
       "supportsTablet": true,
       "usesAppleSignIn": true,
-      "bundleIdentifier": process.env.IOS_BUNDLE_ID,
+      "bundleIdentifier": "com.happetite.dokkebibul",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -34,7 +34,7 @@ export default {
         }
       },
       "edgeToEdgeEnabled": true,
-      "package": process.env.ANDROID_PACKAGE
+      "package": "com.happetite.dokkebibul"
     },
     web: {
       bundler: "metro",
