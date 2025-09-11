@@ -7,15 +7,14 @@ export default function AppLayout() {
 
   if (loading) return null;
 
-  if (!profile && pathname.startsWith('/(app)')) {
+  if (!profile && pathname.startsWith("/(app)")) {
     return <Redirect href="/sign-in" />;
   }
 
   return (
     <Stack>
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack.Screen name="(home)" options={{ headerShown: false }} />
       <Stack.Screen name="onboarding" options={{ headerShown: false }} />
     </Stack>
   );
 }
-

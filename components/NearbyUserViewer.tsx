@@ -65,7 +65,7 @@ export default function NearbyUserViewer() {
   const onPressNearbyUser = (index: number) => {
     // Chat... User Profile...
     router.navigate({
-      pathname: "/(tabs)/other-profile",
+      pathname: "/(app)/(home)/other-profile",
       params: { user_id: index },
     });
   };
@@ -79,7 +79,11 @@ export default function NearbyUserViewer() {
         borderRadius: userViewerSize / 2,
       }}
     >
-      <TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => {
+          router.navigate("/(app)/(home)/my-profile");
+        }}
+      >
         <NearbyUser
           screenWidth={userViewerSize}
           radius={0}

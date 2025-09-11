@@ -33,7 +33,7 @@ function MyProfileScreenHeader() {
   };
 
   const onProfileClick = () => {
-    router.navigate("/(tabs)/my-profile");
+    router.navigate("/(app)/(home)/my-profile");
   };
 
   return (

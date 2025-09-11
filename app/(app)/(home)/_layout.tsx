@@ -3,19 +3,19 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Link, Stack } from "expo-router";
 import { Pressable } from "react-native";
 
-export default function TabLayout() {
+export default function HomeLayout() {
   return (
     <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen
+        name="index"
+        options={{
+          title: "home",
+        }}
+      />
       <Stack.Screen
         name="avatar"
         options={{
           title: "avatar",
-          headerShown: false,
-        }}
-      />
-      <Stack.Screen
-        name="(home)"
-        options={{
           headerShown: false,
         }}
       />
@@ -33,6 +33,7 @@ export default function TabLayout() {
           headerShown: false,
         }}
       />
+      <Stack.Screen name="chat/list" options={{ title: "Chat List" }} />
     </Stack>
   );
 }
