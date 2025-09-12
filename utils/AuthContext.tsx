@@ -115,6 +115,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     if (user && profile) {
+      console.log(user.id);
       getPushTokenAsync()
         .then(token => 
           {

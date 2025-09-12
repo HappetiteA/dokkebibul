@@ -46,14 +46,18 @@ export const sendTokenToDBAsync = async (userId: string, token: string) => {
   try {
     const { error } = await supabase
       .from("user_push_tokens")
-      .insert(
+      .upsert(
         {
           user_id: userId,
           expo_push_token: token,
         },
+        {
+          onConflict: "expo_push_token"
+        }
       );
     if (error) {
-      handleRegistrationError('Failed to insert push token to DB');
+      console.log(error)
+      handleRegistrationError(`Failed to insert push token to DB: ${error.message}`);
     }
   } catch (e: any) {
     handleRegistrationError(`${e}`);
