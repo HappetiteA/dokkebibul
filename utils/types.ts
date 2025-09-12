@@ -1,8 +1,10 @@
 import { Session, User } from "@supabase/supabase-js";
 
 export type Profile = {
-    id: string;
-    is_initialized: boolean;
+    user_id: string;
+    coins: number;
+    name: string;
+    is_ai_enabled: boolean;
 }
 
 export type AuthContextType = {
@@ -12,4 +14,5 @@ export type AuthContextType = {
   loading: boolean;
   setProfile: React.Dispatch<React.SetStateAction<Profile | null>>;
   signOut: () => Promise<void>;
+  refreshProfile: () => Promise<void>;
 };

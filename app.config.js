@@ -45,6 +45,7 @@ export default {
       "expo-router",
       "expo-build-properties",
       "expo-apple-authentication",
+      "expo-notifications",
       [
         "@react-native-google-signin/google-signin",
         {

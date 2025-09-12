@@ -1,19 +1,34 @@
-import { Text, TouchableOpacity, View } from "react-native";
+import { Text, TouchableOpacity, View, Alert } from "react-native";
 import { useRouter } from "expo-router";
 import headerStyle from "@/components/style/headerStyle";
+import { useAuth } from "@/utils/AuthContext";
+import { useAuthActions } from "@/utils/auth";
 
 export default function MyProfileScreen() {
+  const { logout } = useAuthActions();
+  const { profile } = useAuth();
+  const router = useRouter();
+
   return (
     <>
       <MyProfileScreenHeader />
       <View>
         <View></View>
-        <Text>Name</Text>
+        <Text>Name: {profile?.name}</Text>
         <Text>Location</Text>
         <Text>Description</Text>
         <Text>Account Info</Text>
 
-        <TouchableOpacity>
+        <TouchableOpacity
+          onPress={async () => {
+            try {
+              await logout();
+              router.replace('/(auth)/sign-in');
+            } catch (err: any) {
+              Alert.alert('Logout Error', err.message);
+            }
+          }}
+        >
           <Text>Log Out</Text>
         </TouchableOpacity>
         <TouchableOpacity>

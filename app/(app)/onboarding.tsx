@@ -38,7 +38,7 @@ const Onboarding = () => {
     { key: "color", label: "What is your favorite color?" },
   ];
 
-  const { session, user, profile } = useAuth();
+  const { session, user, profile, refreshProfile } = useAuth();
   const router = useRouter();
 
   const [currentIndex, setCurrentIndex] = useState<number>(0);
@@ -69,7 +69,8 @@ const Onboarding = () => {
             user_id: user.id,
             name: answers["name"],
           },
-        );
+        );      
+      await refreshProfile();
       if (error) {
         console.log(error);
         Alert.alert(`Failed to insert profile to DB: ${error.message}`);
@@ -77,6 +78,8 @@ const Onboarding = () => {
     } catch (err: any) {
       console.log(err);
       Alert.alert(`Failed to insert profile to DB: ${err}`);
+    } finally {
+      router.replace("/(app)/(home)");
     }
   }
 

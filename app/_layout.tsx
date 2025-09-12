@@ -10,7 +10,7 @@ export {
 } from "expo-router";
 
 export const unstable_settings = {
-  initialRouteName: "/(app)/(tabs)/(home)",
+  initialRouteName: "/(app)/(home)",
 };
 
 export default function RootLayout() {
