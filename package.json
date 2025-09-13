@@ -45,7 +45,8 @@
     "react-native-web": "~0.20.0",
     "expo-location": "~18.1.6",
     "expo-notifications": "~0.31.4",
-    "expo-device": "~7.1.4"
+    "expo-device": "~7.1.4",
+    "expo-updates": "~0.28.17"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
