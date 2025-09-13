@@ -76,7 +76,7 @@ export default {
     },
     owner: "happetitea",
     "updates": {
-      "url": f`https://u.expo.dev/${process.env.EXPO_PUBLIC_EAS_PROJECT_ID}`
+      "url": `https://u.expo.dev/${process.env.EXPO_PUBLIC_EAS_PROJECT_ID}`
     },
     "runtimeVersion": {
       "policy": "appVersion"
