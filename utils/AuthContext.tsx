@@ -1,9 +1,20 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import type { Dispatch, SetStateAction } from "react";
 import { AppState, Platform } from "react-native";
 import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/utils/supabase";
-import { Profile, AuthContextType } from "@/utils/types";
+import { Profile } from "@/utils/global.types";
 import { getPushTokenAsync, sendTokenToDBAsync } from "./registerPushToken";
+
+type AuthContextType = {
+  user: User | null;
+  session: Session | null;
+  profile: Profile | null;
+  loading: boolean;
+  setProfile: Dispatch<SetStateAction<Profile | null>>;
+  signOut: () => Promise<void>;
+  refreshProfile: () => Promise<void>;
+};
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 

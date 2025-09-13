@@ -2,7 +2,7 @@ import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import { supabase } from "@/utils/supabase";
 
-export const getPushTokenAsync = async () => {
+export const getPushTokenAsync = async (): Promise<string> => {
   try {
     if (!Device.isDevice) {
       throw new Error('Must use physical device for push notifications');
@@ -28,7 +28,7 @@ export const getPushTokenAsync = async () => {
     return token;
   } catch (err: any) {
     console.error(err);
-    throw new Error(err);
+    throw new Error(String(err));
   }
 }
 

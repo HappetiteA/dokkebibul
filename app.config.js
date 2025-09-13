@@ -2,7 +2,7 @@ import "dotenv/config";
 
 export default {
   "expo": {
-    "name": "snu-happetite-dokkaebibul",
+    "name": "dokkaebibul",
     "slug": "dokkaebibul",
     "version": "1.0.0",
     "orientation": "portrait",

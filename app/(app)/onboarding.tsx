@@ -48,7 +48,7 @@ const Onboarding = () => {
     setAnswers((prev) => ({ ...prev, [key]: value }));
   };
 
-  const handleSubmit = async ( answers: Record<string, string> ) => {
+  const handleSubmit = async (answers: Record<string, string>) => {
     if (!user || !user.id || !session) {
       console.error("User session missing");
       Alert.alert("User session missing, please sign in again");
@@ -57,7 +57,7 @@ const Onboarding = () => {
     }
     if (profile) {
       console.error("User profile already exists in DB");
-      Alert.alert("User profile already exists in DB");
+      Alert.alert("User profile already exists");
       router.replace("/(app)/(home)");
       return;
     }
