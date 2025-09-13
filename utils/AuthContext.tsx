@@ -33,7 +33,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         case "TOKEN_REFRESHED":
           console.log("Token was refreshed successfully");
           break;
-  ``
+  
         case "USER_UPDATED":
           console.log("User profile updated:", newSession?.user);
           break;
@@ -67,12 +67,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const refreshProfile = async () => {
+    if (!session?.user) return;
     setLoading(true);
     try {
       const { data, error } = await supabase
         .from("profiles")
         .select("*")
-        .eq("user_id", session!.user.id)
+        .eq("user_id", session.user.id)
         .maybeSingle();
 
       if (error) {
@@ -115,14 +116,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     if (user && profile) {
-      console.log(user.id);
-      getPushTokenAsync()
-        .then(token => 
-          {
-            token && sendTokenToDBAsync(user.id, token);
-          }
-        )
-        .catch((err: any) => console.error("Push token error: ", err))
+      (async () => {
+        try {
+          const token = await getPushTokenAsync();
+          await sendTokenToDBAsync(user.id, token);
+        } catch (err: any) {
+          console.error("Push token error:", err);
+        }
+      })();
     }
   }, [user, profile]);
 

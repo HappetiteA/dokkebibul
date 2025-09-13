@@ -2,43 +2,33 @@ import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import { supabase } from "@/utils/supabase";
 
-const handleRegistrationError = (errorMessage: string) => {
-  alert(errorMessage);
-  throw new Error(errorMessage);
-}
-
 export const getPushTokenAsync = async () => {
-  if (!Device.isDevice) {
-    handleRegistrationError('Must use physical device for push notifications');
-    return;
-  }
-
-  const { status: existingStatus } = await Notifications.getPermissionsAsync();
-  let finalStatus = existingStatus;
-  if (existingStatus !== "granted") {
-    const { status } = await Notifications.requestPermissionsAsync();
-    finalStatus = status;
-  }
-  if (finalStatus !== "granted") {
-    handleRegistrationError('Permission not granted to get push token for push notification!');
-    return;
-  }
-  const projectId = process.env.EXPO_PUBLIC_EAS_PROJECT_ID;
-  if (!projectId) {
-    handleRegistrationError('Project ID not found');
-    return;
-  }
   try {
+    if (!Device.isDevice) {
+      throw new Error('Must use physical device for push notifications');
+    }
+    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+    if (existingStatus !== "granted") {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+    if (finalStatus !== "granted") {
+      throw new Error('Permission not granted to get push token for push notification!');
+    }
+    const projectId = process.env.EXPO_PUBLIC_EAS_PROJECT_ID;
+    if (!projectId) {
+      throw new Error('Project ID not found');
+    }
     const token = (
       await Notifications.getExpoPushTokenAsync({
-        projectId: process.env.EXPO_PUBLIC_EAS_PROJECT_ID,
+        projectId,
       })
     ).data;
-    console.log("Expo push token:", token);
     return token;
-  } catch (e: any) {
-    handleRegistrationError(`${e}`);
-    return;
+  } catch (err: any) {
+    console.error(err);
+    throw new Error(err);
   }
 }
 
@@ -56,10 +46,10 @@ export const sendTokenToDBAsync = async (userId: string, token: string) => {
         }
       );
     if (error) {
-      console.log(error)
-      handleRegistrationError(`Failed to insert push token to DB: ${error.message}`);
+      throw new Error(`Failed to insert push token to DB: ${error.message}`);
     }
-  } catch (e: any) {
-    handleRegistrationError(`${e}`);
+  } catch (err: any) {
+    console.error(err);
+    throw new Error(err);
   }
 }

@@ -48,15 +48,15 @@ const Onboarding = () => {
     setAnswers((prev) => ({ ...prev, [key]: value }));
   };
 
-  const handleSubmit = async ( answers: {[key: string]: string} ) => {
+  const handleSubmit = async ( answers: Record<string, string> ) => {
     if (!user || !user.id || !session) {
-      console.log("User session missing");
+      console.error("User session missing");
       Alert.alert("User session missing, please sign in again");
       router.replace("/(auth)/sign-in");
       return;
     }
     if (profile) {
-      console.log("User profile already exists in DB");
+      console.error("User profile already exists in DB");
       Alert.alert("User profile already exists in DB");
       router.replace("/(app)/(home)");
       return;
@@ -67,19 +67,19 @@ const Onboarding = () => {
         .insert(
           {
             user_id: user.id,
-            name: answers["name"],
+            name: answers["name"]?.trim(),
           },
         );      
-      await refreshProfile();
-      if (error) {
-        console.log(error);
-        Alert.alert(`Failed to insert profile to DB: ${error.message}`);
-      }
+        if (error) {
+          console.error(error);
+          Alert.alert(`Failed to insert profile to DB: ${error.message}`);
+          return;
+        }
+        await refreshProfile();
+        router.replace("/(app)/(home)");
     } catch (err: any) {
-      console.log(err);
+      console.error(err);
       Alert.alert(`Failed to insert profile to DB: ${err}`);
-    } finally {
-      router.replace("/(app)/(home)");
     }
   }
 

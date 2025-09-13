@@ -20,7 +20,10 @@ export const useAuthActions = () => {
         iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
       });
 
-      await GoogleSignin.hasPlayServices();
+      if (Platform.OS === "android") {
+        await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+      }
+      
       const userInfo = await GoogleSignin.signIn();
 
       if (!userInfo.data) throw new Error("Google user data missing");

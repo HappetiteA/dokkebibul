@@ -23,7 +23,6 @@ export default function MyProfileScreen() {
           onPress={async () => {
             try {
               await logout();
-              router.replace('/(auth)/sign-in');
             } catch (err: any) {
               Alert.alert('Logout Error', err.message);
             }

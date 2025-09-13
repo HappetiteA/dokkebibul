@@ -15,7 +15,6 @@ export default function SignIn() {
           onPress={async () => {
             try {
               await loginWithGoogle();
-              router.replace('/(app)/(home)');
             } catch (err: any) {
               Alert.alert("Login failed", err.message || JSON.stringify(err));
               console.error(err);
@@ -28,7 +27,6 @@ export default function SignIn() {
           onPress={async () => {
             try {
               await loginWithApple();
-              router.replace('/(app)/(home)');
             } catch (err: any) {
               Alert.alert("Login failed", err.message || JSON.stringify(err));
               console.error(err);
