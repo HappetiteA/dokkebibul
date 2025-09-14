@@ -6,13 +6,17 @@ export {
 } from "expo-router";
 
 export default function SignInLayout() {
-  const { profile, loading } = useAuth();
+  const { user, profile, loading } = useAuth();
   const pathname = usePathname();
 
   if (loading) return null;
   
-  if (profile && pathname.startsWith('/(auth)')) {
-    return <Redirect href="/(app)/(tabs)/(home)" />;
+  if (profile && pathname.startsWith('/sign-in')) {
+    return <Redirect href="/(app)/(home)" />;
+  }
+
+  if (user && !profile && pathname.startsWith('/sign-in')) {
+    return <Redirect href="/(app)/onboarding" />;
   }
 
   return (

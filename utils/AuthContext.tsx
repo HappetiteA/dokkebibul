@@ -1,8 +1,20 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import { Alert, AppState, Platform } from "react-native";
+import type { Dispatch, SetStateAction } from "react";
+import { AppState, Platform } from "react-native";
 import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/utils/supabase";
-import { Profile, AuthContextType } from "@/utils/types";
+import { Profile } from "@/utils/global.types";
+import { getPushTokenAsync, sendTokenToDBAsync } from "./registerPushToken";
+
+type AuthContextType = {
+  user: User | null;
+  session: Session | null;
+  profile: Profile | null;
+  loading: boolean;
+  setProfile: Dispatch<SetStateAction<Profile | null>>;
+  signOut: () => Promise<void>;
+  refreshProfile: () => Promise<void>;
+};
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -16,6 +28,30 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const { data: listener } = supabase.auth.onAuthStateChange((_event, newSession) => {
       setSession(newSession ?? null);
       setUser(newSession?.user ?? null);
+      switch (_event) {
+        case "INITIAL_SESSION":
+          break;
+
+        case "SIGNED_IN":
+          console.log("User signed in:", newSession?.user?.id);
+          break;
+
+        case "SIGNED_OUT":
+          console.log("User signed out or refresh token invalid");
+          setProfile(null);
+          break;
+
+        case "TOKEN_REFRESHED":
+          console.log("Token was refreshed successfully");
+          break;
+  
+        case "USER_UPDATED":
+          console.log("User profile updated:", newSession?.user);
+          break;
+
+        default:
+          console.log("Unhandled event:", _event);
+      }
     });
 
     return () => listener.subscription.unsubscribe();
@@ -41,50 +77,40 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     init();
   }, []);
 
+  const refreshProfile = async () => {
+    if (!session?.user) return;
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("user_id", session.user.id)
+        .maybeSingle();
+
+      if (error) {
+        console.error("Profile fetch error:", error);
+        setProfile(null);
+      } else if (!data) {
+        console.log("Profile not initialized: redirecting to onboarding...")
+        setProfile(null)
+      } else {
+        setProfile(data);
+      }
+    } catch (err) {
+      console.error("Unexpected profile fetch error:", err);
+      setProfile(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (!session?.user) {
       setProfile(null);
       setLoading(false);
       return;
     }
-
-    const fetchProfile = async () => {
-      setLoading(true);
-      try {
-        const { data, error } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", session.user.id)
-          .maybeSingle();
-
-        if (error) {
-          console.error("Profile fetch error:", error);
-          setProfile(null);
-        } else if (!data) {
-          const { data: newProfile, error: insertError } = await supabase
-            .from("profiles")
-            .insert({ id: session.user.id, is_initialized: false })
-            .select()
-            .single();
-
-          if (insertError) {
-            console.error("Profile creation error:", insertError);
-            setProfile(null);
-          } else {
-            setProfile(newProfile);
-          }
-        } else {
-          setProfile(data);
-        }
-      } catch (err) {
-        console.error("Unexpected profile fetch error:", err);
-        setProfile(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProfile();
+    refreshProfile();
   }, [session]);
 
 
@@ -99,6 +125,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => listener.remove();
   }, []);
 
+  useEffect(() => {
+    if (!user?.id || !profile?.user_id) return;
+    (async () => {
+      try {
+        const token = await getPushTokenAsync();
+        await sendTokenToDBAsync(user.id, token);
+      } catch (err: any) {
+        console.error(`Push token error: ${(err instanceof Error ? err.message : new Error(String(err)))}`);
+      }
+    })();
+  }, [user?.id, profile?.user_id]);
+
 
   const signOut = async () => {
     await supabase.auth.signOut();
@@ -106,7 +144,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, profile, loading, setProfile, signOut }}>
+    <AuthContext.Provider value={{ user, session, profile, loading, setProfile, signOut, refreshProfile }}>
       {children}
     </AuthContext.Provider>
   );
