@@ -126,17 +126,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   useEffect(() => {
-    if (user && profile) {
-      (async () => {
-        try {
-          const token = await getPushTokenAsync();
-          await sendTokenToDBAsync(user.id, token);
-        } catch (err: any) {
-          console.error(`Push token error: ${(err instanceof Error ? err.message : new Error(String(err)))}`);
-        }
-      })();
-    }
-  }, [user, profile]);
+    if (!user?.id || !profile?.user_id) return;
+    (async () => {
+      try {
+        const token = await getPushTokenAsync();
+        await sendTokenToDBAsync(user.id, token);
+      } catch (err: any) {
+        console.error(`Push token error: ${(err instanceof Error ? err.message : new Error(String(err)))}`);
+      }
+    })();
+  }, [user?.id, profile?.user_id]);
 
 
   const signOut = async () => {
