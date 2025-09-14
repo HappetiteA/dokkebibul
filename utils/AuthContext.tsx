@@ -132,7 +132,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           const token = await getPushTokenAsync();
           await sendTokenToDBAsync(user.id, token);
         } catch (err: any) {
-          console.error("Push token error:", err);
+          console.error(`Push token error: ${(err instanceof Error ? err.message : new Error(String(err)))}`);
         }
       })();
     }

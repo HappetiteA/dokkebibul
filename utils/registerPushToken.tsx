@@ -27,8 +27,7 @@ export const getPushTokenAsync = async (): Promise<string> => {
     ).data;
     return token;
   } catch (err: any) {
-    console.error(err);
-    throw new Error(String(err));
+    throw (err instanceof Error ? err : new Error(String(err)));
   }
 }
 
@@ -49,7 +48,6 @@ export const sendTokenToDBAsync = async (userId: string, token: string) => {
       throw new Error(`Failed to insert push token to DB: ${error.message}`);
     }
   } catch (err: any) {
-    console.error(err);
-    throw new Error(err);
+    throw (err instanceof Error ? err : new Error(String(err)));
   }
 }
