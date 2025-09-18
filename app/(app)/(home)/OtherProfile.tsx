@@ -1,20 +1,33 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import headerStyle from "@/components/style/headerStyle";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/utils/supabase";
+import { PostgrestError } from "@supabase/supabase-js";
+import { getProfileById } from "@/hooks/data";
 
-interface IParams {
+interface IProfile {
+  name: string;
   user_id: string;
 }
 
 export default function OtherProfileScreen() {
   const router = useRouter();
   const { user_id } = useLocalSearchParams();
+  const [userInfo, setUserInfo] = useState<IProfile>();
   if (Array.isArray(user_id)) {
     return null;
   }
 
   const [follow, setFollow] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      const profile = await getProfileById(user_id);
+      if (profile == null) return;
+      setUserInfo(profile);
+    })();
+  }, []);
 
   const onFollowBtnPressed = () => {
     setFollow((c) => !c);
@@ -27,7 +40,7 @@ export default function OtherProfileScreen() {
     <>
       <OtherProfileScreenHeader />
       <View>
-        <Text>Name #{user_id}</Text>
+        <Text>{userInfo?.name}</Text>
         <Text>Location</Text>
         <Text>Description</Text>
         <Text>Account Info</Text>

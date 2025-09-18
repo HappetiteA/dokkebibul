@@ -240,6 +240,17 @@ export type Database = {
           similarity: number
         }[]
       }
+      select_profile_by_user_id: {
+        Args: { uid: string }
+        Returns: {
+          name: string
+          user_id: string
+        }[]
+      }
+      update_conversations_chat_enabled: {
+        Args: { new_chat_enabled: boolean; u1id: string; u2id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never

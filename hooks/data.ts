@@ -22,12 +22,25 @@ export const getNearbyWisps = async (user_id: string) => {
       console.error("Error fetching data:", error);
       return null;
     }
-
-    console.log("All rows:", data);
     return data;
   } catch (err) {
     console.error("Unexpected error:", err);
     return null;
+  }
+};
+
+export const getProfileById = async (user_id: string) => {
+  let { data, error } = await supabase.rpc("select_profile_by_user_id", {
+    uid: user_id,
+  });
+  if (error) {
+    console.error(error);
+    return null;
+  } else if (data == null) {
+    console.log("Profile Data is Null");
+    return null;
+  } else {
+    return data[0];
   }
 };
 
