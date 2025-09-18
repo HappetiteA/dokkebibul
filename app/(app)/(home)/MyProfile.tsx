@@ -24,7 +24,7 @@ export default function MyProfileScreen() {
             try {
               await logout();
             } catch (err: any) {
-              Alert.alert('Logout Error', err.message);
+              Alert.alert("Logout Error", err.message);
             }
           }}
         >
@@ -47,7 +47,7 @@ function MyProfileScreenHeader() {
   };
 
   const onProfileClick = () => {
-    router.navigate("/(app)/(home)/my-profile");
+    router.navigate("/(app)/(home)/MyProfile");
   };
 
   return (

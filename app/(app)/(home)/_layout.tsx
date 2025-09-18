@@ -20,16 +20,16 @@ export default function HomeLayout() {
         }}
       />
       <Stack.Screen
-        name="my-profile"
+        name="MyProfile"
         options={{
-          title: "my-profile",
+          title: "MyProfile",
           headerShown: false,
         }}
       />
       <Stack.Screen
-        name="other-profile"
+        name="OtherProfile"
         options={{
-          title: "other-profile",
+          title: "OtherProfile",
           headerShown: false,
         }}
       />

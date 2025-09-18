@@ -1,6 +1,5 @@
 # Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
 
-.env
 credentials/
 
 # dependencies
@@ -43,4 +42,7 @@ yarn-error.*
 
 Gemfile
 Gemfile.lock
+
+.env
 google-services.json
+PayLoad
