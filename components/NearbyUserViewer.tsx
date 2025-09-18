@@ -1,6 +1,9 @@
 import { SampleCoordinateData } from "@/dev/SampleData";
+import { getNearbyWisps } from "@/hooks/data";
+import useCurrentLocation from "@/hooks/useCurrentLocation";
+import { useAuth } from "@/utils/AuthContext";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Dimensions,
   StyleSheet,
@@ -9,9 +12,15 @@ import {
   View,
 } from "react-native";
 
-interface Coord {
-  lat: number;
-  lon: number;
+interface ILocation {
+  latitude: number;
+  longitude: number;
+}
+
+interface IOtherLocation {
+  location: unknown;
+  updated_at: string;
+  user_id: string;
 }
 
 interface NearbyUserProp {
@@ -21,15 +30,15 @@ interface NearbyUserProp {
   children: React.ReactNode;
 }
 
-function haversineDistance(A: Coord, B: Coord): number {
+function haversineDistance(A: ILocation, B: ILocation): number {
   const toRadians = (degrees: number) => degrees * (Math.PI / 180);
 
   const R = 6371000; // 지구 반지름 (미터)
 
-  const lat1Rad = toRadians(A.lat);
-  const lat2Rad = toRadians(B.lat);
-  const deltaLat = toRadians(B.lat - A.lat);
-  const deltaLon = toRadians(B.lon - A.lon);
+  const lat1Rad = toRadians(A.latitude);
+  const lat2Rad = toRadians(B.latitude);
+  const deltaLat = toRadians(B.latitude - A.latitude);
+  const deltaLon = toRadians(B.longitude - A.longitude);
 
   const a =
     Math.sin(deltaLat / 2) ** 2 +
@@ -43,30 +52,44 @@ function haversineDistance(A: Coord, B: Coord): number {
 const MaxRange = 100;
 
 export default function NearbyUserViewer() {
+  // const { location, errorMsg, refreshLocation } = useCurrentLocation();
+  const { profile } = useAuth();
+  const user_id = profile?.user_id;
+
   const { width, height } = Dimensions.get("window");
   const userViewerSize = Math.min(width, height) - 20;
   const router = useRouter();
-  const [selfCoord, setSelfCoord] = useState<Coord>(
-    SampleCoordinateData.selfCoord
-  );
-  const [avatarCoordList, setAvatarCoordList] = useState<Array<Coord>>(
-    SampleCoordinateData.avatarCoordList
-  );
 
-  const getRadius = (avatar: Coord, self: Coord) => {
-    const dist = haversineDistance(avatar, self);
-    if (dist < MaxRange / 2) {
-      return (userViewerSize / 2) * (0.3 + 0.1 * Math.random());
-    } else {
-      return (userViewerSize / 2) * (0.7 + 0.1 * Math.random());
-    }
-  };
+  // const [selfCoord, setSelfCoord] = useState<ILocation>();
+  const [avatarData, setAvatarData] = useState<Array<IOtherLocation>>();
 
-  const onPressNearbyUser = (index: number) => {
+  useEffect(() => {
+    const getNearbyAvatarData = async () => {
+      if (profile != null) {
+        if (user_id == undefined) return;
+
+        const data = await getNearbyWisps(user_id);
+        setAvatarData(data ?? []);
+      }
+    };
+
+    getNearbyAvatarData();
+  });
+
+  // const getRadius = (avatar: ILocation, self: ILocation) => {
+  //   const dist = haversineDistance(avatar, self);
+  //   if (dist < MaxRange / 2) {
+  //     return (userViewerSize / 2) * (0.3 + 0.1 * Math.random());
+  //   } else {
+  //     return (userViewerSize / 2) * (0.7 + 0.1 * Math.random());
+  //   }
+  // };
+
+  const onPressNearbyUser = (user_id: string) => {
     // Chat... User Profile...
     router.navigate({
       pathname: "/(app)/(home)/OtherProfile",
-      params: { user_id: index },
+      params: { user_id: user_id },
     });
   };
 
@@ -81,7 +104,7 @@ export default function NearbyUserViewer() {
     >
       <TouchableOpacity
         onPress={() => {
-          router.navigate("/(app)/(home)/OtherProfile");
+          router.navigate("/(app)/(home)/MyProfile");
         }}
       >
         <NearbyUser
@@ -91,17 +114,17 @@ export default function NearbyUserViewer() {
           children={<Text>Me</Text>}
         />
       </TouchableOpacity>
-      {avatarCoordList.map((value, index) => (
+      {avatarData?.map((value, index) => (
         <TouchableOpacity
           key={index}
           onPress={() => {
-            onPressNearbyUser(index);
+            onPressNearbyUser(value.user_id);
           }}
         >
           <NearbyUser
             screenWidth={userViewerSize}
-            radius={getRadius(value, selfCoord)}
-            angle={(2 * Math.PI * index) / avatarCoordList.length}
+            radius={100}
+            angle={(2 * Math.PI * index) / avatarData.length}
             children={<Text>User</Text>}
           />
         </TouchableOpacity>
