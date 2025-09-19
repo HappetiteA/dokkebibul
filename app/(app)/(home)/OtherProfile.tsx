@@ -15,14 +15,13 @@ export default function OtherProfileScreen() {
   const router = useRouter();
   const { user_id } = useLocalSearchParams();
   const [userInfo, setUserInfo] = useState<IProfile>();
-  if (Array.isArray(user_id)) {
-    return null;
-  }
 
   const [follow, setFollow] = useState(false);
 
   useEffect(() => {
     (async () => {
+      if (typeof user_id !== "string") return;
+
       const profile = await getProfileById(user_id);
       if (profile == null) return;
       setUserInfo(profile);
@@ -34,8 +33,10 @@ export default function OtherProfileScreen() {
   };
 
   const onChatBtnPressed = () => {
+    if (typeof user_id !== "string") return;
     router.navigate({ pathname: "/chat/[id]", params: { id: user_id } });
   };
+
   return (
     <>
       <OtherProfileScreenHeader />

@@ -1,12 +1,12 @@
 import { supabase } from "@/utils/supabase";
 
-interface ILocation {
+export interface ILocation {
   latitude: number;
   longitude: number;
 }
 
-interface IOtherLocation {
-  location: string;
+export interface IOtherLocation {
+  location: unknown;
   updated_at: string;
   user_id: string;
 }

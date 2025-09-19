@@ -1,5 +1,5 @@
 import { SampleCoordinateData } from "@/dev/SampleData";
-import { getNearbyWisps } from "@/hooks/data";
+import { getNearbyWisps, ILocation, IOtherLocation } from "@/hooks/data";
 import useCurrentLocation from "@/hooks/useCurrentLocation";
 import { useAuth } from "@/utils/AuthContext";
 import { useRouter } from "expo-router";
@@ -11,17 +11,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-
-interface ILocation {
-  latitude: number;
-  longitude: number;
-}
-
-interface IOtherLocation {
-  location: unknown;
-  updated_at: string;
-  user_id: string;
-}
 
 interface NearbyUserProp {
   screenWidth: number;
@@ -49,7 +38,7 @@ function haversineDistance(A: ILocation, B: ILocation): number {
   return R * c;
 }
 
-const MaxRange = 100;
+// const MaxRange = 100;
 
 export default function NearbyUserViewer() {
   // const { location, errorMsg, refreshLocation } = useCurrentLocation();
@@ -69,12 +58,13 @@ export default function NearbyUserViewer() {
         if (user_id == undefined) return;
 
         const data = await getNearbyWisps(user_id);
+        console.log(data);
         setAvatarData(data ?? []);
       }
     };
 
     getNearbyAvatarData();
-  });
+  }, [user_id]);
 
   // const getRadius = (avatar: ILocation, self: ILocation) => {
   //   const dist = haversineDistance(avatar, self);
