@@ -26,7 +26,7 @@ export default function OtherProfileScreen() {
       if (profile == null) return;
       setUserInfo(profile);
     })();
-  }, []);
+  }, [user_id]);
 
   const onFollowBtnPressed = () => {
     setFollow((c) => !c);

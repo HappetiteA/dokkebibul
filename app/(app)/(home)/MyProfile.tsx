@@ -1,4 +1,4 @@
-import { Text, TouchableOpacity, View, Alert } from "react-native";
+import { Text, TouchableOpacity, View, Alert, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import headerStyle from "@/components/style/headerStyle";
 import { useAuth } from "@/utils/AuthContext";
@@ -14,10 +14,29 @@ export default function MyProfileScreen() {
       <MyProfileScreenHeader />
       <View>
         <View></View>
-        <Text>Name: {profile?.name}</Text>
+        <Text>{profile?.name}</Text>
         <Text>Location</Text>
         <Text>Description</Text>
         <Text>Account Info</Text>
+
+        <View>
+          <TouchableOpacity
+            onPress={() => {
+              router.navigate("/FollowersList");
+            }}
+          >
+            <Text>{102}</Text>
+            <Text>팔로우</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              router.navigate("/FollowingsList");
+            }}
+          >
+            <Text>{98}</Text>
+            <Text>팔로잉</Text>
+          </TouchableOpacity>
+        </View>
 
         <TouchableOpacity
           onPress={async () => {
@@ -37,6 +56,8 @@ export default function MyProfileScreen() {
     </>
   );
 }
+
+const styles = StyleSheet.create({});
 
 function MyProfileScreenHeader() {
   const router = useRouter();

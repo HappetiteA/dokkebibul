@@ -33,6 +33,20 @@ export default function HomeLayout() {
           headerShown: false,
         }}
       />
+      <Stack.Screen
+        name="FollowersList"
+        options={{
+          title: "FollowersList",
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="FollowingsList"
+        options={{
+          title: "FollowingsList",
+          headerShown: false,
+        }}
+      />
       <Stack.Screen name="chat/list" options={{ title: "Chat List" }} />
     </Stack>
   );
