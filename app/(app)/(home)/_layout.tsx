@@ -47,7 +47,6 @@ export default function HomeLayout() {
           headerShown: false,
         }}
       />
-      <Stack.Screen name="chat/list" options={{ title: "Chat List" }} />
     </Stack>
   );
 }
