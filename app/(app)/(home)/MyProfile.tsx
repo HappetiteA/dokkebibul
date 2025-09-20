@@ -5,22 +5,19 @@ import { useAuth } from "@/utils/AuthContext";
 import { useAuthActions } from "@/utils/auth";
 
 export default function MyProfileScreen() {
-  const { logout } = useAuthActions();
   const { profile } = useAuth();
   const router = useRouter();
 
   return (
     <>
       <MyProfileScreenHeader />
-      <View>
-        <View></View>
-        <Text>{profile?.name}</Text>
-        <Text>Location</Text>
-        <Text>Description</Text>
-        <Text>Account Info</Text>
+      <View style={styles.container}>
+        <View style={styles.profileImage}></View>
+        <Text style={styles.nameText}>{profile?.name}</Text>
 
-        <View>
+        <View style={styles.followView}>
           <TouchableOpacity
+            style={styles.followViewBtn}
             onPress={() => {
               router.navigate("/FollowersList");
             }}
@@ -29,6 +26,7 @@ export default function MyProfileScreen() {
             <Text>팔로우</Text>
           </TouchableOpacity>
           <TouchableOpacity
+            style={styles.followViewBtn}
             onPress={() => {
               router.navigate("/FollowingsList");
             }}
@@ -38,26 +36,36 @@ export default function MyProfileScreen() {
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity
-          onPress={async () => {
-            try {
-              await logout();
-            } catch (err: any) {
-              Alert.alert("Logout Error", err.message);
-            }
-          }}
-        >
-          <Text>Log Out</Text>
-        </TouchableOpacity>
-        <TouchableOpacity>
-          <Text>Delete Account</Text>
-        </TouchableOpacity>
+        <Text>Description</Text>
       </View>
     </>
   );
 }
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  container: {
+    alignItems: "center",
+    padding: 20,
+  },
+  profileImage: {
+    width: 108,
+    height: 108,
+    backgroundColor: "gray",
+  },
+  nameText: {
+    margin: 10,
+    fontSize: 20,
+  },
+  followView: {
+    marginVertical: 10,
+    width: "30%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  followViewBtn: {
+    alignItems: "center",
+  },
+});
 
 function MyProfileScreenHeader() {
   const router = useRouter();

@@ -59,6 +59,10 @@ function MainScreenHeader() {
     router.navigate("/(app)/(home)/MyProfile");
   };
 
+  const onSettingsClick = () => {
+    router.navigate("/(app)/(home)/Settings");
+  };
+
   return (
     <View style={headerStyle.container}>
       <View style={headerStyle.content}>
@@ -66,7 +70,10 @@ function MainScreenHeader() {
           <Text>LOGO & TEXT</Text>
         </View>
         <View style={headerStyle.right}>
-          <TouchableOpacity style={headerStyle.button}>
+          <TouchableOpacity
+            style={headerStyle.button}
+            onPress={onSettingsClick}
+          >
             <Text>Setting</Text>
           </TouchableOpacity>
           <TouchableOpacity style={headerStyle.button} onPress={onProfileClick}>
