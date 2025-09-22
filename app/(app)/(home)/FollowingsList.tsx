@@ -1,13 +1,28 @@
 import DefaultHeader from "@/components/DefaultHeader";
+import { getFollowings } from "@/hooks/data";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 
+interface IFollowing {
+  created_at: string;
+  dst_id: string;
+  dst_name: string;
+  id: string;
+  src_id: string;
+  src_name: string;
+}
+
 export default function FollowingsList() {
   const router = useRouter();
-  const [followers, setFollowers] = useState<string[]>(["a", "b", "c", "d"]);
+  const [followings, setFollowings] = useState<IFollowing[]>([]);
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    (async () => {
+      const followData = await getFollowings();
+      setFollowings(followData ?? []);
+    })();
+  }, [followings]);
 
   const MoveToOtherProfile = (user_id: string) => {
     router.navigate({
@@ -20,14 +35,14 @@ export default function FollowingsList() {
     <>
       <DefaultHeader title="팔로잉 목록" />
       <View>
-        {followers.map((value, index) => (
+        {followings.map((value) => (
           <TouchableOpacity
-            key={index}
+            key={value.dst_id}
             onPress={() => {
-              MoveToOtherProfile("uuid from database HERE");
+              MoveToOtherProfile(value.dst_id);
             }}
           >
-            <Text>Profile : {value}</Text>
+            <Text>{value.dst_name}</Text>
           </TouchableOpacity>
         ))}
       </View>

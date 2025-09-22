@@ -240,6 +240,45 @@ export type Database = {
           similarity: number
         }[]
       }
+      select_blocks: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          created_at: string
+          dst_id: string
+          dst_name: string
+          id: string
+          src_id: string
+          src_name: string
+        }[]
+      }
+      select_conversations: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          created_at: string
+          id: string
+          user1_ai_enabled: boolean
+          user1_chat_enabled: boolean
+          user1_id: string
+          user1_name: string
+          user1_noti_enabled: boolean
+          user2_ai_enabled: boolean
+          user2_chat_enabled: boolean
+          user2_id: string
+          user2_name: string
+          user2_noti_enabled: boolean
+        }[]
+      }
+      select_follows: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          created_at: string
+          dst_id: string
+          dst_name: string
+          id: string
+          src_id: string
+          src_name: string
+        }[]
+      }
       select_profile_by_user_id: {
         Args: { uid: string }
         Returns: {

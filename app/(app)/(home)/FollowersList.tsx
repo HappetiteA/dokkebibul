@@ -7,7 +7,9 @@ export default function FollowersList() {
   const router = useRouter();
   const [followers, setFollowers] = useState(["a", "b", "c", "d"]);
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    (async () => {})();
+  }, [followers]);
 
   const MoveToOtherProfile = (user_id: string) => {
     router.navigate({
@@ -18,7 +20,7 @@ export default function FollowersList() {
 
   return (
     <>
-      <DefaultHeader title="팔로잉 목록" />
+      <DefaultHeader title="팔로우 목록" />
       <View>
         {followers.map((value, index) => (
           <TouchableOpacity
