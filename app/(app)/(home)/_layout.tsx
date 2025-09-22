@@ -20,20 +20,40 @@ export default function HomeLayout() {
         }}
       />
       <Stack.Screen
-        name="my-profile"
+        name="MyProfile"
         options={{
-          title: "my-profile",
+          title: "MyProfile",
           headerShown: false,
         }}
       />
       <Stack.Screen
-        name="other-profile"
+        name="OtherProfile"
         options={{
-          title: "other-profile",
+          title: "OtherProfile",
           headerShown: false,
         }}
       />
-      <Stack.Screen name="chat/list" options={{ title: "Chat List" }} />
+      <Stack.Screen
+        name="FollowersList"
+        options={{
+          title: "FollowersList",
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="FollowingsList"
+        options={{
+          title: "FollowingsList",
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="Settings"
+        options={{
+          title: "Settings",
+          headerShown: false,
+        }}
+      />
     </Stack>
   );
 }

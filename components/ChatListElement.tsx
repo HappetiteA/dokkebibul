@@ -3,17 +3,19 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 interface IChatListElementProp {
   id: string;
+  other_name: string;
   onLongPress: () => void;
 }
 
 export default function ChatListElement({
   id,
+  other_name,
   onLongPress,
 }: IChatListElementProp) {
   return (
     <Link href={{ pathname: "/chat/[id]", params: { id: id } }} asChild>
       <TouchableOpacity style={styles.container} onLongPress={onLongPress}>
-        <Text>Chat Room #{id}</Text>
+        <Text>Chat Room #{other_name}</Text>
       </TouchableOpacity>
     </Link>
   );

@@ -14,6 +14,7 @@ import ChatListElement from "@/components/ChatListElement";
 import Modal from "@/components/Modal";
 import { useState } from "react";
 import headerStyle from "@/components/style/headerStyle";
+import ChatRoomList from "@/components/ChatRoomList";
 
 export default function MainScreen() {
   const [modalOpen, setModalOpen] = useState(false);
@@ -23,20 +24,9 @@ export default function MainScreen() {
     <>
       <MainScreenHeader />
       <View style={styles.container}>
-        <NearbyUserViewer />
-        <Link href={"/chat/list"} asChild>
-          <Text>Show Chat Room List</Text>
-        </Link>
-        <ScrollView style={styles.chatList}>
-          {["asdf", "ewfd", "awegdv"].map((value, index) => (
-            <ChatListElement
-              id={value}
-              key={index}
-              onLongPress={() => {
-                setModalOpen(true);
-              }}
-            />
-          ))}
+        <ScrollView style={styles.scrollView}>
+          <NearbyUserViewer />
+          <ChatRoomList setModalOpen={setModalOpen} />
         </ScrollView>
       </View>
 
@@ -58,7 +48,7 @@ export default function MainScreen() {
             />
           </View>
         }
-      />
+      ></Modal>
     </>
   );
 }
@@ -66,7 +56,11 @@ export default function MainScreen() {
 function MainScreenHeader() {
   const router = useRouter();
   const onProfileClick = () => {
-    router.navigate("/(app)/(home)/my-profile");
+    router.navigate("/(app)/(home)/MyProfile");
+  };
+
+  const onSettingsClick = () => {
+    router.navigate("/(app)/(home)/Settings");
   };
 
   return (
@@ -76,7 +70,10 @@ function MainScreenHeader() {
           <Text>LOGO & TEXT</Text>
         </View>
         <View style={headerStyle.right}>
-          <TouchableOpacity style={headerStyle.button}>
+          <TouchableOpacity
+            style={headerStyle.button}
+            onPress={onSettingsClick}
+          >
             <Text>Setting</Text>
           </TouchableOpacity>
           <TouchableOpacity style={headerStyle.button} onPress={onProfileClick}>
@@ -93,7 +90,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
   },
-  chatList: {
+  scrollView: {
     width: "100%",
     paddingHorizontal: 10,
   },
