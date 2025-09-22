@@ -43,6 +43,20 @@ export const getFollowings = async () => {
   }
 };
 
+export const getChatRooms = async () => {
+  try {
+    let { data, error } = await supabase.rpc("select_conversations");
+    if (error) {
+      console.error("Error fetching data:", error);
+      return null;
+    }
+    return data;
+  } catch (err) {
+    console.error("Unexpected error:", err);
+    return null;
+  }
+};
+
 export const getProfileById = async (user_id: string) => {
   let { data, error } = await supabase.rpc("select_profile_by_user_id", {
     uid: user_id,
