@@ -64,6 +64,7 @@ export default function OtherProfileScreen() {
         .insert({ src_id: profile.user_id, dst_id: user_id });
       if (error) {
         console.error(error);
+        setFollow(false);
       }
       setFollowBtnEnabled(true);
     } else {
@@ -73,6 +74,10 @@ export default function OtherProfileScreen() {
         .delete()
         .eq("src_id", profile.user_id)
         .eq("dst_id", user_id);
+      if (error) {
+        console.error(error);
+        setFollow(true);
+      }
       setFollowBtnEnabled(true);
     }
   };
