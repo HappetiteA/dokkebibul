@@ -1,10 +1,12 @@
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View, Button } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import headerStyle from "@/components/style/headerStyle";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/utils/supabase";
 import { PostgrestError } from "@supabase/supabase-js";
-import { getProfileById } from "@/hooks/data";
+import { getProfileById, getFollowings } from "@/hooks/data";
+import ModalChain, { ModalChainRef } from "@/components/ModalChain";
+import { useAuth } from "@/utils/AuthContext";
 
 interface IProfile {
   name: string;
@@ -13,23 +15,66 @@ interface IProfile {
 
 export default function OtherProfileScreen() {
   const router = useRouter();
-  const { user_id } = useLocalSearchParams();
+  const { profile } = useAuth();
+
+  const params = useLocalSearchParams();
+  const user_id = params.user_id as string;
+
   const [userInfo, setUserInfo] = useState<IProfile>();
 
   const [follow, setFollow] = useState(false);
 
+  const [followBtnEnabled, setFollowBtnEnabled] = useState(true);
+
+  const blockModalChainRef = useRef<ModalChainRef>(null);
+
   useEffect(() => {
     (async () => {
-      if (typeof user_id !== "string") return;
-
       const profile = await getProfileById(user_id);
       if (profile == null) return;
       setUserInfo(profile);
     })();
+
+    (async () => {
+      const followingsData = await getFollowings();
+      if (!followingsData) {
+        setFollow(false);
+        return;
+      }
+      followingsData.forEach((following) => {
+        if (following.dst_id === user_id) {
+          setFollow(true);
+        }
+      });
+    })();
   }, [user_id]);
 
-  const onFollowBtnPressed = () => {
-    setFollow((c) => !c);
+  const onFollowBtnPressed = async () => {
+    setFollowBtnEnabled(false);
+
+    if (!profile) {
+      setFollowBtnEnabled(true);
+      return;
+    }
+
+    if (!follow) {
+      setFollow(true);
+      const { error } = await supabase
+        .from("follows")
+        .insert({ src_id: profile.user_id, dst_id: user_id });
+      if (error) {
+        console.error(error);
+      }
+      setFollowBtnEnabled(true);
+    } else {
+      setFollow(false);
+      const { data, error } = await supabase
+        .from("follows")
+        .delete()
+        .eq("src_id", profile.user_id)
+        .eq("dst_id", user_id);
+      setFollowBtnEnabled(true);
+    }
   };
 
   const onChatBtnPressed = () => {
@@ -38,7 +83,7 @@ export default function OtherProfileScreen() {
   };
 
   return (
-    <>
+    <View>
       <OtherProfileScreenHeader />
       <View>
         <Text>{userInfo?.name}</Text>
@@ -47,7 +92,10 @@ export default function OtherProfileScreen() {
         <Text>Account Info</Text>
 
         <View style={styles.horizontalBtn}>
-          <TouchableOpacity onPress={onFollowBtnPressed}>
+          <TouchableOpacity
+            onPress={onFollowBtnPressed}
+            disabled={!followBtnEnabled}
+          >
             <Text>{follow ? "팔로우 취소" : "팔로우"}</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={onChatBtnPressed}>
@@ -58,11 +106,40 @@ export default function OtherProfileScreen() {
         <TouchableOpacity>
           <Text>신고하기</Text>
         </TouchableOpacity>
-        <TouchableOpacity>
+        <TouchableOpacity onPressOut={blockModalChainRef.current?.open}>
           <Text>차단하기</Text>
         </TouchableOpacity>
       </View>
-    </>
+
+      <ModalChain
+        ref={blockModalChainRef}
+        modals={[
+          {
+            children: (
+              <View>
+                <Text>{userInfo?.name}님을 차단하시겠습니까?</Text>
+                <TouchableOpacity onPressOut={blockModalChainRef.current?.close}>
+                  <Text>취소</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPressOut={blockModalChainRef.current?.goNext}>
+                  <Text>차단하기</Text>
+                </TouchableOpacity>
+              </View>
+            ),
+          },
+          {
+            children: (
+              <View>
+                <Text>{userInfo?.name}님을 차단했습니다</Text>
+                <TouchableOpacity onPressOut={blockModalChainRef.current?.goNext}>
+                  <Text>확인</Text>
+                </TouchableOpacity>
+              </View>
+            ),
+          },
+        ]}
+      />
+    </View>
   );
 }
 

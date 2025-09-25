@@ -31,7 +31,7 @@ export const getNearbyWisps = async (user_id: string) => {
 
 export const getFollowings = async () => {
   try {
-    let { data, error } = await supabase.rpc("select_follows");
+    let { data, error } = await supabase.rpc("select_followings");
     if (error) {
       console.error("Error fetching data:", error);
       return null;
