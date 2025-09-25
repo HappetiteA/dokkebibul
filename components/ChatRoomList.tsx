@@ -1,7 +1,7 @@
 import { Button, View } from "react-native";
 import ChatListElement from "./ChatListElement";
 import { useEffect, useState } from "react";
-import Modal from "./Modal";
+import Modal from "./ModalChain";
 import { getChatRooms } from "@/hooks/data";
 import { useAuth } from "@/utils/AuthContext";
 

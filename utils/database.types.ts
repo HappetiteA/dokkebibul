@@ -268,7 +268,18 @@ export type Database = {
           user2_noti_enabled: boolean
         }[]
       }
-      select_follows: {
+      select_followers: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          created_at: string
+          dst_id: string
+          dst_name: string
+          id: string
+          src_id: string
+          src_name: string
+        }[]
+      }
+      select_followings: {
         Args: Record<PropertyKey, never>
         Returns: {
           created_at: string

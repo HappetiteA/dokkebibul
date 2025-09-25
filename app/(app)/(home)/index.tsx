@@ -11,7 +11,7 @@ import {
 import { Link, useRouter } from "expo-router";
 import NearbyUserViewer from "@/components/NearbyUserViewer";
 import ChatListElement from "@/components/ChatListElement";
-import Modal from "@/components/Modal";
+import Modal from "@/components/ModalChain";
 import { useState } from "react";
 import headerStyle from "@/components/style/headerStyle";
 import ChatRoomList from "@/components/ChatRoomList";
