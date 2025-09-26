@@ -33,7 +33,7 @@ export default function ChatRoomList({ setModalOpen }: IChatRoomListProp) {
       const chatRoomData = await getChatRooms();
       setChatRooms(chatRoomData ?? []);
     })();
-  }, []);
+  }, [chatRooms]);
 
   const ChatList = (value: IChatRoomData) => {
     var is_user1 = profile?.user_id == value.user1_id;

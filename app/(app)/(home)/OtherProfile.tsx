@@ -12,6 +12,7 @@ interface IProfile {
   name: string;
   user_id: string;
 }
+3;
 
 export default function OtherProfileScreen() {
   const router = useRouter();
@@ -82,8 +83,15 @@ export default function OtherProfileScreen() {
     }
   };
 
-  const onChatBtnPressed = () => {
+  const onChatBtnPressed = async () => {
     if (typeof user_id !== "string") return;
+    if (profile == null) return;
+
+    const { error } = await supabase.rpc("update_conversations_chat_enabled", {
+      u1id: profile.user_id,
+      u2id: user_id,
+      new_chat_enabled: true,
+    });
     router.navigate({ pathname: "/chat/[id]", params: { id: user_id } });
   };
 
@@ -103,7 +111,7 @@ export default function OtherProfileScreen() {
           >
             <Text>{follow ? "팔로우 취소" : "팔로우"}</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={onChatBtnPressed}>
+          <TouchableOpacity onPress={onChatBtnPressed} disabled={!follow}>
             <Text>대화하기</Text>
           </TouchableOpacity>
         </View>
@@ -123,10 +131,14 @@ export default function OtherProfileScreen() {
             children: (
               <View>
                 <Text>{userInfo?.name}님을 차단하시겠습니까?</Text>
-                <TouchableOpacity onPressOut={blockModalChainRef.current?.close}>
+                <TouchableOpacity
+                  onPressOut={blockModalChainRef.current?.close}
+                >
                   <Text>취소</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPressOut={blockModalChainRef.current?.goNext}>
+                <TouchableOpacity
+                  onPressOut={blockModalChainRef.current?.goNext}
+                >
                   <Text>차단하기</Text>
                 </TouchableOpacity>
               </View>
@@ -136,7 +148,9 @@ export default function OtherProfileScreen() {
             children: (
               <View>
                 <Text>{userInfo?.name}님을 차단했습니다</Text>
-                <TouchableOpacity onPressOut={blockModalChainRef.current?.goNext}>
+                <TouchableOpacity
+                  onPressOut={blockModalChainRef.current?.goNext}
+                >
                   <Text>확인</Text>
                 </TouchableOpacity>
               </View>
