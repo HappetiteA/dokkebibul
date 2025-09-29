@@ -12,23 +12,41 @@ import { Link, useRouter } from "expo-router";
 import NearbyUserViewer from "@/components/NearbyUserViewer";
 import ChatListElement from "@/components/ChatListElement";
 import Modal from "@/components/ModalChain";
-import { useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import headerStyle from "@/components/style/headerStyle";
 import ChatRoomList from "@/components/ChatRoomList";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import BottomSheet, { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 
 export default function MainScreen() {
+  const bottomSheetRef = useRef<BottomSheet>(null);
+  const snapPoints = useMemo(() => ["20%", "50%", "90%"], []);
+
   const [modalOpen, setModalOpen] = useState(false);
   const onModalOpen = () => {};
+
+  const handleSheetChanges = useCallback((index: number) => {
+    console.log("handleSheetChanges", index);
+  }, []);
 
   return (
     <>
       <MainScreenHeader />
-      <View style={styles.container}>
-        <ScrollView style={styles.scrollView}>
-          <NearbyUserViewer />
-          <ChatRoomList setModalOpen={setModalOpen} />
-        </ScrollView>
-      </View>
+      <GestureHandlerRootView style={styles.container}>
+        <NearbyUserViewer />
+
+        <BottomSheet
+          ref={bottomSheetRef}
+          onChange={handleSheetChanges}
+          snapPoints={snapPoints}
+          index={2}
+        >
+          <BottomSheetScrollView style={styles.contentContainer}>
+            <Text>채팅방 목록</Text>
+            <ChatRoomList setModalOpen={setModalOpen} />
+          </BottomSheetScrollView>
+        </BottomSheet>
+      </GestureHandlerRootView>
 
       <Modal
         isOpen={modalOpen}
@@ -90,7 +108,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
   },
-  scrollView: {
+  contentContainer: {
     width: "100%",
     paddingHorizontal: 10,
   },
