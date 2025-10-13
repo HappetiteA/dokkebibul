@@ -12,7 +12,6 @@ interface IProfile {
   name: string;
   user_id: string;
 }
-3;
 
 export default function OtherProfileScreen() {
   const router = useRouter();
