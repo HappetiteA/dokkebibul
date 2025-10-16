@@ -1,16 +1,29 @@
-import { StyleSheet, Text, TouchableOpacity, View, Button } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View, Button, Modal } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import headerStyle from "@/components/style/headerStyle";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/utils/supabase";
-import { PostgrestError } from "@supabase/supabase-js";
 import { getProfileById, getFollowings } from "@/hooks/data";
+import useModal from "@/hooks/useModal";
 import ModalChain, { ModalChainRef } from "@/components/ModalChain";
 import { useAuth } from "@/utils/AuthContext";
 
 interface IProfile {
   name: string;
   user_id: string;
+}
+
+function TestModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+  return (
+    <Modal visible={isOpen} transparent animationType="slide" onRequestClose={onClose}>
+      <View style={styles.modalOverlay}>
+        <View style={styles.modalContent}>
+          <Text style={styles.modalText}>Hello from React Native Modal!</Text>
+          <Button title="Close Modal" onPress={onClose} />
+        </View>
+      </View>
+    </Modal>
+  );
 }
 
 export default function OtherProfileScreen() {
@@ -25,8 +38,9 @@ export default function OtherProfileScreen() {
   const [follow, setFollow] = useState(false);
 
   const [followBtnEnabled, setFollowBtnEnabled] = useState(true);
+  const [blockBtnEnabled, setBlockBtnEnabled] = useState(true);
 
-  const blockModalChainRef = useRef<ModalChainRef>(null);
+  const { open: openTestModal, close: closeTestModal } = useModal(TestModal);
 
   useEffect(() => {
     (async () => {
@@ -51,6 +65,39 @@ export default function OtherProfileScreen() {
 
   const onFollowBtnPressed = async () => {
     setFollowBtnEnabled(false);
+
+    if (!profile) {
+      setFollowBtnEnabled(true);
+      return;
+    }
+
+    if (!follow) {
+      setFollow(true);
+      const { error } = await supabase
+        .from("follows")
+        .insert({ src_id: profile.user_id, dst_id: user_id });
+      if (error) {
+        console.error(error);
+        setFollow(false);
+      }
+      setFollowBtnEnabled(true);
+    } else {
+      setFollow(false);
+      const { data, error } = await supabase
+        .from("follows")
+        .delete()
+        .eq("src_id", profile.user_id)
+        .eq("dst_id", user_id);
+      if (error) {
+        console.error(error);
+        setFollow(true);
+      }
+      setFollowBtnEnabled(true);
+    }
+  };
+
+  const onBlockBtnPressed = async () => {
+    setBlockBtnEnabled(false);
 
     if (!profile) {
       setFollowBtnEnabled(true);
@@ -111,12 +158,12 @@ export default function OtherProfileScreen() {
         <TouchableOpacity>
           <Text>신고하기</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPressOut={blockModalChainRef.current?.open}>
+        <TouchableOpacity onPress={() => openTestModal({ onClose: closeTestModal})}>
           <Text>차단하기</Text>
         </TouchableOpacity>
       </View>
 
-      <ModalChain
+      {/* <ModalChain
         ref={blockModalChainRef}
         modals={[
           {
@@ -136,14 +183,14 @@ export default function OtherProfileScreen() {
             children: (
               <View>
                 <Text>{userInfo?.name}님을 차단했습니다</Text>
-                <TouchableOpacity onPressOut={blockModalChainRef.current?.goNext}>
+                <TouchableOpacity onPressOut={blockModalChainRef.current?.close}>
                   <Text>확인</Text>
                 </TouchableOpacity>
               </View>
             ),
           },
         ]}
-      />
+      /> */}
     </View>
   );
 }
@@ -173,5 +220,33 @@ function OtherProfileScreenHeader() {
 const styles = StyleSheet.create({
   horizontalBtn: {
     flexDirection: "row",
+  },
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    minWidth: 300,
+    alignItems: 'center',
+  },
+  modalText: {
+    fontSize: 18,
+    marginBottom: 20,
   },
 });
