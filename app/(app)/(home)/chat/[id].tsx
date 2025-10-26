@@ -1,6 +1,7 @@
 import ChatHistory from "@/components/ChatHistory";
-import { ChatLog } from "@/components/interfaces";
-import { SampleChatData } from "@/dev/SampleData";
+import { useAuth } from "@/utils/AuthContext";
+import { Message } from "@/utils/global.types";
+import { supabase } from "@/utils/supabase";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
@@ -15,8 +16,14 @@ import {
 
 export default function ChatScreen() {
   const navigation = useNavigation();
-  const { id } = useLocalSearchParams();
-  const [chat, setChat] = useState<ChatLog>();
+
+  const params = useLocalSearchParams();
+  const conversation_id = params.id as string;
+  const user_ids = JSON.parse(params.user_ids as string);
+  const user_names = JSON.parse(params.user_names as string);
+
+  const { profile } = useAuth();
+  const [chat, setChat] = useState<Array<Message>>([]);
   const [text, setText] = useState<string>("");
   const [showAI, setShowAI] = useState(false);
 
@@ -28,21 +35,63 @@ export default function ChatScreen() {
     setShowAI(value);
   };
 
-  const onSubmit = () => {
-    // setChat
-    // Backend Thing...
+  const onSubmit = async () => {
+    const { error } = await supabase.from("messages").insert({
+      conversation_id: conversation_id,
+      sender_id: profile!.user_id,
+      content: text,
+      is_human: true,
+    });
+
+    if (error) {
+      console.log(error);
+    }
+
+    setText("");
   };
 
   useEffect(() => {
-    navigation.setOptions({ title: `Chat #${id}` });
-    setChat(SampleChatData);
+    navigation.setOptions({ title: `Chat #${conversation_id}` });
+    (async () => {
+      const { data, error } = await supabase
+        .from("messages")
+        .select("*")
+        .eq("conversation_id", conversation_id);
+      if (error) {
+        console.log(error);
+      }
+      setChat(data ?? []);
+    })();
+
+    const channel = supabase.channel(`chatroom:${conversation_id}`).on(
+      "postgres_changes",
+      {
+        event: "INSERT",
+        schema: "public",
+        table: "messages",
+        filter: `conversation_id=eq.${conversation_id}`,
+      },
+      (payload) => {
+        alert("새 메시지:" + JSON.stringify(payload.new));
+      }
+    );
+
+    return () => {
+      channel.unsubscribe();
+    };
   }, []);
+
   return (
     <>
       <ChatScreenHeader updateShowAI={updateShowAI}></ChatScreenHeader>
       <View>
-        <Text>Hello Chat #{id}</Text>
-        <ChatHistory chat={chat} showAI={showAI} />
+        <Text>Hello Chat #{conversation_id}</Text>
+        <ChatHistory
+          chat={chat}
+          user_ids={user_ids}
+          user_names={user_names}
+          showAI={showAI}
+        />
       </View>
       <View>
         <TextInput

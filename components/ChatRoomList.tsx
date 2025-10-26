@@ -1,9 +1,10 @@
-import { Button, View } from "react-native";
-import ChatListElement from "./ChatListElement";
+import { Button, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useEffect, useState } from "react";
 import Modal from "./ModalChain";
 import { getChatRooms } from "@/hooks/data";
 import { useAuth } from "@/utils/AuthContext";
+import { Link } from "expo-router";
+import ChatListElement from "./ChatListElement";
 
 interface IChatRoomListProp {
   setModalOpen: (arg0: boolean) => void;
@@ -54,10 +55,15 @@ export default function ChatRoomList({ setModalOpen }: IChatRoomListProp) {
       return <></>;
     }
 
+    var user_ids = JSON.stringify([value.user1_id, value.user2_id]);
+    var user_names = JSON.stringify([value.user1_name, value.user2_name]);
+
     return (
       <ChatListElement
         key={value.id}
-        id={value.id}
+        conversation_id={value.id}
+        user_ids={user_ids}
+        user_names={user_names}
         other_name={other_name}
         onLongPress={() => {
           setModalOpen(true);
