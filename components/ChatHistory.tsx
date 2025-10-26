@@ -1,8 +1,10 @@
 import { ScrollView, Text, View } from "react-native";
 import { Message } from "@/utils/global.types";
 
+type Chat = Omit<Message, "id" | "conversation_id">;
+
 interface ChatHistoryProp {
-  chat?: Array<Message>;
+  chat?: Array<Chat>;
   user_ids: string[];
   user_names: string[];
   showAI: boolean;

@@ -14,6 +14,8 @@ import {
   View,
 } from "react-native";
 
+type Chat = Omit<Message, "id" | "conversation_id">;
+
 export default function ChatScreen() {
   const navigation = useNavigation();
 
@@ -23,7 +25,7 @@ export default function ChatScreen() {
   const user_names = JSON.parse(params.user_names as string);
 
   const { profile } = useAuth();
-  const [chat, setChat] = useState<Array<Message>>([]);
+  const [chat, setChat] = useState<Array<Chat>>([]);
   const [text, setText] = useState<string>("");
   const [showAI, setShowAI] = useState(false);
 
@@ -36,6 +38,8 @@ export default function ChatScreen() {
   };
 
   const onSubmit = async () => {
+    if (text == "") return;
+
     const { error } = await supabase.from("messages").insert({
       conversation_id: conversation_id,
       sender_id: profile!.user_id,
@@ -45,6 +49,7 @@ export default function ChatScreen() {
 
     if (error) {
       console.log(error);
+      return;
     }
 
     setText("");
@@ -55,7 +60,7 @@ export default function ChatScreen() {
     (async () => {
       const { data, error } = await supabase
         .from("messages")
-        .select("*")
+        .select("sender_id, content, created_at, is_read, is_human")
         .eq("conversation_id", conversation_id);
       if (error) {
         console.log(error);
@@ -63,18 +68,28 @@ export default function ChatScreen() {
       setChat(data ?? []);
     })();
 
-    const channel = supabase.channel(`chatroom:${conversation_id}`).on(
-      "postgres_changes",
-      {
-        event: "INSERT",
-        schema: "public",
-        table: "messages",
-        filter: `conversation_id=eq.${conversation_id}`,
-      },
-      (payload) => {
-        alert("새 메시지:" + JSON.stringify(payload.new));
-      }
-    );
+    const channel = supabase
+      .channel(`chatroom:${conversation_id}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "messages",
+          filter: `conversation_id=eq.${conversation_id}`,
+        },
+        (payload) => {
+          const new_chat: Chat = {
+            sender_id: payload.new.sender_id,
+            content: payload.new.content,
+            created_at: payload.new.created_at,
+            is_read: payload.new.is_read,
+            is_human: payload.new.is_human,
+          };
+          setChat((c) => [...c, new_chat]);
+        }
+      )
+      .subscribe();
 
     return () => {
       channel.unsubscribe();
