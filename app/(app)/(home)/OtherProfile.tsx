@@ -5,25 +5,115 @@ import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/utils/supabase";
 import { getProfileById, getFollowings } from "@/hooks/data";
 import useModal from "@/hooks/useModal";
-import ModalChain, { ModalChainRef } from "@/components/ModalChain";
 import { useAuth } from "@/utils/AuthContext";
+import { Profile } from "@/utils/global.types";
 
-interface IProfile {
-  name: string;
-  user_id: string;
-}
 
-function TestModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+function BlockModal({ isOpen, onClose, name, onBlockBtnPressed, blockBtnEnabled }: { isOpen: boolean; onClose: () => void; name: string | undefined, onBlockBtnPressed: () => Promise<void>, blockBtnEnabled: boolean }) {
   return (
     <Modal visible={isOpen} transparent animationType="slide" onRequestClose={onClose}>
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
-          <Text style={styles.modalText}>Hello from React Native Modal!</Text>
-          <Button title="Close Modal" onPress={onClose} />
+          <Text style={styles.modalText}>{name} 님을 차단하시겠습니까?</Text>
+          <>
+            <Button title="차단" onPress={onBlockBtnPressed} disabled={!blockBtnEnabled} />
+            <Button title="취소" onPress={onClose} />
+          </>
         </View>
       </View>
     </Modal>
   );
+}
+
+function BlockSuccessModal({ isOpen, onClose, name }: { isOpen: boolean; onClose: () => void; name: string | undefined}) {
+  return (
+    <Modal visible={isOpen} transparent animationType="slide" onRequestClose={onClose}>
+      <View style={styles.modalOverlay}>
+        <View style={styles.modalContent}>
+          <Text style={styles.modalText}>{name} 님을 차단했습니다.</Text>
+          <>
+            <Button title="확인" onPress={onClose} />
+          </>
+        </View>
+      </View>
+    </Modal>
+  )
+}
+
+function BlockFailModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void; }) {
+  return (
+    <Modal visible={isOpen} transparent animationType="slide" onRequestClose={onClose}>
+      <View style={styles.modalOverlay}>
+        <View style={styles.modalContent}>
+          <Text style={styles.modalText}>알 수 없는 오류로 차단에 실패했습니다. 잠시 후에 다시 시도해주세요.</Text>
+          <>
+            <Button title="확인" onPress={onClose} />
+          </>
+        </View>
+      </View>
+    </Modal>
+  )
+}
+
+
+const reportReasons = ["음담패설", "못생김", "짜증나게 함", "패드립 함"];
+
+function ReportModal({ isOpen, onClose, name, onReportBtnPressed, reportBtnEnabled, reasons, setReasons }: { isOpen: boolean; onClose: () => void; name: string | undefined, onReportBtnPressed: () => Promise<void>, reportBtnEnabled: boolean, reasons: Record<string, boolean>; setReasons: React.Dispatch<React.SetStateAction<Record<string, boolean>>> }) {
+  const toggleReason = (reason: string) => {
+    setReasons(prev => ({
+      ...prev,
+      [reason]: !prev[reason],
+    }));
+  };
+
+  return (
+    <Modal visible={isOpen} transparent animationType="slide" onRequestClose={onClose}>
+      <View style={styles.modalOverlay}>
+        <View style={styles.modalContent}>
+          <Text style={styles.modalText}>{name} 님을 신고하시겠습니까?</Text>
+          <>
+            {reportReasons.map(reason => {
+              <Button title={reason} onPress={() => {toggleReason(reason)}} disabled={!reportBtnEnabled} />
+            })}
+          </>
+          <>
+            <Button title="신고하기" onPress={onReportBtnPressed} disabled={!reportBtnEnabled} />
+            <Button title="취소" onPress={onClose} />
+          </>
+        </View>
+      </View>
+    </Modal>
+  );
+}
+
+function ReportSuccessModal({ isOpen, onClose, name }: { isOpen: boolean; onClose: () => void; name: string | undefined}) {
+  return (
+    <Modal visible={isOpen} transparent animationType="slide" onRequestClose={onClose}>
+      <View style={styles.modalOverlay}>
+        <View style={styles.modalContent}>
+          <Text style={styles.modalText}>{name} 님을 신고했습니다.</Text>
+          <>
+            <Button title="확인" onPress={onClose} />
+          </>
+        </View>
+      </View>
+    </Modal>
+  )
+}
+
+function ReportFailModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void; }) {
+  return (
+    <Modal visible={isOpen} transparent animationType="slide" onRequestClose={onClose}>
+      <View style={styles.modalOverlay}>
+        <View style={styles.modalContent}>
+          <Text style={styles.modalText}>알 수 없는 오류로 신고에 실패했습니다. 잠시 후에 다시 시도해주세요.</Text>
+          <>
+            <Button title="확인" onPress={onClose} />
+          </>
+        </View>
+      </View>
+    </Modal>
+  )
 }
 
 export default function OtherProfileScreen() {
@@ -33,14 +123,22 @@ export default function OtherProfileScreen() {
   const params = useLocalSearchParams();
   const user_id = params.user_id as string;
 
-  const [userInfo, setUserInfo] = useState<IProfile>();
+  const [userInfo, setUserInfo] = useState<Profile>();
 
   const [follow, setFollow] = useState(false);
-
   const [followBtnEnabled, setFollowBtnEnabled] = useState(true);
-  const [blockBtnEnabled, setBlockBtnEnabled] = useState(true);
 
-  const { open: openTestModal, close: closeTestModal } = useModal(TestModal);
+  const [blockBtnEnabled, setBlockBtnEnabled] = useState(true);
+  const { open: openBlockModal, close: closeBlockModal } = useModal(BlockModal);
+  const { open: openBlockSuccessModal, close: closeBlockSuccessModal } = useModal(BlockSuccessModal);
+  const { open: openBlockFailModal, close: closeBlockFailModal } = useModal(BlockFailModal);
+
+  const [reportBtnEnabled, setReportBtnEnabled] = useState(true);
+  const { open: openReportModal, close: closeReportModal } = useModal(ReportModal);
+  const { open: openReportSuccessModal, close: closeReportSuccessModal } = useModal(ReportSuccessModal);
+  const { open: openReportFailModal, close: closeReportFailModal } = useModal(ReportFailModal);
+  const defaultReasons = Object.fromEntries(reportReasons.map(r => [r, false]));
+  const [reasons, setReasons] = useState<Record<string, boolean>>(defaultReasons);
 
   useEffect(() => {
     (async () => {
@@ -100,32 +198,46 @@ export default function OtherProfileScreen() {
     setBlockBtnEnabled(false);
 
     if (!profile) {
-      setFollowBtnEnabled(true);
+      setBlockBtnEnabled(true);
       return;
     }
 
-    if (!follow) {
-      setFollow(true);
-      const { error } = await supabase
-        .from("follows")
-        .insert({ src_id: profile.user_id, dst_id: user_id });
-      if (error) {
-        console.error(error);
-        setFollow(false);
-      }
-      setFollowBtnEnabled(true);
+    const { error } = await supabase
+      .from("blocks")
+      .insert({ src_id: profile.user_id, dst_id: user_id });
+
+    closeBlockModal();
+    setBlockBtnEnabled(true);
+    if (error) {
+      console.error(error);
+      openBlockFailModal({ onClose: closeBlockFailModal });
     } else {
-      setFollow(false);
-      const { data, error } = await supabase
-        .from("follows")
-        .delete()
-        .eq("src_id", profile.user_id)
-        .eq("dst_id", user_id);
-      if (error) {
-        console.error(error);
-        setFollow(true);
-      }
-      setFollowBtnEnabled(true);
+      openBlockSuccessModal({ onClose: () => {router.navigate("/(app)/(home)"); closeBlockSuccessModal();}, name: userInfo?.name });
+    }
+  };
+
+  const onReportBtnPressed = async () => {
+    setReportBtnEnabled(false);
+
+    if (!profile) {
+      setReportBtnEnabled(true);
+      return;
+    }
+
+    const selectedReasons = Object.keys(reasons).filter(r => reasons[r]);
+    const joinedReasons = selectedReasons.join(", ");
+
+    const { error } = await supabase
+      .from("reports")
+      .insert({ src_id: profile.user_id, dst_id: user_id, reason: joinedReasons });
+
+    closeReportModal();
+    setReportBtnEnabled(true);
+    if (error) {
+      console.error(error);
+      openReportFailModal({ onClose: closeReportFailModal });
+    } else {
+      openReportSuccessModal({ onClose: () => {closeReportSuccessModal();}, name: userInfo?.name });
     }
   };
 
@@ -162,10 +274,10 @@ export default function OtherProfileScreen() {
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => openReportModal({ onClose: closeReportModal, name: userInfo?.name, onReportBtnPressed: onReportBtnPressed, reportBtnEnabled: reportBtnEnabled, reasons: reasons, setReasons: setReasons })}>
           <Text>신고하기</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => openTestModal({ onClose: closeTestModal})}>
+        <TouchableOpacity onPress={() => openBlockModal({ onClose: closeBlockModal, name: userInfo?.name, onBlockBtnPressed: onBlockBtnPressed, blockBtnEnabled: blockBtnEnabled })}>
           <Text>차단하기</Text>
         </TouchableOpacity>
       </View>
