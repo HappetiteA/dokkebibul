@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ModalDispatchContext, ModalStateContext } from './ModalContext';
-import type { CloseParams, ModalState, OpenParams } from '../types/modal';
+import type { ModalKey, CloseParams, ModalState, OpenParams } from '../types/modal';
 import Modals from '../components/Modals';
 
 interface ModalProviderProps {
@@ -104,6 +104,15 @@ export default function ModalProvider({
     []
   );
 
+  const timeoutsRef = useRef<Map<ModalKey, NodeJS.Timeout | number>>(new Map());
+
+  useEffect(() => {
+    return () => {
+      timeoutsRef.current.forEach(clearTimeout);
+      timeoutsRef.current.clear();
+    };
+  }, []);
+
   const closeModal = useCallback(
     ({ key, clearTime: eachClearTime }: CloseParams) => {
       setModals((modals) => {
@@ -122,17 +131,34 @@ export default function ModalProvider({
 
       const timeout = typeof eachClearTime === 'number' ? eachClearTime : clearTime;
 
-      setTimeout(() => {
+      const existingTimeout = timeoutsRef.current.get(key);
+      if (existingTimeout) {
+        clearTimeout(existingTimeout);
+      }
+
+      const timeoutId = setTimeout(() => {
         setModals((modals) => {
           const targetModal = modals.find((modal) => modal.key === key);
           if (!targetModal || targetModal.props.isOpen === true) return modals;
 
           return modals.filter((modal) => modal.key !== key);
         });
+        timeoutsRef.current.delete(key);
       }, timeout);
+      timeoutsRef.current.set(key, timeoutId);
     },
     [clearTime]
   );
+
+  const clearTimeoutRef = useRef<NodeJS.Timeout | null | number>(null);
+
+  useEffect(() => {
+    return () => {
+      if (clearTimeoutRef.current) {
+        clearTimeout(clearTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const clearModals = useCallback(() => {
     setModals((modals) => {
@@ -145,8 +171,13 @@ export default function ModalProvider({
       }));
     });
 
-    setTimeout(() => {
+    if (clearTimeoutRef.current) {
+      clearTimeout(clearTimeoutRef.current);
+    }
+
+    clearTimeoutRef.current = setTimeout(() => {
       setModals((modals) => modals.filter((modal) => modal.props.isOpen === true));
+      clearTimeoutRef.current = null;
     }, clearTime);
   }, [clearTime]);
 

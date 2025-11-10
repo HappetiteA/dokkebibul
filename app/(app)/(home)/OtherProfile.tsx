@@ -72,9 +72,9 @@ function ReportModal({ isOpen, onClose, name, onReportBtnPressed, reportBtnEnabl
         <View style={styles.modalContent}>
           <Text style={styles.modalText}>{name} 님을 신고하시겠습니까?</Text>
           <>
-            {reportReasons.map(reason => {
-              <Button title={reason} onPress={() => {toggleReason(reason)}} disabled={!reportBtnEnabled} />
-            })}
+            {reportReasons.map(reason => 
+              <Button key={reason} title={reason} onPress={() => {toggleReason(reason)}} disabled={!reportBtnEnabled} />
+            )}
           </>
           <>
             <Button title="신고하기" onPress={onReportBtnPressed} disabled={!reportBtnEnabled} />
