@@ -61,7 +61,8 @@ export default function ChatScreen() {
       const { data, error } = await supabase
         .from("messages")
         .select("sender_id, content, created_at, is_read, is_human")
-        .eq("conversation_id", conversation_id);
+        .eq("conversation_id", conversation_id)
+        .order("created_at", { ascending: true });
       if (error) {
         console.log(error);
       }
