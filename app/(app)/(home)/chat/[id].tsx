@@ -39,10 +39,14 @@ export default function ChatScreen() {
 
   const onSubmit = async () => {
     if (text == "") return;
+    if (!profile?.user_id) {
+      console.warn("Cannot send message: user not authenticated");
+      return;
+    }
 
     const { error } = await supabase.from("messages").insert({
       conversation_id: conversation_id,
-      sender_id: profile!.user_id,
+      sender_id: profile.user_id,
       content: text,
       is_human: true,
     });
@@ -95,7 +99,7 @@ export default function ChatScreen() {
     return () => {
       channel.unsubscribe();
     };
-  }, []);
+  }, [conversation_id]);
 
   return (
     <>
