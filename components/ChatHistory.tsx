@@ -1,11 +1,20 @@
 import { ScrollView, Text, View } from "react-native";
-import { ChatLog, DailyChat } from "./interfaces";
+import { Message } from "@/utils/global.types";
+
+type Chat = Omit<Message, "id" | "conversation_id">;
 
 interface ChatHistoryProp {
-  chat?: ChatLog;
+  chat?: Array<Chat>;
+  user_ids: string[];
+  user_names: string[];
   showAI: boolean;
 }
-export default function ChatHistory({ chat, showAI }: ChatHistoryProp) {
+export default function ChatHistory({
+  chat,
+  user_ids,
+  user_names,
+  showAI,
+}: ChatHistoryProp) {
   const TextColor = (AIgenerated: boolean) => {
     if (!showAI) {
       return { color: "black" };
@@ -17,24 +26,36 @@ export default function ChatHistory({ chat, showAI }: ChatHistoryProp) {
       }
     }
   };
-  const ShowChatList = (dailyChat: DailyChat) => {
-    return (
-      <View>
-        <Text>{dailyChat.date}</Text>
-        {dailyChat.chat.map((value, index) => (
-          <Text key={index} style={TextColor(value.AIgenerated)}>
-            {value.sender}({value.time}) : {value.message}
-          </Text>
-        ))}
-      </View>
-    );
+
+  const convertUIDtoUserName = (user_id: string) => {
+    var idx = user_ids.findIndex((value) => value == user_id);
+    return user_names[idx];
+  };
+
+  const convertTimestampToTime = (timestamp: string): string => {
+    const date = new Date(timestamp);
+
+    var hours = date.getHours().toString();
+    hours = hours.length == 1 ? "0" + hours : hours;
+
+    var minutes = date.getMinutes().toString();
+    minutes = minutes.length == 1 ? "0" + minutes : minutes;
+
+    const timeString = hours + ":" + minutes;
+    return timeString;
   };
 
   return (
     <>
       <ScrollView>
         {chat?.map((value, index) => (
-          <Text key={index}>{ShowChatList(value)}</Text>
+          <View key={index}>
+            <Text style={TextColor(value.is_human)}>
+              {convertUIDtoUserName(value.sender_id)}(
+              {convertTimestampToTime(value.created_at)})
+            </Text>
+            <Text style={TextColor(value.is_human)}>{value.content}</Text>
+          </View>
         ))}
       </ScrollView>
     </>

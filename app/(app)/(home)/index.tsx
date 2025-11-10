@@ -10,7 +10,6 @@ import {
 } from "react-native";
 import { Link, useRouter } from "expo-router";
 import NearbyUserViewer from "@/components/NearbyUserViewer";
-import ChatListElement from "@/components/ChatListElement";
 import Modal from "@/components/ModalChain";
 import { useCallback, useMemo, useRef, useState } from "react";
 import headerStyle from "@/components/style/headerStyle";
