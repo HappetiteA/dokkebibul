@@ -52,7 +52,7 @@ export default function OtherProfileScreen() {
   const onFollowBtnPressed = async () => {
     setFollowBtnEnabled(false);
 
-    if (!myProfile) {
+    if (!profile) {
       setFollowBtnEnabled(true);
       return;
     }
@@ -61,7 +61,7 @@ export default function OtherProfileScreen() {
       setFollow(true);
       const { error } = await supabase
         .from("follows")
-        .insert({ src_id: myProfile.user_id, dst_id: otherUserId });
+        .insert({ src_id: profile.user_id, dst_id: user_id });
       if (error) {
         console.error(error);
         setFollow(false);
@@ -72,8 +72,8 @@ export default function OtherProfileScreen() {
       const { data, error } = await supabase
         .from("follows")
         .delete()
-        .eq("src_id", myProfile.user_id)
-        .eq("dst_id", otherUserId);
+        .eq("src_id", profile.user_id)
+        .eq("dst_id", user_id);
       if (error) {
         console.error(error);
         setFollow(true);
