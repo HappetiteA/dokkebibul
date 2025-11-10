@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import { AuthProvider } from "@/utils/AuthContext";
+import ModalProvider from "@/contexts/ModalProvider";
 import { SplashScreenController } from "@/components/SplashScreenController";
 
 export {
@@ -34,8 +35,10 @@ export default function RootLayout() {
 function RootLayoutNav() {
   return (
     <AuthProvider>
-      <SplashScreenController />
-      <Stack screenOptions={{ headerShown: false }} />
+      <ModalProvider>
+        <SplashScreenController />
+        <Stack screenOptions={{ headerShown: false }} />
+      </ModalProvider>
     </AuthProvider>
   );
 }
