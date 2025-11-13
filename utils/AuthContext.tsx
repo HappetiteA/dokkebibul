@@ -1,9 +1,15 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  ReactNode,
+} from "react";
 import type { Dispatch, SetStateAction } from "react";
 import { AppState, Platform } from "react-native";
 import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/utils/supabase";
-import { Profile } from "@/utils/global.types";
+import { Profile } from "@/utils/model.types";
 import { getPushTokenAsync, sendTokenToDBAsync } from "./registerPushToken";
 
 type AuthContextType = {
@@ -25,34 +31,36 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, newSession) => {
-      setSession(newSession ?? null);
-      setUser(newSession?.user ?? null);
-      switch (_event) {
-        case "INITIAL_SESSION":
-          break;
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      (_event, newSession) => {
+        setSession(newSession ?? null);
+        setUser(newSession?.user ?? null);
+        switch (_event) {
+          case "INITIAL_SESSION":
+            break;
 
-        case "SIGNED_IN":
-          console.log("User signed in:", newSession?.user?.id);
-          break;
+          case "SIGNED_IN":
+            console.log("User signed in:", newSession?.user?.id);
+            break;
 
-        case "SIGNED_OUT":
-          console.log("User signed out or refresh token invalid");
-          setProfile(null);
-          break;
+          case "SIGNED_OUT":
+            console.log("User signed out or refresh token invalid");
+            setProfile(null);
+            break;
 
-        case "TOKEN_REFRESHED":
-          console.log("Token was refreshed successfully");
-          break;
-  
-        case "USER_UPDATED":
-          console.log("User profile updated:", newSession?.user);
-          break;
+          case "TOKEN_REFRESHED":
+            console.log("Token was refreshed successfully");
+            break;
 
-        default:
-          console.log("Unhandled event:", _event);
+          case "USER_UPDATED":
+            console.log("User profile updated:", newSession?.user);
+            break;
+
+          default:
+            console.log("Unhandled event:", _event);
+        }
       }
-    });
+    );
 
     return () => listener.subscription.unsubscribe();
   }, []);
@@ -91,8 +99,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         console.error("Profile fetch error:", error);
         setProfile(null);
       } else if (!data) {
-        console.log("Profile not initialized: redirecting to onboarding...")
-        setProfile(null)
+        console.log("Profile not initialized: redirecting to onboarding...");
+        setProfile(null);
       } else {
         setProfile(data);
       }
@@ -113,7 +121,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     refreshProfile();
   }, [session]);
 
-
   useEffect(() => {
     if (Platform.OS === "web") return;
 
@@ -132,11 +139,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const token = await getPushTokenAsync();
         await sendTokenToDBAsync(user.id, token);
       } catch (err: any) {
-        console.error(`Push token error: ${(err instanceof Error ? err.message : new Error(String(err)))}`);
+        console.error(
+          `Push token error: ${
+            err instanceof Error ? err.message : new Error(String(err))
+          }`
+        );
       }
     })();
   }, [user?.id, profile?.user_id]);
-
 
   const signOut = async () => {
     await supabase.auth.signOut();
@@ -144,7 +154,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, profile, loading, setProfile, signOut, refreshProfile }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        session,
+        profile,
+        loading,
+        setProfile,
+        signOut,
+        refreshProfile,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

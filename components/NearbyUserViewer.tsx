@@ -1,6 +1,5 @@
-import { SampleCoordinateData } from "@/dev/SampleData";
-import { getNearbyWisps, ILocation, IOtherLocation } from "@/hooks/data";
-import useCurrentLocation from "@/hooks/useCurrentLocation";
+import { getNearbyUsers } from "@/hooks/data";
+import { SelectNearbyUsersResponse } from "@/utils/schema.types";
 import { useAuth } from "@/utils/AuthContext";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -10,73 +9,140 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Modal,
+  Button,
 } from "react-native";
+import * as Location from "expo-location";
+import { supabase } from "@/utils/supabase";
+import useModal from "@/hooks/useModal";
 
-interface NearbyUserProp {
-  screenWidth: number;
-  radius: number;
-  angle: number;
-  children: React.ReactNode;
+
+
+async function startTracking(
+  onUpdate: (lat: number, lon: number) => void
+) {
+  const { status } = await Location.requestForegroundPermissionsAsync();
+  if (status !== "granted") throw new Error("Location permission denied");
+
+  return await Location.watchPositionAsync(
+    {
+      accuracy: Location.Accuracy.High,
+      timeInterval: 3000,
+      distanceInterval: 5,
+    },
+    (loc) => {
+      const { latitude, longitude } = loc.coords;
+      onUpdate(latitude, longitude);
+    }
+  );
 }
 
-function haversineDistance(A: ILocation, B: ILocation): number {
-  const toRadians = (degrees: number) => degrees * (Math.PI / 180);
 
-  const R = 6371000; // 지구 반지름 (미터)
-
-  const lat1Rad = toRadians(A.latitude);
-  const lat2Rad = toRadians(B.latitude);
-  const deltaLat = toRadians(B.latitude - A.latitude);
-  const deltaLon = toRadians(B.longitude - A.longitude);
-
-  const a =
-    Math.sin(deltaLat / 2) ** 2 +
-    Math.cos(lat1Rad) * Math.cos(lat2Rad) * Math.sin(deltaLon / 2) ** 2;
-
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-  return R * c;
+function PlaceModal({
+  isOpen,
+  onClose,
+  origAddr,
+  newAddr,
+  onPlaceBtnPressed,
+  placeBtnEnabled,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  origAddr: string | undefined;
+  newAddr: string | undefined;
+  onPlaceBtnPressed: () => Promise<void>;
+  placeBtnEnabled: boolean;
+}) {
+  return (
+    <Modal
+      visible={isOpen}
+      transparent
+      animationType="slide"
+      onRequestClose={onClose}
+    >
+      <View style={styles.modalOverlay}>
+        <View style={styles.modalContent}>
+          <Text style={styles.modalText}>
+            현 위치에 도깨비불을 데려다 놓을까요?
+          </Text>
+          <Text style={styles.modalText}>기존 위치: {origAddr}</Text>
+          <Text style={styles.modalText}>현 위지: {newAddr}</Text>
+          <>
+            <Button
+              title="네"
+              onPress={onPlaceBtnPressed}
+              disabled={!placeBtnEnabled}
+            />
+            <Button title="아니오" onPress={onClose} />
+          </>
+        </View>
+      </View>
+    </Modal>
+  );
 }
 
-// const MaxRange = 100;
 
 export default function NearbyUserViewer() {
-  // const { location, errorMsg, refreshLocation } = useCurrentLocation();
   const { profile } = useAuth();
-  const user_id = profile?.user_id;
-
+  
   const { width, height } = Dimensions.get("window");
   const userViewerSize = Math.min(width, height) - 20;
   const router = useRouter();
+  
+  const [myLocation, setMyLocation] = useState<{
+    lat: number;
+    lon: number;
+  } | null>(null);
+  const [nearbyUsersLocations, setNearbyUsersLocations] = useState<SelectNearbyUsersResponse>([]);
 
-  // const [selfCoord, setSelfCoord] = useState<ILocation>();
-  const [avatarData, setAvatarData] = useState<Array<IOtherLocation>>();
+  const { open: openPlaceModal, close: closePlaceModal } = useModal(PlaceModal);
+  const [placeBtnEnabled, setPlaceBtnEnabled] = useState(true);
 
   useEffect(() => {
-    const getNearbyAvatarData = async () => {
-      if (profile != null) {
-        if (user_id == undefined) return;
+    let watcher: any;
+    let interval: any;
 
-        const data = await getNearbyWisps(user_id);
-        console.log(data);
-        setAvatarData(data ?? []);
-      }
+    async function start() {
+      watcher = await startTracking(async (lat, lon) => {
+        setMyLocation({ lat, lon });
+      });
+
+      interval = setInterval(async () => {
+        if (!myLocation) return;
+        const data = await getNearbyUsers(myLocation.lat, myLocation.lon, 5000);
+        setNearbyUsersLocations(data);
+        console.log(data)
+      }, 3000);
+    }
+
+    start();
+    return () => {
+      watcher?.remove?.();
+      clearInterval(interval);
     };
+  }, [myLocation]);
 
-    getNearbyAvatarData();
-  }, [user_id]);
-
-  // const getRadius = (avatar: ILocation, self: ILocation) => {
-  //   const dist = haversineDistance(avatar, self);
-  //   if (dist < MaxRange / 2) {
-  //     return (userViewerSize / 2) * (0.3 + 0.1 * Math.random());
-  //   } else {
-  //     return (userViewerSize / 2) * (0.7 + 0.1 * Math.random());
-  //   }
-  // };
-
+  const onPressMyself = async () => {
+    setPlaceBtnEnabled(false);
+    if (!myLocation || !profile) {
+      console.error("Failed to fetch current location");
+      setPlaceBtnEnabled(false);
+      return;
+    }
+    const { error } = await supabase
+      .from("locations")
+      .upsert({
+        user_id: profile.user_id,
+        location: `POINT(${myLocation.lon} ${myLocation.lat})`,
+      });
+    if (error) {
+      console.error(error);
+    }
+    closePlaceModal();
+    setPlaceBtnEnabled(true);
+  };
+  
   const onPressNearbyUser = (user_id: string) => {
-    // Chat... User Profile...
     router.navigate({
       pathname: "/(app)/(home)/OtherProfile",
       params: { user_id: user_id },
@@ -93,18 +159,24 @@ export default function NearbyUserViewer() {
       }}
     >
       <TouchableOpacity
-        onPress={() => {
-          router.navigate("/(app)/(home)/MyProfile");
-        }}
+        onPress={() =>
+          openPlaceModal({
+            onClose: closePlaceModal,
+            origAddr: profile?.user_id,
+            newAddr: `POINT(${myLocation?.lon}, ${myLocation?.lat})`,
+            onPlaceBtnPressed: onPressMyself,
+            placeBtnEnabled: placeBtnEnabled,
+          })
+        }
       >
         <NearbyUser
           screenWidth={userViewerSize}
-          radius={0}
-          angle={0}
+          myLocation={myLocation!}
+          userLocation={myLocation!}
           children={<Text>Me</Text>}
         />
       </TouchableOpacity>
-      {avatarData?.map((value, index) => (
+      {nearbyUsersLocations?.map((value, index) => (
         <TouchableOpacity
           key={index}
           onPress={() => {
@@ -113,9 +185,9 @@ export default function NearbyUserViewer() {
         >
           <NearbyUser
             screenWidth={userViewerSize}
-            radius={100}
-            angle={(2 * Math.PI * index) / avatarData.length}
-            children={<Text>User</Text>}
+            myLocation={myLocation!}
+            userLocation={{ lat: value.lat, lon: value.lon }}
+            children={<Text>{value.name}</Text>}
           />
         </TouchableOpacity>
       ))}
@@ -123,30 +195,59 @@ export default function NearbyUserViewer() {
   );
 }
 
-interface getPosInput {
-  screenWidth: number;
-  radius: number;
-  angle: number;
-}
 
-function NearbyUser({ screenWidth, radius, angle, children }: NearbyUserProp) {
-  const getPosition = ({ screenWidth, radius, angle }: getPosInput) => {
-    const top = screenWidth / 2 - radius * Math.sin(angle) - 25;
-    const left = screenWidth / 2 - radius * Math.cos(angle) - 25;
-    return { top: top, left: left };
-  };
+function NearbyUser({
+  screenWidth,
+  myLocation,
+  userLocation,
+  mapRadiusMeters = 500,
+  children,
+}: {
+  screenWidth: number;
+  myLocation: { lat: number; lon: number };
+  userLocation: { lat: number; lon: number };
+  mapRadiusMeters?: number;
+  children: React.ReactNode;
+}) {
+  if (!myLocation || !userLocation) return null;
+
+  const METERS_PER_DEG_LAT = 111000;
+  const center = screenWidth / 2;
+
+  const dx_m =
+    (userLocation.lon - myLocation.lon) *
+    METERS_PER_DEG_LAT *
+    Math.cos((myLocation.lat * Math.PI) / 180);
+  const dy_m = (userLocation.lat - myLocation.lat) * METERS_PER_DEG_LAT;
+
+  const pixelsPerMeter = screenWidth / (2 * mapRadiusMeters);
+  const x_px = dx_m * pixelsPerMeter;
+  const y_px = -dy_m * pixelsPerMeter;
+
+  const top = center + y_px - 25;
+  const left = center + x_px - 25;
+
+  if (Math.abs(x_px) > center || Math.abs(y_px) > center) return null;
 
   return (
     <View
       style={{
         ...styles.profileBG,
-        ...getPosition({ screenWidth, radius, angle }),
+        position: "absolute",
+        top,
+        left,
+        width: 50,
+        height: 50,
+        borderRadius: 25,
+        justifyContent: "center",
+        alignItems: "center",
       }}
     >
       {children}
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   nearbyUserViewer: {
@@ -161,5 +262,22 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     justifyContent: "center",
     alignItems: "center",
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContent: {
+    backgroundColor: "white",
+    padding: 20,
+    borderRadius: 10,
+    minWidth: 300,
+    alignItems: "center",
+  },
+  modalText: {
+    fontSize: 18,
+    marginBottom: 20,
   },
 });
