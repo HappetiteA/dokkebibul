@@ -7,7 +7,7 @@ export async function getNearbyUsers(
   lon: number | undefined,
   maxDistance: number
 ): Promise<SelectNearbyUsersResponse> {
-  if (!lat || !lon) {
+  if (lat == null || lon == null) {
     console.error("Error fetching current location");
     return [];
   }

@@ -138,7 +138,7 @@ export default function NearbyUserViewer() {
     setPlaceBtnEnabled(false);
     if (!myLocation || !profile) {
       console.error("Failed to fetch current location");
-      setPlaceBtnEnabled(false);
+      setPlaceBtnEnabled(true);
       return;
     }
     const { error } = await supabase
