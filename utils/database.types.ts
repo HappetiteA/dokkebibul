@@ -241,7 +241,7 @@ export type Database = {
         }[]
       }
       select_blocks: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           created_at: string
           dst_id: string
@@ -252,7 +252,7 @@ export type Database = {
         }[]
       }
       select_conversations: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           created_at: string
           id: string
@@ -269,7 +269,7 @@ export type Database = {
         }[]
       }
       select_followers: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           created_at: string
           dst_id: string
@@ -280,7 +280,7 @@ export type Database = {
         }[]
       }
       select_followings: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           created_at: string
           dst_id: string
@@ -288,6 +288,16 @@ export type Database = {
           id: string
           src_id: string
           src_name: string
+        }[]
+      }
+      select_nearby_users: {
+        Args: { max_distance: number; ref_lat: number; ref_lon: number }
+        Returns: {
+          distance: number
+          lat: number
+          lon: number
+          name: string
+          user_id: string
         }[]
       }
       select_profile_by_user_id: {

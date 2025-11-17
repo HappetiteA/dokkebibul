@@ -7,22 +7,56 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Modal
 } from "react-native";
 import { Link, useRouter } from "expo-router";
 import NearbyUserViewer from "@/components/NearbyUserViewer";
-import Modal from "@/components/ModalChain";
 import { useCallback, useMemo, useRef, useState } from "react";
 import headerStyle from "@/components/style/headerStyle";
 import ChatRoomList from "@/components/ChatRoomList";
+import useModal from "@/hooks/useModal";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import BottomSheet, { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 
+
+function DetailsModal({
+  isOpen,
+  onClose,
+  name,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  name: string | undefined;
+}) {
+  return (
+    <Modal
+      visible={isOpen}
+      transparent
+      animationType="slide"
+      onRequestClose={onClose}
+    >
+      <View>
+        <View>
+          <Text>{name}</Text>
+          <Button title={"채팅방 나가기"} />
+          <Button title={"차단하기"} />
+          <Button title={"신고하기"} />
+          <Button
+            title={"확인"}
+            onPress={onClose}
+          />
+        </View>
+      </View>
+    </Modal>
+  );
+}
+
+
 export default function MainScreen() {
   const bottomSheetRef = useRef<BottomSheet>(null);
-  const snapPoints = useMemo(() => ["20%", "50%", "90%"], []);
+  const snapPoints = useMemo(() => ["20%", "60%"], []);
 
-  const [modalOpen, setModalOpen] = useState(false);
-  const onModalOpen = () => {};
+  const { open: openDetailsModal, close: closeDetailsModal } = useModal(DetailsModal);
 
   const handleSheetChanges = useCallback((index: number) => {
     console.log("handleSheetChanges", index);
@@ -38,34 +72,15 @@ export default function MainScreen() {
           ref={bottomSheetRef}
           onChange={handleSheetChanges}
           snapPoints={snapPoints}
-          index={2}
+          index={1}
         >
           <BottomSheetScrollView style={styles.contentContainer}>
             <Text>채팅방 목록</Text>
-            <ChatRoomList setModalOpen={setModalOpen} />
+            <ChatRoomList openModal={(name) => openDetailsModal({ onClose: closeDetailsModal, name: name })} />
           </BottomSheetScrollView>
         </BottomSheet>
       </GestureHandlerRootView>
 
-      <Modal
-        isOpen={modalOpen}
-        onClose={() => {
-          setModalOpen(false);
-        }}
-        children={
-          <View>
-            <Button title={"채팅방 나가기"} />
-            <Button title={"차단하기"} />
-            <Button title={"신고하기"} />
-            <Button
-              title={"확인"}
-              onPress={() => {
-                setModalOpen(false);
-              }}
-            />
-          </View>
-        }
-      ></Modal>
     </>
   );
 }

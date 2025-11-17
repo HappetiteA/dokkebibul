@@ -1,5 +1,5 @@
 import { ScrollView, Text, View } from "react-native";
-import { Message } from "@/utils/global.types";
+import { Message } from "@/utils/model.types";
 
 type Chat = Omit<Message, "id" | "conversation_id">;
 

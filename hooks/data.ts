@@ -1,33 +1,28 @@
 import { supabase } from "@/utils/supabase";
+import { SelectNearbyUsersResponse } from "@/utils/schema.types";
 
-export interface ILocation {
-  latitude: number;
-  longitude: number;
-}
 
-export interface IOtherLocation {
-  location: unknown;
-  updated_at: string;
-  user_id: string;
-}
-
-export const getNearbyWisps = async (user_id: string) => {
-  try {
-    const { data, error } = await supabase
-      .from("locations")
-      .select("*")
-      .neq("user_id", user_id);
-
-    if (error) {
-      console.error("Error fetching data:", error);
-      return null;
-    }
-    return data;
-  } catch (err) {
-    console.error("Unexpected error:", err);
-    return null;
+export async function getNearbyUsers(
+  lat: number | undefined,
+  lon: number | undefined,
+  maxDistance: number
+): Promise<SelectNearbyUsersResponse> {
+  if (lat == null || lon == null) {
+    console.error("Error fetching current location");
+    return [];
   }
-};
+  const { data, error } = await supabase.rpc("select_nearby_users", {
+    ref_lat: lat,
+    ref_lon: lon,
+    max_distance: maxDistance,
+  });
+
+  if (error) {
+    console.error("Error fetching nearby users:", error);
+    return [];
+  }
+  return data;
+}
 
 export const getFollowings = async () => {
   try {
@@ -72,47 +67,3 @@ export const getProfileById = async (user_id: string) => {
   }
 };
 
-export const addNewAvatar = (location: ILocation) => {};
-// async (location: ILocation) => {
-//   const {
-//     data: { session },
-//     error: sessionError,
-//   } = await supabase.auth.getSession();
-
-//   if (sessionError) {
-//     console.error(sessionError);
-//     return;
-//   }
-
-//   const id = session?.user.id;
-
-//   const { error } = await supabase.from("location").insert({
-//     id: id,
-//     latitude: location!.latitude,
-//     longitude: location!.longitude,
-//   });
-
-//   if (error) {
-//     console.error(error);
-//   }
-// };
-
-export const updateAvatarPosition = (location: ILocation) => {};
-// async (location: ILocation) => {
-//   const {
-//     data: { session },
-//     error: sessionError,
-//   } = await supabase.auth.getSession();
-
-//   if (sessionError) {
-//     console.error(sessionError);
-//     return;
-//   }
-
-//   const id = session?.user.id;
-
-//   const { error } = await supabase
-//     .from("location")
-//     .update({ latitude: location!.latitude, longitude: location!.longitude })
-//     .eq("id", id);
-// };

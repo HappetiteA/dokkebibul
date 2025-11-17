@@ -1,13 +1,12 @@
 import { Button, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useEffect, useState } from "react";
-import Modal from "./ModalChain";
 import { getChatRooms } from "@/hooks/data";
 import { useAuth } from "@/utils/AuthContext";
 import { Link } from "expo-router";
 import ChatListElement from "./ChatListElement";
 
 interface IChatRoomListProp {
-  setModalOpen: (arg0: boolean) => void;
+  openModal: (name: string | undefined) => void;
 }
 
 interface IChatRoomData {
@@ -25,7 +24,7 @@ interface IChatRoomData {
   user2_noti_enabled: boolean;
 }
 
-export default function ChatRoomList({ setModalOpen }: IChatRoomListProp) {
+export default function ChatRoomList({ openModal }: IChatRoomListProp) {
   const { profile } = useAuth();
   const [chatRooms, setChatRooms] = useState<IChatRoomData[]>([]);
 
@@ -66,7 +65,7 @@ export default function ChatRoomList({ setModalOpen }: IChatRoomListProp) {
         user_names={user_names}
         other_name={other_name}
         onLongPress={() => {
-          setModalOpen(true);
+          openModal(other_name);
         }}
       />
     );
