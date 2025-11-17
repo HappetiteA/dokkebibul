@@ -2,7 +2,7 @@ import { getNearbyUsers } from "@/hooks/data";
 import { SelectNearbyUsersResponse } from "@/utils/schema.types";
 import { useAuth } from "@/utils/AuthContext";
 import { useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   Dimensions,
   StyleSheet,
@@ -28,7 +28,6 @@ async function startTracking(
     {
       accuracy: Location.Accuracy.High,
       timeInterval: 3000,
-      distanceInterval: 5,
     },
     (loc) => {
       const { latitude, longitude } = loc.coords;
@@ -93,10 +92,19 @@ export default function NearbyUserViewer() {
     lat: number;
     lon: number;
   } | null>(null);
+  const myLocationRef = useRef<{
+    lat: number;
+    lon: number;
+  } | null>(null);
+
   const [nearbyUsersLocations, setNearbyUsersLocations] = useState<SelectNearbyUsersResponse>([]);
 
   const { open: openPlaceModal, close: closePlaceModal } = useModal(PlaceModal);
   const [placeBtnEnabled, setPlaceBtnEnabled] = useState(true);
+
+  useEffect(() => {
+    myLocationRef.current = myLocation;
+  }, [myLocation]);
 
   useEffect(() => {
     let watcher: any;
@@ -104,14 +112,18 @@ export default function NearbyUserViewer() {
 
     async function start() {
       watcher = await startTracking(async (lat, lon) => {
+        console.log(lat, lon)
         setMyLocation({ lat, lon });
       });
 
       interval = setInterval(async () => {
-        if (!myLocation) return;
-        const data = await getNearbyUsers(myLocation.lat, myLocation.lon, 5000);
+        const loc = myLocationRef.current;
+        console.log(loc);
+        if (!loc) return;
+        const data = await getNearbyUsers(loc.lat, loc.lon, 5000);
         setNearbyUsersLocations(data);
-        console.log(data)
+        console.log(nearbyUsersLocations);
+        console.log(myLocation)
       }, 3000);
     }
 
@@ -120,7 +132,7 @@ export default function NearbyUserViewer() {
       watcher?.remove?.();
       clearInterval(interval);
     };
-  }, [myLocation]);
+  }, []);
 
   const onPressMyself = async () => {
     setPlaceBtnEnabled(false);
