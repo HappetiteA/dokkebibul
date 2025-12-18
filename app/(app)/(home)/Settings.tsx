@@ -16,9 +16,9 @@ export default function Settings() {
 
   const updateGlobalAISetting = (value: boolean) => {
     setIsOn(value);
-    updateStorageData(value);
 
     (async () => {
+      await updateStorageData(value);
       const { error } = await supabase
         .from("profiles")
         .update({ is_ai_enabled: value })
