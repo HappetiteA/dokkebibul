@@ -97,7 +97,7 @@ export default function Settings() {
       // can use asyncstorage data
       setIsOn(aiEnabledData["global"].enabled);
     })();
-  }, []);
+  }, [profile]);
 
   return (
     <>

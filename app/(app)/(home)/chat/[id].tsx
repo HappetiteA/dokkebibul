@@ -36,6 +36,11 @@ export default function ChatScreen() {
   };
 
   const updateAISetting = (value: boolean) => {
+    if (profile == null || profile.user_id == null) {
+      console.warn("Cannot update AI setting: user not authenticated");
+      return;
+    }
+
     updateStorageData(value);
     (async () => {
       if (profile?.user_id == user_ids[0]) {
@@ -185,7 +190,7 @@ export default function ChatScreen() {
     return () => {
       channel.unsubscribe();
     };
-  }, [conversation_id]);
+  }, [conversation_id, profile?.user_id]);
 
   return (
     <>
