@@ -63,6 +63,10 @@ export default function Settings() {
     await AsyncStorage.setItem("AIenabled", jsonStr);
   };
 
+  const resetStorageData = async () => {
+    await AsyncStorage.removeItem("AIenabled");
+  };
+
   useEffect(() => {
     (async () => {
       const aiEnableDataFromStorage = await AsyncStorage.getItem("AIenabled");
@@ -71,24 +75,19 @@ export default function Settings() {
         // need to make new key value pair
         const dataFromServer = loadDataFromServer();
         insertStorageData(dataFromServer);
-        return;
-      }
-
-      const aiEnabledData = JSON.parse(aiEnableDataFromStorage) as IAIenabled;
-      console.log(aiEnabledData);
-      if (aiEnabledData["global"] == null) {
-        // load data from server and save at local storage
-        // need to add new row
-        const dataFromServer = loadDataFromServer();
-        updateStorageData(dataFromServer);
         setIsOn(dataFromServer);
         return;
       }
 
-      // row exists
+      const aiEnabledData = JSON.parse(aiEnableDataFromStorage) as IAIenabled;
       const ONE_DAY = 24 * 60 * 60 * 1000;
-      if (aiEnabledData["global"].last_fetched < Date.now() - ONE_DAY) {
-        // asyncstorage data is old
+      // do not exist or expired
+      if (
+        aiEnabledData["global"] == null ||
+        aiEnabledData["global"].last_fetched < Date.now() - ONE_DAY
+      ) {
+        // load data from server and save at local storage
+        // need to add new row
         const dataFromServer = loadDataFromServer();
         updateStorageData(dataFromServer);
         setIsOn(dataFromServer);
@@ -111,6 +110,13 @@ export default function Settings() {
             updateGlobalAISetting(!isOn);
           }}
         ></Switch>
+        <TouchableOpacity
+          onPress={() => {
+            resetStorageData();
+          }}
+        >
+          <Text>RESET Asyncstorage</Text>
+        </TouchableOpacity>
         <TouchableOpacity
           onPress={async () => {
             try {

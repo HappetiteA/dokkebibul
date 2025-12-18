@@ -160,23 +160,19 @@ export default function ChatScreen() {
         // need to make new key value pair
         const dataFromServer = loadDataFromServer();
         insertStorageData(dataFromServer);
-        return;
-      }
-
-      const aiEnabledData = JSON.parse(aiEnableDataFromStorage) as IAIenabled;
-      if (aiEnabledData[conversation_id] == null) {
-        // load data from server and save at local storage
-        // need to add new row
-        const dataFromServer = loadDataFromServer();
-        updateStorageData(dataFromServer);
         setAiEnabled(dataFromServer);
         return;
       }
 
-      // row exists
       const ONE_DAY = 24 * 60 * 60 * 1000;
-      if (aiEnabledData[conversation_id].last_fetched < Date.now() - ONE_DAY) {
-        // asyncstorage data is old
+      const aiEnabledData = JSON.parse(aiEnableDataFromStorage) as IAIenabled;
+      // do not exist or expired
+      if (
+        aiEnabledData[conversation_id] == null ||
+        aiEnabledData[conversation_id].last_fetched < Date.now() - ONE_DAY
+      ) {
+        // load data from server and save at local storage
+        // need to add new row
         const dataFromServer = loadDataFromServer();
         updateStorageData(dataFromServer);
         setAiEnabled(dataFromServer);
