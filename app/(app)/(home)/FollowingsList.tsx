@@ -14,7 +14,7 @@ export default function FollowingsList() {
       const followData = await getFollowings();
       setFollowings(followData ?? []);
     })();
-  }, [followings]);
+  }, []);
 
   const MoveToOtherProfile = (user_id: string) => {
     router.navigate({

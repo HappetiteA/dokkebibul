@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Text, View } from "react-native";
 import { SelectBlocksResponse } from "@/types/orm.types";
 
-export default function FollowingsList() {
+export default function BlocksList() {
   const [blocks, setBlocks] = useState<SelectBlocksResponse>([]);
 
   useEffect(() => {
@@ -12,14 +12,14 @@ export default function FollowingsList() {
       const followData = await getBlocks();
       setBlocks(followData ?? []);
     })();
-  }, [blocks]);
+  }, []);
 
   return (
     <>
       <DefaultHeader title="차단 목록" />
       <View>
         {blocks.map((value) => (
-            <Text>{value.dst_name}</Text>
+          <Text key={value.dst_id}>{value.dst_name}</Text>
         ))}
       </View>
     </>
