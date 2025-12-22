@@ -16,10 +16,6 @@ export default function FollowerList() {
     })();
   }, []);
 
-  useEffect(() => {
-    console.log(followers)
-  }, [followers])
-
   const MoveToOtherProfile = (user_id: string) => {
     router.navigate({
       pathname: "/(app)/(home)/OtherProfile",
