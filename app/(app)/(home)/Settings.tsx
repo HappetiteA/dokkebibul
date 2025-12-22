@@ -111,13 +111,6 @@ export default function Settings() {
           }}
         ></Switch>
         <TouchableOpacity
-          onPress={() => {
-            resetStorageData();
-          }}
-        >
-          <Text>RESET Asyncstorage</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
           onPress={async () => {
             try {
               await logout();

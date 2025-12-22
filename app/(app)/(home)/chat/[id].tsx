@@ -1,5 +1,8 @@
 import ChatHistory from "@/components/ChatHistory";
 import { IAIenabled } from "@/components/interfaces";
+import { BackIcon, SettingsIcon } from "@/components/style/Icons";
+import headerStyle from "@/components/style/headerStyle";
+import ShadowWrap from "@/components/style/Shadow";
 import { useAuth } from "@/utils/AuthContext";
 import { Message } from "@/utils/global.types";
 import { supabase } from "@/utils/supabase";
@@ -120,6 +123,20 @@ export default function ChatScreen() {
     await AsyncStorage.setItem("AIenabled", jsonStr);
   };
 
+  const getOtherName = () => {
+    let index = -1;
+    if (profile?.user_id == user_ids[0]) {
+      index = 1;
+    } else if (profile?.user_id == user_ids[1]) {
+      index = 0;
+    }
+
+    if (index == -1) {
+      return "Undefined";
+    }
+    return user_names[index];
+  };
+
   useEffect(() => {
     navigation.setOptions({ title: `Chat #${conversation_id}` });
     (async () => {
@@ -198,21 +215,32 @@ export default function ChatScreen() {
         aiEnabled={aiEnabled}
         setAiEnable={setAiEnabled}
         updateAISetting={updateAISetting}
+        otherName={getOtherName()}
       ></ChatScreenHeader>
       <View>
-        <Text>Hello Chat #{conversation_id}</Text>
         <ChatHistory chat={chat} user_ids={user_ids} user_names={user_names} />
       </View>
-      <View>
-        <TextInput
-          editable={!aiEnabled}
-          style={styles.textInput}
-          value={text}
-          onChangeText={onChangeText}
-          placeholder="Say Something."
-        />
-        <Button title="submit" onPress={onSubmit} disabled={aiEnabled}></Button>
-      </View>
+      <ShadowWrap>
+        <View style={styles.textInputView}>
+          <TextInput
+            editable={!aiEnabled}
+            value={text}
+            onChangeText={onChangeText}
+            placeholder="Say Something."
+            style={{ flex: 5, fontSize: 20 }}
+          />
+          <TouchableOpacity onPress={onSubmit} disabled={aiEnabled}>
+            <View
+              style={{
+                backgroundColor: "#99D8EE",
+                width: 30,
+                height: 30,
+                borderRadius: 30,
+              }}
+            ></View>
+          </TouchableOpacity>
+        </View>
+      </ShadowWrap>
     </>
   );
 }
@@ -221,12 +249,14 @@ interface ChatScreenHeaderProp {
   aiEnabled: boolean;
   setAiEnable: React.Dispatch<React.SetStateAction<boolean>>;
   updateAISetting: (value: boolean) => void;
+  otherName: string;
 }
 
 function ChatScreenHeader({
   aiEnabled,
   setAiEnable,
   updateAISetting,
+  otherName,
 }: ChatScreenHeaderProp) {
   const router = useRouter();
 
@@ -242,18 +272,21 @@ function ChatScreenHeader({
   };
 
   return (
-    <View style={styles.header}>
-      <View style={styles.headerContent}>
-        <View style={styles.headerLeft}>
+    <View style={headerStyle.container}>
+      <View style={headerStyle.content}>
+        <View style={headerStyle.left}>
           <TouchableOpacity onPress={onPressBackBtn}>
-            <Text>Back</Text>
+            <BackIcon />
           </TouchableOpacity>
+          <Text style={headerStyle.title}>{otherName}</Text>
         </View>
-        <View style={styles.headerRight}>
+        <View style={headerStyle.right}>
           <Switch value={aiEnabled} onChange={onSwitchChange}></Switch>
-          <TouchableOpacity style={styles.headerButton}>
-            <Text>Setting</Text>
-          </TouchableOpacity>
+          <ShadowWrap>
+            <TouchableOpacity style={headerStyle.button}>
+              <SettingsIcon />
+            </TouchableOpacity>
+          </ShadowWrap>
         </View>
       </View>
     </View>
@@ -261,39 +294,11 @@ function ChatScreenHeader({
 }
 
 const styles = StyleSheet.create({
-  header: {
-    height: 100,
-    backgroundColor: "#bdc3c7",
-  },
-  headerContent: {
-    marginTop: 50,
-    height: 50,
+  textInputView: {
     flexDirection: "row",
-    textAlignVertical: "center",
-    justifyContent: "space-between",
-  },
-  headerRight: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginRight: 20,
-  },
-  headerLeft: {
-    justifyContent: "center",
-    marginLeft: 20,
-  },
-  headerButton: {
-    width: 48,
-    height: 48,
-    backgroundColor: "#95a5a6",
-    borderRadius: 25,
-    justifyContent: "center",
-    alignItems: "center",
-    marginHorizontal: 2,
-  },
-  textInput: {
-    backgroundColor: "#bdc3c7",
-    margin: 10,
+    backgroundColor: "#F8F8FA",
+    borderRadius: 30,
+    marginHorizontal: 15,
     padding: 10,
-    fontSize: 20,
   },
 });

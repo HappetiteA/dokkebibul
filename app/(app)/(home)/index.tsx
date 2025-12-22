@@ -16,6 +16,8 @@ import headerStyle from "@/components/style/headerStyle";
 import ChatRoomList from "@/components/ChatRoomList";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import BottomSheet, { BottomSheetScrollView } from "@gorhom/bottom-sheet";
+import ShadowWrap from "@/components/style/Shadow";
+import { ProfilesIcon, SettingsIcon } from "@/components/style/Icons";
 
 export default function MainScreen() {
   const bottomSheetRef = useRef<BottomSheet>(null);
@@ -41,7 +43,6 @@ export default function MainScreen() {
           index={2}
         >
           <BottomSheetScrollView style={styles.contentContainer}>
-            <Text>채팅방 목록</Text>
             <ChatRoomList setModalOpen={setModalOpen} />
           </BottomSheetScrollView>
         </BottomSheet>
@@ -87,15 +88,22 @@ function MainScreenHeader() {
           <Text>LOGO & TEXT</Text>
         </View>
         <View style={headerStyle.right}>
-          <TouchableOpacity
-            style={headerStyle.button}
-            onPress={onSettingsClick}
-          >
-            <Text>Setting</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={headerStyle.button} onPress={onProfileClick}>
-            <Text>Profile</Text>
-          </TouchableOpacity>
+          <ShadowWrap>
+            <TouchableOpacity
+              style={headerStyle.button}
+              onPress={onSettingsClick}
+            >
+              <SettingsIcon />
+            </TouchableOpacity>
+          </ShadowWrap>
+          <ShadowWrap>
+            <TouchableOpacity
+              style={headerStyle.button}
+              onPress={onProfileClick}
+            >
+              <ProfilesIcon />
+            </TouchableOpacity>
+          </ShadowWrap>
         </View>
       </View>
     </View>
@@ -106,9 +114,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
+    backgroundColor: "#F8F8FA",
   },
   contentContainer: {
     width: "100%",
     paddingHorizontal: 10,
+    backgroundColor: "#F8F8FA",
   },
 });
