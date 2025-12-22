@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { StyleSheet, Text, View, Button, Alert, TextInput } from "react-native";
 import { useRouter } from "expo-router";
-import { useAuth } from "@/utils/AuthContext";
-import { supabase } from "@/utils/supabase";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/lib/supabase";
 
 type QuestionProps = {
   question: string;
@@ -10,9 +10,15 @@ type QuestionProps = {
   onChangeText: (text: string) => void;
   onNext: () => void;
   isLast: boolean;
-}
+};
 
-const Question = ({ question, value, onChangeText, onNext, isLast }: QuestionProps) => {
+const Question = ({
+  question,
+  value,
+  onChangeText,
+  onNext,
+  isLast,
+}: QuestionProps) => {
   return (
     <View style={styles.questionContainer}>
       <Text style={styles.questionText}>{question}</Text>
@@ -42,7 +48,7 @@ const Onboarding = () => {
   const router = useRouter();
 
   const [currentIndex, setCurrentIndex] = useState<number>(0);
-  const [answers, setAnswers] = useState<{[key: string]: string}>({});
+  const [answers, setAnswers] = useState<{ [key: string]: string }>({});
 
   const handleAnswerChange = (key: string, value: string) => {
     setAnswers((prev) => ({ ...prev, [key]: value }));
@@ -62,26 +68,22 @@ const Onboarding = () => {
       return;
     }
     try {
-      const { error } = await supabase
-        .from("profiles")
-        .insert(
-          {
-            user_id: user.id,
-            name: answers["name"]?.trim(),
-          },
-        );      
-        if (error) {
-          console.error(error);
-          Alert.alert(`Failed to insert profile to DB: ${error.message}`);
-          return;
-        }
-        await refreshProfile();
-        router.replace("/(app)/(home)");
+      const { error } = await supabase.from("profiles").insert({
+        user_id: user.id,
+        name: answers["name"]?.trim(),
+      });
+      if (error) {
+        console.error(error);
+        Alert.alert(`Failed to insert profile to DB: ${error.message}`);
+        return;
+      }
+      await refreshProfile();
+      router.replace("/(app)/(home)");
     } catch (err: any) {
       console.error(err);
       Alert.alert(`Failed to insert profile to DB: ${err}`);
     }
-  }
+  };
 
   const handleNext = () => {
     if (currentIndex < questions.length - 1) {
@@ -98,7 +100,9 @@ const Onboarding = () => {
       <Question
         question={currentQuestion.label}
         value={answers[currentQuestion.key] || ""}
-        onChangeText={(text: string) => handleAnswerChange(currentQuestion.key, text)}
+        onChangeText={(text: string) =>
+          handleAnswerChange(currentQuestion.key, text)
+        }
         onNext={handleNext}
         isLast={currentIndex === questions.length - 1}
       />
@@ -106,7 +110,7 @@ const Onboarding = () => {
   );
 };
 
-export default Onboarding
+export default Onboarding;
 
 const styles = StyleSheet.create({
   container: {

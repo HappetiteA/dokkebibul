@@ -2,7 +2,7 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useEffect } from "react";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
-import { AuthProvider } from "@/utils/AuthContext";
+import { AuthProvider } from "@/contexts/AuthContext";
 import ModalProvider from "@/contexts/ModalProvider";
 import { SplashScreenController } from "@/components/SplashScreenController";
 

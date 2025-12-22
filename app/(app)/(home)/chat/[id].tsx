@@ -1,7 +1,7 @@
 import ChatHistory from "@/components/ChatHistory";
-import { useAuth } from "@/utils/AuthContext";
-import { Message } from "@/utils/model.types";
-import { supabase } from "@/utils/supabase";
+import { useAuth } from "@/contexts/AuthContext";
+import { Message } from "@/types/model.types";
+import { supabase } from "@/lib/supabase";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {

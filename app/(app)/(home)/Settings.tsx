@@ -1,5 +1,5 @@
 import DefaultHeader from "@/components/DefaultHeader";
-import { useAuthActions } from "@/utils/auth";
+import { useAuthActions } from "@/hooks/useAuthActions";
 import { Alert, Text } from "react-native";
 import { TouchableOpacity } from "react-native";
 

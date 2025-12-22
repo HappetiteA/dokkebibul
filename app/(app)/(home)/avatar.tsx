@@ -1,6 +1,6 @@
 import DefaultHeader from "@/components/DefaultHeader";
 import { Text, TouchableOpacity, View } from "react-native";
-import { addNewAvatar, updateAvatarPosition } from "@/hooks/data";
+import { addNewAvatar, updateAvatarPosition } from "@/services/supabase";
 import useCurrentLocation from "@/hooks/useCurrentLocation";
 
 export default function AvatarScreen() {

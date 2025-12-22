@@ -9,11 +9,11 @@ import {
 import { useLocalSearchParams, useRouter } from "expo-router";
 import headerStyle from "@/components/style/headerStyle";
 import { useEffect, useRef, useState } from "react";
-import { supabase } from "@/utils/supabase";
-import { getProfileById, getFollowings } from "@/hooks/data";
+import { supabase } from "@/lib/supabase";
+import { getProfileById, getFollowings } from "@/services/supabase";
 import useModal from "@/hooks/useModal";
-import { useAuth } from "@/utils/AuthContext";
-import { Profile } from "@/utils/model.types";
+import { useAuth } from "@/contexts/AuthContext";
+import { Profile } from "@/types/model.types";
 
 function BlockModal({
   isOpen,
@@ -351,13 +351,11 @@ export default function OtherProfileScreen() {
     const selectedReasons = Object.keys(reasons).filter((r) => reasons[r]);
     const joinedReasons = selectedReasons.join(", ");
 
-    const { error } = await supabase
-      .from("reports")
-      .insert({
-        src_id: profile.user_id,
-        dst_id: user_id,
-        reason: joinedReasons,
-      });
+    const { error } = await supabase.from("reports").insert({
+      src_id: profile.user_id,
+      dst_id: user_id,
+      reason: joinedReasons,
+    });
 
     closeReportModal();
     setReportBtnEnabled(true);
