@@ -2,6 +2,8 @@ import ChatHistory from "@/components/ChatHistory";
 import { useAuth } from "@/contexts/AuthContext";
 import { Message } from "@/types/model.types";
 import { supabase } from "@/lib/supabase";
+import { IAIenabled } from "@/components/interfaces";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
@@ -27,14 +29,40 @@ export default function ChatScreen() {
   const { profile } = useAuth();
   const [chat, setChat] = useState<Array<Chat>>([]);
   const [text, setText] = useState<string>("");
-  const [showAI, setShowAI] = useState(false);
+  const [aiEnabled, setAiEnabled] = useState(false);
 
   const onChangeText = (inputText: string) => {
     setText(inputText);
   };
 
-  const updateShowAI = (value: boolean) => {
-    setShowAI(value);
+  const updateAISetting = (value: boolean) => {
+    if (profile == null || profile.user_id == null) {
+      console.warn("Cannot update AI setting: user not authenticated");
+      return;
+    }
+
+    updateStorageData(value);
+    (async () => {
+      if (profile?.user_id == user_ids[0]) {
+        const { error } = await supabase
+          .from("conversations")
+          .update({ user1_ai_enabled: value })
+          .eq("id", conversation_id);
+
+        if (error) {
+          console.log(error);
+        }
+      } else {
+        const { error } = await supabase
+          .from("conversations")
+          .update({ user2_ai_enabled: value })
+          .eq("id", conversation_id);
+
+        if (error) {
+          console.log(error);
+        }
+      }
+    })();
   };
 
   const onSubmit = async () => {
@@ -57,6 +85,39 @@ export default function ChatScreen() {
     }
 
     setText("");
+  };
+
+  const loadDataFromServer = () => {
+    if (profile == null) {
+      return false;
+    }
+    return profile.is_ai_enabled;
+  };
+
+  const insertStorageData = async (aiEnabled: boolean) => {
+    const newData: IAIenabled = {
+      global: {
+        enabled: aiEnabled,
+        last_fetched: Date.now(),
+      },
+    };
+    const jsonStr = JSON.stringify(newData);
+    await AsyncStorage.setItem("AIenabled", jsonStr);
+  };
+
+  const updateStorageData = async (aiEnabled: boolean) => {
+    const aiEnableDataFromStorage = await AsyncStorage.getItem("AIenabled");
+    if (aiEnableDataFromStorage == null) {
+      return;
+    }
+
+    const aiEnabledData = JSON.parse(aiEnableDataFromStorage) as IAIenabled;
+    aiEnabledData[conversation_id] = {
+      enabled: aiEnabled,
+      last_fetched: Date.now(),
+    };
+    const jsonStr = JSON.stringify(aiEnabledData);
+    await AsyncStorage.setItem("AIenabled", jsonStr);
   };
 
   useEffect(() => {
@@ -96,47 +157,84 @@ export default function ChatScreen() {
       )
       .subscribe();
 
+    // Load ai_enable from asyncstorage
+    (async () => {
+      const aiEnableDataFromStorage = await AsyncStorage.getItem("AIenabled");
+      if (aiEnableDataFromStorage == null) {
+        // load data from server and save at local storage
+        // need to make new key value pair
+        const dataFromServer = loadDataFromServer();
+        insertStorageData(dataFromServer);
+        setAiEnabled(dataFromServer);
+        return;
+      }
+
+      const ONE_DAY = 24 * 60 * 60 * 1000;
+      const aiEnabledData = JSON.parse(aiEnableDataFromStorage) as IAIenabled;
+      // do not exist or expired
+      if (
+        aiEnabledData[conversation_id] == null ||
+        aiEnabledData[conversation_id].last_fetched < Date.now() - ONE_DAY
+      ) {
+        // load data from server and save at local storage
+        // need to add new row
+        const dataFromServer = loadDataFromServer();
+        updateStorageData(dataFromServer);
+        setAiEnabled(dataFromServer);
+        return;
+      }
+
+      // can use asyncstorage data
+      setAiEnabled(aiEnabledData[conversation_id].enabled);
+    })();
     return () => {
       channel.unsubscribe();
     };
-  }, [conversation_id]);
+  }, [conversation_id, profile?.user_id]);
 
   return (
     <>
-      <ChatScreenHeader updateShowAI={updateShowAI}></ChatScreenHeader>
+      <ChatScreenHeader
+        aiEnabled={aiEnabled}
+        setAiEnable={setAiEnabled}
+        updateAISetting={updateAISetting}
+      ></ChatScreenHeader>
       <View>
         <Text>Hello Chat #{conversation_id}</Text>
-        <ChatHistory
-          chat={chat}
-          user_ids={user_ids}
-          user_names={user_names}
-          showAI={showAI}
-        />
+        <ChatHistory chat={chat} user_ids={user_ids} user_names={user_names} />
       </View>
       <View>
         <TextInput
+          editable={!aiEnabled}
           style={styles.textInput}
           value={text}
           onChangeText={onChangeText}
           placeholder="Say Something."
         />
-        <Button title="submit" onPress={onSubmit}></Button>
+        <Button title="submit" onPress={onSubmit} disabled={aiEnabled}></Button>
       </View>
     </>
   );
 }
 
 interface ChatScreenHeaderProp {
-  updateShowAI: (value: boolean) => void;
+  aiEnabled: boolean;
+  setAiEnable: React.Dispatch<React.SetStateAction<boolean>>;
+  updateAISetting: (value: boolean) => void;
 }
 
-function ChatScreenHeader({ updateShowAI }: ChatScreenHeaderProp) {
+function ChatScreenHeader({
+  aiEnabled,
+  setAiEnable,
+  updateAISetting,
+}: ChatScreenHeaderProp) {
   const router = useRouter();
-  const [isOn, setIsOn] = useState(false);
+
   const onSwitchChange = () => {
-    setIsOn((c) => !c);
-    updateShowAI(!isOn);
+    updateAISetting(!aiEnabled);
+    setAiEnable((c) => !c);
   };
+
   const onPressBackBtn = () => {
     if (router.canGoBack()) {
       router.back();
@@ -152,7 +250,7 @@ function ChatScreenHeader({ updateShowAI }: ChatScreenHeaderProp) {
           </TouchableOpacity>
         </View>
         <View style={styles.headerRight}>
-          <Switch value={isOn} onChange={onSwitchChange}></Switch>
+          <Switch value={aiEnabled} onChange={onSwitchChange}></Switch>
           <TouchableOpacity style={styles.headerButton}>
             <Text>Setting</Text>
           </TouchableOpacity>

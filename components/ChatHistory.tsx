@@ -7,23 +7,17 @@ interface ChatHistoryProp {
   chat?: Array<Chat>;
   user_ids: string[];
   user_names: string[];
-  showAI: boolean;
 }
 export default function ChatHistory({
   chat,
   user_ids,
   user_names,
-  showAI,
 }: ChatHistoryProp) {
   const TextColor = (AIgenerated: boolean) => {
-    if (!showAI) {
-      return { color: "black" };
+    if (AIgenerated) {
+      return { color: "tomato" };
     } else {
-      if (AIgenerated) {
-        return { color: "tomato" };
-      } else {
-        return { color: "teal" };
-      }
+      return { color: "teal" };
     }
   };
 
@@ -47,7 +41,7 @@ export default function ChatHistory({
 
   return (
     <>
-      <ScrollView>
+      <ScrollView style={{ height: 500 }}>
         {chat?.map((value, index) => (
           <View key={index}>
             <Text style={TextColor(value.is_human)}>
