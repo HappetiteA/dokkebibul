@@ -18,6 +18,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { NeumorphicSwitch } from "@/components/style/Switch";
 
 type Chat = Omit<Message, "id" | "conversation_id">;
 
@@ -230,14 +231,16 @@ export default function ChatScreen() {
             style={{ flex: 5, fontSize: 20 }}
           />
           <TouchableOpacity onPress={onSubmit} disabled={aiEnabled}>
-            <View
-              style={{
-                backgroundColor: "#99D8EE",
-                width: 30,
-                height: 30,
-                borderRadius: 30,
-              }}
-            ></View>
+            <View style={styles.inner_shadow}>
+              <View
+                style={{
+                  backgroundColor: "#99D8EE",
+                  width: 30,
+                  height: 30,
+                  borderRadius: 30,
+                }}
+              ></View>
+            </View>
           </TouchableOpacity>
         </View>
       </ShadowWrap>
@@ -281,7 +284,17 @@ function ChatScreenHeader({
           <Text style={headerStyle.title}>{otherName}</Text>
         </View>
         <View style={headerStyle.right}>
-          <Switch value={aiEnabled} onChange={onSwitchChange}></Switch>
+          <View style={{ justifyContent: "center" }}>
+            <NeumorphicSwitch
+              width={60}
+              height={30}
+              padding={5}
+              value={aiEnabled}
+              onValueChange={onSwitchChange}
+              onColor="#93D7EA"
+              offColor="#D7D7E2"
+            ></NeumorphicSwitch>
+          </View>
           <ShadowWrap>
             <TouchableOpacity style={headerStyle.button}>
               <SettingsIcon />
@@ -300,5 +313,16 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     marginHorizontal: 15,
     padding: 10,
+  },
+  inner_shadow: {
+    backgroundColor: "transparent",
+    borderRadius: 20,
+    borderWidth: 0.01,
+    borderColor: "transparent",
+    overflow: "hidden",
+    shadowOffset: { width: 2, height: 2 },
+    shadowColor: "#000000",
+    shadowOpacity: 0.2,
+    elevation: 1,
   },
 });
