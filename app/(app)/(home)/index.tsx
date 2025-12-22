@@ -59,7 +59,7 @@ export default function MainScreen() {
   const { open: openDetailsModal, close: closeDetailsModal } = useModal(DetailsModal);
 
   const handleSheetChanges = useCallback((index: number) => {
-    console.log("handleSheetChanges", index);
+    // console.log("handleSheetChanges", index);
   }, []);
 
   return (

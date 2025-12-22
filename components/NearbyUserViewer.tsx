@@ -107,18 +107,18 @@ export default function NearbyUserViewer() {
 
     async function start() {
       watcher = await startTracking(async (lat, lon) => {
-        console.log(lat, lon);
+        // console.log(lat, lon);
         setMyLocation({ lat, lon });
       });
 
       interval = setInterval(async () => {
         const loc = myLocationRef.current;
-        console.log(loc);
+        // console.log(loc);
         if (!loc) return;
         const data = await getNearbyUsers(loc.lat, loc.lon, 5000);
         setNearbyUsersLocations(data);
-        console.log(nearbyUsersLocations);
-        console.log(myLocation);
+        // console.log(nearbyUsersLocations);
+        // console.log(myLocation);
       }, 3000);
     }
 

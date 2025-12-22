@@ -29,12 +29,12 @@ export default function FollowerList() {
       <View>
         {followers.map((value) => (
           <TouchableOpacity
-            key={value.dst_id}
+            key={value.src_id}
             onPress={() => {
-              MoveToOtherProfile(value.dst_id);
+              MoveToOtherProfile(value.src_id);
             }}
           >
-            <Text>{value.dst_name}</Text>
+            <Text>{value.src_name}</Text>
           </TouchableOpacity>
         ))}
       </View>
