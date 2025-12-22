@@ -1,12 +1,30 @@
+import { useEffect, useState } from "react";
 import { Text, TouchableOpacity, View, Alert, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import headerStyle from "@/components/style/headerStyle";
-import { useAuth } from "@/utils/AuthContext";
-import { useAuthActions } from "@/utils/auth";
+import { useAuth } from "@/contexts/AuthContext";
+import { getFollowers, getFollowings } from "@/services/supabase";
 
 export default function MyProfileScreen() {
   const { profile } = useAuth();
   const router = useRouter();
+  const [followingNumber, setFollowingNumber] = useState<number>(0);
+  const [followerNumber, setFollowerNumber] = useState<number>(0);
+
+  useEffect(() => {
+    async function start() {
+      (async () => {
+        const followingData = await getFollowings();
+        setFollowingNumber(followingData.length);
+      })();
+      (async () => {
+        const followerData = await getFollowers();
+        setFollowerNumber(followerData.length);
+      })();
+    }
+
+    start();
+  }, []);
 
   return (
     <>
@@ -22,7 +40,7 @@ export default function MyProfileScreen() {
               router.navigate("/FollowersList");
             }}
           >
-            <Text>{102}</Text>
+            <Text>{followerNumber}</Text>
             <Text>팔로우</Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -31,7 +49,7 @@ export default function MyProfileScreen() {
               router.navigate("/FollowingsList");
             }}
           >
-            <Text>{98}</Text>
+            <Text>{followingNumber}</Text>
             <Text>팔로잉</Text>
           </TouchableOpacity>
         </View>

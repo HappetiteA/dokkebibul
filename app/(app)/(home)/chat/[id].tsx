@@ -1,8 +1,8 @@
 import ChatHistory from "@/components/ChatHistory";
+import { useAuth } from "@/contexts/AuthContext";
+import { Message } from "@/types/model.types";
+import { supabase } from "@/lib/supabase";
 import { IAIenabled } from "@/components/interfaces";
-import { useAuth } from "@/utils/AuthContext";
-import { Message } from "@/utils/model.types";
-import { supabase } from "@/utils/supabase";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { useEffect, useState } from "react";

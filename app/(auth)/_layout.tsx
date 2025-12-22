@@ -1,5 +1,5 @@
 import { Stack, Redirect, usePathname } from "expo-router";
-import { useAuth } from "@/utils/AuthContext";
+import { useAuth } from "@/contexts/AuthContext";
 
 export {
   ErrorBoundary,

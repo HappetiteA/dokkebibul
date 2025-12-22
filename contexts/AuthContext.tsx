@@ -8,9 +8,9 @@ import {
 import type { Dispatch, SetStateAction } from "react";
 import { AppState, Platform } from "react-native";
 import { Session, User } from "@supabase/supabase-js";
-import { supabase } from "@/utils/supabase";
-import { Profile } from "@/utils/model.types";
-import { getPushTokenAsync, sendTokenToDBAsync } from "./registerPushToken";
+import { supabase } from "@/lib/supabase";
+import { Profile } from "@/types/model.types";
+import { getPushTokenAsync, sendTokenToDBAsync } from "@/lib/registerPushToken";
 
 type AuthContextType = {
   user: User | null;

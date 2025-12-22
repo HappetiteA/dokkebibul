@@ -1,15 +1,20 @@
 import DefaultHeader from "@/components/DefaultHeader";
+import { getFollowers } from "@/services/supabase";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
+import { SelectFollowersResponse } from "@/types/orm.types";
 
-export default function FollowersList() {
+export default function FollowerList() {
   const router = useRouter();
-  const [followers, setFollowers] = useState(["a", "b", "c", "d"]);
+  const [followers, setFollowers] = useState<SelectFollowersResponse>([]);
 
   useEffect(() => {
-    (async () => {})();
-  }, [followers]);
+    (async () => {
+      const followData = await getFollowers();
+      setFollowers(followData ?? []);
+    })();
+  }, []);
 
   const MoveToOtherProfile = (user_id: string) => {
     router.navigate({
@@ -22,14 +27,14 @@ export default function FollowersList() {
     <>
       <DefaultHeader title="팔로우 목록" />
       <View>
-        {followers.map((value, index) => (
+        {followers.map((value) => (
           <TouchableOpacity
-            key={index}
+            key={value.dst_id}
             onPress={() => {
-              MoveToOtherProfile("uuid from database HERE");
+              MoveToOtherProfile(value.dst_id);
             }}
           >
-            <Text>Profile : {value}</Text>
+            <Text>{value.dst_name}</Text>
           </TouchableOpacity>
         ))}
       </View>

@@ -1,6 +1,6 @@
-import { getNearbyUsers } from "@/hooks/data";
-import { SelectNearbyUsersResponse } from "@/utils/schema.types";
-import { useAuth } from "@/utils/AuthContext";
+import { getNearbyUsers } from "@/services/supabase";
+import { SelectNearbyUsersResponse } from "@/types/orm.types";
+import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState, useRef } from "react";
 import {
@@ -13,14 +13,10 @@ import {
   Button,
 } from "react-native";
 import * as Location from "expo-location";
-import { supabase } from "@/utils/supabase";
+import { supabase } from "@/lib/supabase";
 import useModal from "@/hooks/useModal";
 
-
-
-async function startTracking(
-  onUpdate: (lat: number, lon: number) => void
-) {
+async function startTracking(onUpdate: (lat: number, lon: number) => void) {
   const { status } = await Location.requestForegroundPermissionsAsync();
   if (status !== "granted") throw new Error("Location permission denied");
 
@@ -35,7 +31,6 @@ async function startTracking(
     }
   );
 }
-
 
 function PlaceModal({
   isOpen,
@@ -80,14 +75,13 @@ function PlaceModal({
   );
 }
 
-
 export default function NearbyUserViewer() {
   const { profile } = useAuth();
-  
+
   const { width, height } = Dimensions.get("window");
   const userViewerSize = Math.min(width, height) - 20;
   const router = useRouter();
-  
+
   const [myLocation, setMyLocation] = useState<{
     lat: number;
     lon: number;
@@ -97,7 +91,8 @@ export default function NearbyUserViewer() {
     lon: number;
   } | null>(null);
 
-  const [nearbyUsersLocations, setNearbyUsersLocations] = useState<SelectNearbyUsersResponse>([]);
+  const [nearbyUsersLocations, setNearbyUsersLocations] =
+    useState<SelectNearbyUsersResponse>([]);
 
   const { open: openPlaceModal, close: closePlaceModal } = useModal(PlaceModal);
   const [placeBtnEnabled, setPlaceBtnEnabled] = useState(true);
@@ -112,7 +107,7 @@ export default function NearbyUserViewer() {
 
     async function start() {
       watcher = await startTracking(async (lat, lon) => {
-        console.log(lat, lon)
+        console.log(lat, lon);
         setMyLocation({ lat, lon });
       });
 
@@ -123,7 +118,7 @@ export default function NearbyUserViewer() {
         const data = await getNearbyUsers(loc.lat, loc.lon, 5000);
         setNearbyUsersLocations(data);
         console.log(nearbyUsersLocations);
-        console.log(myLocation)
+        console.log(myLocation);
       }, 3000);
     }
 
@@ -141,19 +136,17 @@ export default function NearbyUserViewer() {
       setPlaceBtnEnabled(true);
       return;
     }
-    const { error } = await supabase
-      .from("locations")
-      .upsert({
-        user_id: profile.user_id,
-        location: `POINT(${myLocation.lon} ${myLocation.lat})`,
-      });
+    const { error } = await supabase.from("locations").upsert({
+      user_id: profile.user_id,
+      location: `POINT(${myLocation.lon} ${myLocation.lat})`,
+    });
     if (error) {
       console.error(error);
     }
     closePlaceModal();
     setPlaceBtnEnabled(true);
   };
-  
+
   const onPressNearbyUser = (user_id: string) => {
     router.navigate({
       pathname: "/(app)/(home)/OtherProfile",
@@ -207,7 +200,6 @@ export default function NearbyUserViewer() {
   );
 }
 
-
 function NearbyUser({
   screenWidth,
   myLocation,
@@ -259,7 +251,6 @@ function NearbyUser({
     </View>
   );
 }
-
 
 const styles = StyleSheet.create({
   nearbyUserViewer: {

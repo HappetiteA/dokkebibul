@@ -1,6 +1,5 @@
-import { supabase } from "@/utils/supabase";
-import { SelectNearbyUsersResponse } from "@/utils/schema.types";
-
+import { supabase } from "@/lib/supabase";
+import { SelectNearbyUsersResponse, SelectFollowingsResponse, SelectFollowersResponse, SelectBlocksResponse } from "@/types/orm.types";
 
 export async function getNearbyUsers(
   lat: number | undefined,
@@ -24,23 +23,51 @@ export async function getNearbyUsers(
   return data;
 }
 
-export const getFollowings = async () => {
+export async function getFollowings(): Promise<SelectFollowingsResponse> {
   try {
-    let { data, error } = await supabase.rpc("select_followings");
+    const { data, error } = await supabase.rpc("select_followings");
     if (error) {
       console.error("Error fetching data:", error);
-      return null;
+      return [];
     }
     return data;
   } catch (err) {
     console.error("Unexpected error:", err);
-    return null;
+    return [];
+  }
+};
+
+export async function getFollowers(): Promise<SelectFollowersResponse> {
+  try {
+    const { data, error } = await supabase.rpc("select_followers");
+    if (error) {
+      console.error("Error fetching data:", error);
+      return [];
+    }
+    return data;
+  } catch (err) {
+    console.error("Unexpected error:", err);
+    return [];
+  }
+};
+
+export async function getBlocks(): Promise<SelectBlocksResponse> {
+  try {
+    const { data, error } = await supabase.rpc("select_blocks");
+    if (error) {
+      console.error("Error fetching data:", error);
+      return [];
+    }
+    return data;
+  } catch (err) {
+    console.error("Unexpected error:", err);
+    return [];
   }
 };
 
 export const getChatRooms = async () => {
   try {
-    let { data, error } = await supabase.rpc("select_conversations");
+    const { data, error } = await supabase.rpc("select_conversations");
     if (error) {
       console.error("Error fetching data:", error);
       return null;
@@ -53,7 +80,7 @@ export const getChatRooms = async () => {
 };
 
 export const getProfileById = async (user_id: string) => {
-  let { data, error } = await supabase.rpc("select_profile_by_user_id", {
+  const { data, error } = await supabase.rpc("select_profile_by_user_id", {
     uid: user_id,
   });
   if (error) {
@@ -66,4 +93,3 @@ export const getProfileById = async (user_id: string) => {
     return data[0];
   }
 };
-

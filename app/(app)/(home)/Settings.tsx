@@ -1,8 +1,8 @@
 import DefaultHeader from "@/components/DefaultHeader";
 import { IAIenabled } from "@/components/interfaces";
-import { useAuthActions } from "@/utils/auth";
-import { useAuth } from "@/utils/AuthContext";
-import { supabase } from "@/utils/supabase";
+import { useAuthActions } from "@/hooks/useAuthActions";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/lib/supabase";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useState } from "react";
 import { Alert, Switch, Text, View } from "react-native";

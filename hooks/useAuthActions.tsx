@@ -1,14 +1,13 @@
 import { Platform, Alert } from "react-native";
 import * as AppleAuthentication from "expo-apple-authentication";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
-import { supabase } from "@/utils/supabase";
-import { useAuth } from "@/utils/AuthContext";
+import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/contexts/AuthContext";
 
 export const useAuthActions = () => {
   const { signOut } = useAuth();
 
   const loginWithGoogle = async (redirectTo?: string) => {
-
     if (Platform.OS === "web") {
       await supabase.auth.signInWithOAuth({
         provider: "google",
@@ -21,22 +20,27 @@ export const useAuthActions = () => {
       });
 
       if (Platform.OS === "android") {
-        await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+        await GoogleSignin.hasPlayServices({
+          showPlayServicesUpdateDialog: true,
+        });
       }
-      
+
       const userInfo = await GoogleSignin.signIn();
 
       if (!userInfo.data) throw new Error("Google user data missing");
-      if (!userInfo.data.idToken) throw new Error("Google user ID token missing");
+      if (!userInfo.data.idToken)
+        throw new Error("Google user ID token missing");
 
-      const { data: { user }, error } = await supabase.auth.signInWithIdToken({
+      const {
+        data: { user },
+        error,
+      } = await supabase.auth.signInWithIdToken({
         provider: "google",
         token: userInfo.data.idToken,
       });
 
       if (error || !user) throw error || new Error("Google login failed");
     }
-
   };
 
   const loginWithApple = async () => {
@@ -52,9 +56,13 @@ export const useAuthActions = () => {
       ],
     });
 
-    if (!credential.identityToken) throw new Error("No identity token returned by Apple");
+    if (!credential.identityToken)
+      throw new Error("No identity token returned by Apple");
 
-    const { data: { user }, error } = await supabase.auth.signInWithIdToken({
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.signInWithIdToken({
       provider: "apple",
       token: credential.identityToken,
     });
@@ -62,7 +70,7 @@ export const useAuthActions = () => {
     if (error || !user) throw error || new Error("Apple login failed");
   };
 
-  const logout = signOut
+  const logout = signOut;
 
   return { loginWithGoogle, loginWithApple, logout };
 };

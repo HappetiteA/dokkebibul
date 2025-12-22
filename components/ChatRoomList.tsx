@@ -1,7 +1,7 @@
 import { Button, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useEffect, useState } from "react";
-import { getChatRooms } from "@/hooks/data";
-import { useAuth } from "@/utils/AuthContext";
+import { getChatRooms } from "@/services/supabase";
+import { useAuth } from "@/contexts/AuthContext";
 import { Link } from "expo-router";
 import ChatListElement from "./ChatListElement";
 

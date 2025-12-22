@@ -1,28 +1,20 @@
 import DefaultHeader from "@/components/DefaultHeader";
-import { getFollowings } from "@/hooks/data";
+import { getFollowings } from "@/services/supabase";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
-
-interface IFollowing {
-  created_at: string;
-  dst_id: string;
-  dst_name: string;
-  id: string;
-  src_id: string;
-  src_name: string;
-}
+import { SelectFollowingsResponse } from "@/types/orm.types";
 
 export default function FollowingsList() {
   const router = useRouter();
-  const [followings, setFollowings] = useState<IFollowing[]>([]);
+  const [followings, setFollowings] = useState<SelectFollowingsResponse>([]);
 
   useEffect(() => {
     (async () => {
       const followData = await getFollowings();
       setFollowings(followData ?? []);
     })();
-  }, [followings]);
+  }, []);
 
   const MoveToOtherProfile = (user_id: string) => {
     router.navigate({
