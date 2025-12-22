@@ -19,7 +19,7 @@ export default function BlocksList() {
       <DefaultHeader title="차단 목록" />
       <View>
         {blocks.map((value) => (
-          <Text key={value.dst_id}>{value.dst_name}</Text>
+          <Text key={value.src_id}>{value.src_name}</Text>
         ))}
       </View>
     </>
