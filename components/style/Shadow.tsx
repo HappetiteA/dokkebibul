@@ -6,20 +6,20 @@ interface ShadowWrapProp {
 
 export default function ShadowWrap({ children }: ShadowWrapProp) {
   return (
-    <View style={styles.outer_shadow}>
-      <View style={styles.inner_shadow}>{children}</View>
+    <View style={styles.outer_view_shadow}>
+      <View style={styles.inner_view_shadow}>{children}</View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  outer_shadow: {
+  outer_view_shadow: {
     shadowColor: "#000000",
     shadowOffset: { width: 2, height: 4 },
     shadowOpacity: 0.15,
     shadowRadius: 6,
   },
-  inner_shadow: {
+  inner_view_shadow: {
     shadowColor: "#FFFFFF",
     shadowOffset: { width: -2, height: -3 },
     shadowOpacity: 0.6,

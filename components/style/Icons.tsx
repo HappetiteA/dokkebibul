@@ -38,8 +38,8 @@ export function BackIcon() {
           x2="2.28942"
           y2="15.5441"
           stroke="#C2C2D2"
-          stroke-width={strokeWidth}
-          stroke-linecap="round"
+          strokeWidth={strokeWidth}
+          strokeLinecap="round"
         />
         <Line
           x1="12.9834"
@@ -47,8 +47,8 @@ export function BackIcon() {
           x2="2.81683"
           y2="15.0167"
           stroke="#C2C2D2"
-          stroke-width={strokeWidth}
-          stroke-linecap="round"
+          strokeWidth={strokeWidth}
+          strokeLinecap="round"
         />
       </Svg>
     </View>

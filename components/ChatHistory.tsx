@@ -17,48 +17,38 @@ export default function ChatHistory({
 }: ChatHistoryProp) {
   const { profile } = useAuth();
 
-  const TextBox = (isMe: boolean, value: Chat) => {
+  const TextBox = (value: Chat, color: string) => {
+    return (
+      <View
+        style={{
+          width: "auto",
+          maxWidth: 200,
+          backgroundColor: color,
+          padding: 8,
+          marginHorizontal: 10,
+          marginVertical: 3,
+          borderRadius: 10,
+        }}
+      >
+        <Text style={{ textAlign: "left", fontSize: 16 }}>{value.content}</Text>
+      </View>
+    );
+  };
+
+  const TextElement = (isMe: boolean, value: Chat) => {
     if (isMe) {
       //Right Aligned
       return (
         <View style={{ flexDirection: "row" }}>
           <View style={{ flex: 1 }} />
-          <View
-            style={{
-              width: "auto",
-              maxWidth: 200,
-              backgroundColor: "#99D8EE",
-              padding: 8,
-              marginRight: 10,
-              marginVertical: 3,
-              borderRadius: 10,
-            }}
-          >
-            <Text style={{ textAlign: "left", fontSize: 16 }}>
-              {value.content}
-            </Text>
-          </View>
+          {TextBox(value, "#99D8EE")}
         </View>
       );
     } else {
       // Left Aligned
       return (
         <View style={{ flexDirection: "row" }}>
-          <View
-            style={{
-              width: "auto",
-              maxWidth: 200,
-              backgroundColor: "#E4E4EA",
-              padding: 8,
-              marginLeft: 10,
-              marginVertical: 3,
-              borderRadius: 10,
-            }}
-          >
-            <Text style={{ textAlign: "left", fontSize: 16 }}>
-              {value.content}
-            </Text>
-          </View>
+          {TextBox(value, "#E4E4EA")}
           <View style={{ flex: 1 }} />
         </View>
       );
@@ -87,12 +77,19 @@ export default function ChatHistory({
     return id == profile?.user_id;
   };
 
+  const showName = (chat: Chat[], value: Chat, index: number) => {
+    if (isMe(value.sender_id)) return false;
+    if (index == 0) return true;
+
+    return value.sender_id != chat[index - 1].sender_id;
+  };
+
   const scrollRef = useRef<ScrollView>(null);
 
   return (
     <>
       <ScrollView
-        style={{ height: 500 }}
+        style={{ height: "50%" }}
         ref={scrollRef}
         onContentSizeChange={() => {
           scrollRef.current?.scrollToEnd({ animated: false });
@@ -100,19 +97,18 @@ export default function ChatHistory({
       >
         {chat?.map((value, index) => (
           <View key={index}>
-            {isMe(value.sender_id) ||
-            value.sender_id == chat[index - 1].sender_id ? (
-              ""
-            ) : (
+            {showName(chat, value, index) ? (
               <View>
                 <Text style={styles.counterpartView}>
                   {convertUIDtoUserName(value.sender_id)}(
                   {convertTimestampToTime(value.created_at)})
                 </Text>
               </View>
+            ) : (
+              ""
             )}
 
-            {TextBox(isMe(value.sender_id), value)}
+            {TextElement(isMe(value.sender_id), value)}
           </View>
         ))}
       </ScrollView>
