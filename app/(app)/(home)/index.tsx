@@ -18,7 +18,11 @@ import useModal from "@/hooks/useModal";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import BottomSheet, { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import ShadowWrap from "@/components/style/Shadow";
-import { ProfilesIcon, SettingsIcon } from "@/components/style/Icons";
+import {
+  PlaceIcon,
+  ProfilesIcon,
+  SettingsIcon,
+} from "@/components/style/Icons";
 
 function DetailsModal({
   isOpen,
@@ -100,7 +104,14 @@ function MainScreenHeader() {
     <View style={headerStyle.container}>
       <View style={headerStyle.content}>
         <View style={headerStyle.left}>
-          <Text>LOGO & TEXT</Text>
+          <ShadowWrap>
+            <TouchableOpacity
+              style={headerStyle.button}
+              onPress={onSettingsClick}
+            >
+              <PlaceIcon />
+            </TouchableOpacity>
+          </ShadowWrap>
         </View>
         <View style={headerStyle.right}>
           <ShadowWrap>

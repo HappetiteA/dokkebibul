@@ -25,8 +25,8 @@ export default function ChatHistory({
           maxWidth: 200,
           backgroundColor: color,
           padding: 8,
-          marginHorizontal: 10,
           marginVertical: 3,
+          marginHorizontal: 5,
           borderRadius: 10,
         }}
       >
@@ -35,21 +35,60 @@ export default function ChatHistory({
     );
   };
 
-  const TextElement = (isMe: boolean, value: Chat) => {
+  const TextElement = (
+    chat: Chat[],
+    value: Chat,
+    index: number,
+    isMe: boolean
+  ) => {
     if (isMe) {
       //Right Aligned
       return (
-        <View style={{ flexDirection: "row" }}>
+        <View key={index} style={{ flexDirection: "row" }}>
           <View style={{ flex: 1 }} />
-          {TextBox(value, "#99D8EE")}
+          <View style={{ flexDirection: "row" }}>
+            <Text style={{ marginTop: "auto" }}>
+              {convertTimestampToTime(value.created_at)}
+            </Text>
+            {TextBox(value, "#99D8EE")}
+          </View>
         </View>
       );
     } else {
       // Left Aligned
       return (
-        <View style={{ flexDirection: "row" }}>
-          {TextBox(value, "#E4E4EA")}
-          <View style={{ flex: 1 }} />
+        <View key={index} style={{ flexDirection: "row" }}>
+          <View
+            style={{
+              width: 40,
+              height: 40,
+              borderRadius: 20,
+              backgroundColor: showName(chat, value, index)
+                ? "red"
+                : "transparent",
+              marginLeft: 5,
+            }}
+          ></View>
+          <View>
+            {showName(chat, value, index) ? (
+              <View>
+                <Text style={styles.otherName}>
+                  {convertUIDtoUserName(value.sender_id)}
+                </Text>
+              </View>
+            ) : (
+              ""
+            )}
+            <View style={{ flexDirection: "row" }}>
+              <View style={{ flexDirection: "row" }}>
+                {TextBox(value, "#E4E4EA")}
+                <Text style={{ marginTop: "auto" }}>
+                  {convertTimestampToTime(value.created_at)}
+                </Text>
+              </View>
+              <View style={{ flex: 1 }} />
+            </View>
+          </View>
         </View>
       );
     }
@@ -63,13 +102,15 @@ export default function ChatHistory({
   const convertTimestampToTime = (timestamp: string): string => {
     const date = new Date(timestamp);
 
-    var hours = date.getHours().toString();
+    var afternoon = date.getHours() > 12 ? "오후" : "오전";
+
+    var hours = (date.getHours() % 12).toString();
     hours = hours.length == 1 ? "0" + hours : hours;
 
     var minutes = date.getMinutes().toString();
     minutes = minutes.length == 1 ? "0" + minutes : minutes;
 
-    const timeString = hours + ":" + minutes;
+    const timeString = afternoon + " " + hours + ":" + minutes;
     return timeString;
   };
 
@@ -78,7 +119,7 @@ export default function ChatHistory({
   };
 
   const showName = (chat: Chat[], value: Chat, index: number) => {
-    if (isMe(value.sender_id)) return false;
+    //if (isMe(value.sender_id)) return false;
     if (index == 0) return true;
 
     return value.sender_id != chat[index - 1].sender_id;
@@ -95,22 +136,9 @@ export default function ChatHistory({
           scrollRef.current?.scrollToEnd({ animated: false });
         }}
       >
-        {chat?.map((value, index) => (
-          <View key={index}>
-            {showName(chat, value, index) ? (
-              <View>
-                <Text style={styles.counterpartView}>
-                  {convertUIDtoUserName(value.sender_id)}(
-                  {convertTimestampToTime(value.created_at)})
-                </Text>
-              </View>
-            ) : (
-              ""
-            )}
-
-            {TextElement(isMe(value.sender_id), value)}
-          </View>
-        ))}
+        {chat?.map((value, index) =>
+          TextElement(chat, value, index, isMe(value.sender_id))
+        )}
       </ScrollView>
     </>
   );
@@ -121,8 +149,10 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
     flexDirection: "row",
   },
-  counterpartView: {
+  otherName: {
     alignItems: "flex-start",
+    marginHorizontal: 5,
+    fontSize: 20,
   },
   leftAlignText: {
     color: "black",
