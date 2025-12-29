@@ -3,11 +3,16 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Message } from "@/types/model.types";
 import { supabase } from "@/lib/supabase";
 import { IAIenabled } from "@/components/interfaces";
-import { BackIcon, SettingsIcon } from "@/components/style/Icons";
+import { BackIcon, SendIcon, SettingsIcon } from "@/components/style/Icons";
 import headerStyle from "@/components/style/headerStyle";
 import ShadowWrap from "@/components/style/Shadow";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
+import {
+  Link,
+  useLocalSearchParams,
+  useNavigation,
+  useRouter,
+} from "expo-router";
 import { useEffect, useState } from "react";
 import {
   Button,
@@ -213,6 +218,7 @@ export default function ChatScreen() {
   return (
     <>
       <ChatScreenHeader
+        conversation_id={conversation_id}
         aiEnabled={aiEnabled}
         setAiEnable={setAiEnabled}
         updateAISetting={updateAISetting}
@@ -227,20 +233,11 @@ export default function ChatScreen() {
             editable={!aiEnabled}
             value={text}
             onChangeText={onChangeText}
-            placeholder="Say Something."
+            placeholder={aiEnabled ? "AI가 대신 채팅중" : "Say Something..."}
             style={{ flex: 5, fontSize: 20 }}
           />
           <TouchableOpacity onPress={onSubmit} disabled={aiEnabled}>
-            <View style={styles.inner_shadow}>
-              <View
-                style={{
-                  backgroundColor: "#99D8EE",
-                  width: 30,
-                  height: 30,
-                  borderRadius: 30,
-                }}
-              ></View>
-            </View>
+            <SendIcon />
           </TouchableOpacity>
         </View>
       </ShadowWrap>
@@ -249,6 +246,7 @@ export default function ChatScreen() {
 }
 
 interface ChatScreenHeaderProp {
+  conversation_id: string;
   aiEnabled: boolean;
   setAiEnable: React.Dispatch<React.SetStateAction<boolean>>;
   updateAISetting: (value: boolean) => void;
@@ -256,6 +254,7 @@ interface ChatScreenHeaderProp {
 }
 
 function ChatScreenHeader({
+  conversation_id,
   aiEnabled,
   setAiEnable,
   updateAISetting,
@@ -296,9 +295,17 @@ function ChatScreenHeader({
             ></NeumorphicSwitch>
           </View>
           <ShadowWrap>
-            <TouchableOpacity style={headerStyle.button}>
-              <SettingsIcon />
-            </TouchableOpacity>
+            <Link
+              href={{
+                pathname: "/chat/ChatSettings",
+                params: { id: conversation_id },
+              }}
+              asChild
+            >
+              <TouchableOpacity style={headerStyle.button}>
+                <SettingsIcon />
+              </TouchableOpacity>
+            </Link>
           </ShadowWrap>
         </View>
       </View>
@@ -312,17 +319,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#F8F8FA",
     borderRadius: 30,
     marginHorizontal: 15,
-    padding: 10,
-  },
-  inner_shadow: {
-    backgroundColor: "transparent",
-    borderRadius: 20,
-    borderWidth: 0.01,
-    borderColor: "transparent",
-    overflow: "hidden",
-    shadowOffset: { width: 2, height: 2 },
-    shadowColor: "#000000",
-    shadowOpacity: 0.2,
-    elevation: 1,
+    paddingVertical: 5,
+    paddingLeft: 15,
+    paddingRight: 5,
   },
 });
