@@ -3,7 +3,7 @@ import { StyleSheet } from "react-native";
 const headerStyle = StyleSheet.create({
   container: {
     height: 100,
-    backgroundColor: "#bdc3c7",
+    backgroundColor: "#F8F8FA",
   },
   content: {
     marginTop: 50,
@@ -14,25 +14,25 @@ const headerStyle = StyleSheet.create({
   },
   right: {
     flexDirection: "row",
-    marginRight: 20,
+    marginRight: 15,
   },
   left: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    marginLeft: 20,
+    marginLeft: 15,
   },
   button: {
     width: 48,
     height: 48,
-    backgroundColor: "#95a5a6",
     borderRadius: 25,
     justifyContent: "center",
     alignItems: "center",
     marginHorizontal: 2,
   },
   title: {
-    marginLeft: 5,
+    marginLeft: 10,
+    fontSize: 26,
   },
 });
 

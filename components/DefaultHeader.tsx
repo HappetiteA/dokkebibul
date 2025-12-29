@@ -1,5 +1,7 @@
 import { useRouter } from "expo-router";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import headerStyle from "./style/headerStyle";
+import { BackIcon } from "./style/Icons";
 interface Prop {
   title?: string;
 }
@@ -12,30 +14,19 @@ export default function DefaultHeader({ title }: Prop) {
     }
   };
   return (
-    <View style={styles.header}>
-      <View style={styles.container}>
-        <TouchableOpacity onPress={onPressBackBtn}>
-          <Text>Back</Text>
-        </TouchableOpacity>
-        {title != null ? <Text style={styles.title}>{title}</Text> : <></>}
+    <View style={headerStyle.container}>
+      <View style={headerStyle.content}>
+        <View style={headerStyle.left}>
+          <TouchableOpacity onPress={onPressBackBtn}>
+            <BackIcon />
+          </TouchableOpacity>
+          {title != null ? (
+            <Text style={headerStyle.title}>{title}</Text>
+          ) : (
+            <></>
+          )}
+        </View>
       </View>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  header: {
-    height: 100,
-    backgroundColor: "gray",
-  },
-  container: {
-    marginTop: 50,
-    height: 50,
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 20,
-  },
-  title: {
-    marginLeft: 10,
-  },
-});

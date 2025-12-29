@@ -7,7 +7,7 @@ import {
   Text,
   TouchableOpacity,
   View,
-  Modal
+  Modal,
 } from "react-native";
 import { Link, useRouter } from "expo-router";
 import NearbyUserViewer from "@/components/NearbyUserViewer";
@@ -17,7 +17,8 @@ import ChatRoomList from "@/components/ChatRoomList";
 import useModal from "@/hooks/useModal";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import BottomSheet, { BottomSheetScrollView } from "@gorhom/bottom-sheet";
-
+import ShadowWrap from "@/components/style/Shadow";
+import { ProfilesIcon, SettingsIcon } from "@/components/style/Icons";
 
 function DetailsModal({
   isOpen,
@@ -41,22 +42,19 @@ function DetailsModal({
           <Button title={"채팅방 나가기"} />
           <Button title={"차단하기"} />
           <Button title={"신고하기"} />
-          <Button
-            title={"확인"}
-            onPress={onClose}
-          />
+          <Button title={"확인"} onPress={onClose} />
         </View>
       </View>
     </Modal>
   );
 }
 
-
 export default function MainScreen() {
   const bottomSheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ["20%", "60%"], []);
 
-  const { open: openDetailsModal, close: closeDetailsModal } = useModal(DetailsModal);
+  const { open: openDetailsModal, close: closeDetailsModal } =
+    useModal(DetailsModal);
 
   const handleSheetChanges = useCallback((index: number) => {
     // console.log("handleSheetChanges", index);
@@ -76,11 +74,14 @@ export default function MainScreen() {
         >
           <BottomSheetScrollView style={styles.contentContainer}>
             <Text>채팅방 목록</Text>
-            <ChatRoomList openModal={(name) => openDetailsModal({ onClose: closeDetailsModal, name: name })} />
+            <ChatRoomList
+              openModal={(name) =>
+                openDetailsModal({ onClose: closeDetailsModal, name: name })
+              }
+            />
           </BottomSheetScrollView>
         </BottomSheet>
       </GestureHandlerRootView>
-
     </>
   );
 }
@@ -102,15 +103,22 @@ function MainScreenHeader() {
           <Text>LOGO & TEXT</Text>
         </View>
         <View style={headerStyle.right}>
-          <TouchableOpacity
-            style={headerStyle.button}
-            onPress={onSettingsClick}
-          >
-            <Text>Setting</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={headerStyle.button} onPress={onProfileClick}>
-            <Text>Profile</Text>
-          </TouchableOpacity>
+          <ShadowWrap>
+            <TouchableOpacity
+              style={headerStyle.button}
+              onPress={onSettingsClick}
+            >
+              <SettingsIcon />
+            </TouchableOpacity>
+          </ShadowWrap>
+          <ShadowWrap>
+            <TouchableOpacity
+              style={headerStyle.button}
+              onPress={onProfileClick}
+            >
+              <ProfilesIcon />
+            </TouchableOpacity>
+          </ShadowWrap>
         </View>
       </View>
     </View>
@@ -121,9 +129,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
+    backgroundColor: "#F8F8FA",
   },
   contentContainer: {
     width: "100%",
     paddingHorizontal: 10,
+    backgroundColor: "#F8F8FA",
   },
 });
