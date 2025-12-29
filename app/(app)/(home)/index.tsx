@@ -77,7 +77,6 @@ export default function MainScreen() {
           index={1}
         >
           <BottomSheetScrollView style={styles.contentContainer}>
-            <Text>채팅방 목록</Text>
             <ChatRoomList
               openModal={(name) =>
                 openDetailsModal({ onClose: closeDetailsModal, name: name })

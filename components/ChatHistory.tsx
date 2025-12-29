@@ -47,7 +47,7 @@ export default function ChatHistory({
         <View key={index} style={{ flexDirection: "row" }}>
           <View style={{ flex: 1 }} />
           <View style={{ flexDirection: "row" }}>
-            <Text style={{ marginTop: "auto" }}>
+            <Text style={{ marginTop: "auto", color: "#909090" }}>
               {convertTimestampToTime(value.created_at)}
             </Text>
             {TextBox(value, "#99D8EE")}
@@ -82,7 +82,7 @@ export default function ChatHistory({
             <View style={{ flexDirection: "row" }}>
               <View style={{ flexDirection: "row" }}>
                 {TextBox(value, "#E4E4EA")}
-                <Text style={{ marginTop: "auto" }}>
+                <Text style={{ marginTop: "auto", color: "#909090" }}>
                   {convertTimestampToTime(value.created_at)}
                 </Text>
               </View>
@@ -114,6 +114,19 @@ export default function ChatHistory({
     return timeString;
   };
 
+  const convertTimestampToDate = (timestamp: string): string => {
+    const date = new Date(timestamp);
+
+    var year = date.getFullYear().toString();
+
+    var month = (date.getMonth() + 1).toString();
+
+    var day = date.getDate().toString();
+
+    const dateString = year + "년 " + month + "월 " + day + "일";
+    return dateString;
+  };
+
   const isMe = (id: string) => {
     return id == profile?.user_id;
   };
@@ -121,8 +134,16 @@ export default function ChatHistory({
   const showName = (chat: Chat[], value: Chat, index: number) => {
     //if (isMe(value.sender_id)) return false;
     if (index == 0) return true;
-
     return value.sender_id != chat[index - 1].sender_id;
+  };
+
+  const showDate = (chat: Chat[], value: Chat, index: number) => {
+    //if (isMe(value.sender_id)) return false;
+    if (index == 0) return true;
+    return (
+      convertTimestampToDate(value.created_at) !=
+      convertTimestampToDate(chat[index - 1].created_at)
+    );
   };
 
   const scrollRef = useRef<ScrollView>(null);
@@ -136,9 +157,21 @@ export default function ChatHistory({
           scrollRef.current?.scrollToEnd({ animated: false });
         }}
       >
-        {chat?.map((value, index) =>
-          TextElement(chat, value, index, isMe(value.sender_id))
-        )}
+        {chat?.map((value, index) => (
+          <>
+            {showDate(chat, value, index) ? (
+              <View style={styles.timeText}>
+                <Text style={{ color: "#96969D" }}>
+                  {convertTimestampToDate(value.created_at)}
+                </Text>
+              </View>
+            ) : (
+              ""
+            )}
+
+            {TextElement(chat, value, index, isMe(value.sender_id))}
+          </>
+        ))}
       </ScrollView>
     </>
   );
@@ -148,6 +181,15 @@ const styles = StyleSheet.create({
   selfView: {
     alignItems: "flex-end",
     flexDirection: "row",
+  },
+  timeText: {
+    marginVertical: 10,
+    marginHorizontal: "auto",
+    justifyContent: "center",
+    paddingHorizontal: 20,
+    height: 20,
+    borderRadius: 15,
+    backgroundColor: "#E4E4EA",
   },
   otherName: {
     alignItems: "flex-start",
