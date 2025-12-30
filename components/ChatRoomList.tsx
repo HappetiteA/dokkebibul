@@ -71,5 +71,11 @@ export default function ChatRoomList({ openModal }: IChatRoomListProp) {
     );
   };
 
-  return <>{chatRooms.map((value) => ChatList(value))}</>;
+  return (
+    <>
+      {chatRooms.map((value) => (
+        <View key={value.id}>{ChatList(value)}</View>
+      ))}
+    </>
+  );
 }

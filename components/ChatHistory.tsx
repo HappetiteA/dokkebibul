@@ -22,15 +22,17 @@ export default function ChatHistory({
       <View
         style={{
           width: "auto",
-          maxWidth: 200,
+          maxWidth: 250,
           backgroundColor: color,
           padding: 8,
-          marginVertical: 3,
+          marginVertical: 5,
           marginHorizontal: 5,
-          borderRadius: 10,
+          borderRadius: 15,
         }}
       >
-        <Text style={{ textAlign: "left", fontSize: 16 }}>{value.content}</Text>
+        <Text style={{ textAlign: "justify", fontSize: 16 }}>
+          {value.content}
+        </Text>
       </View>
     );
   };
@@ -158,7 +160,7 @@ export default function ChatHistory({
         }}
       >
         {chat?.map((value, index) => (
-          <>
+          <View key={index}>
             {showDate(chat, value, index) ? (
               <View style={styles.timeText}>
                 <Text style={{ color: "#96969D" }}>
@@ -170,7 +172,7 @@ export default function ChatHistory({
             )}
 
             {TextElement(chat, value, index, isMe(value.sender_id))}
-          </>
+          </View>
         ))}
       </ScrollView>
     </>
