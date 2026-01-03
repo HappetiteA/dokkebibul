@@ -11,10 +11,19 @@ import {
   View,
   Modal,
   Button,
+  Image,
+  ImageBackground,
 } from "react-native";
 import * as Location from "expo-location";
 import { supabase } from "@/lib/supabase";
 import useModal from "@/hooks/useModal";
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withTiming,
+} from "react-native-reanimated";
 
 async function startTracking(onUpdate: (lat: number, lon: number) => void) {
   const { status } = await Location.requestForegroundPermissionsAsync();
@@ -155,48 +164,51 @@ export default function NearbyUserViewer() {
   };
 
   return (
-    <View
-      style={{
-        ...styles.nearbyUserViewer,
-        width: userViewerSize,
-        height: userViewerSize,
-        borderRadius: userViewerSize / 2,
-      }}
-    >
-      <TouchableOpacity
-        onPress={() =>
-          openPlaceModal({
-            onClose: closePlaceModal,
-            origAddr: profile?.user_id,
-            newAddr: `POINT(${myLocation?.lon}, ${myLocation?.lat})`,
-            onPlaceBtnPressed: onPressMyself,
-            placeBtnEnabled: placeBtnEnabled,
-          })
-        }
+    <>
+      <BackgroundAnimation />
+      <ImageBackground
+        style={{
+          marginVertical: 20,
+          width: userViewerSize,
+          height: userViewerSize,
+        }}
+        source={require("../assets/from_figma/MainScreenBorder.png")}
       >
-        <NearbyUser
-          screenWidth={userViewerSize}
-          myLocation={myLocation!}
-          userLocation={myLocation!}
-          children={<Text>Me</Text>}
-        />
-      </TouchableOpacity>
-      {nearbyUsersLocations?.map((value, index) => (
         <TouchableOpacity
-          key={index}
-          onPress={() => {
-            onPressNearbyUser(value.user_id);
-          }}
+          onPress={() =>
+            openPlaceModal({
+              onClose: closePlaceModal,
+              origAddr: profile?.user_id,
+              newAddr: `POINT(${myLocation?.lon}, ${myLocation?.lat})`,
+              onPlaceBtnPressed: onPressMyself,
+              placeBtnEnabled: placeBtnEnabled,
+            })
+          }
         >
           <NearbyUser
             screenWidth={userViewerSize}
             myLocation={myLocation!}
-            userLocation={{ lat: value.lat, lon: value.lon }}
-            children={<Text>{value.name}</Text>}
+            userLocation={myLocation!}
+            children={<Text>Me</Text>}
           />
         </TouchableOpacity>
-      ))}
-    </View>
+        {nearbyUsersLocations?.map((value, index) => (
+          <TouchableOpacity
+            key={index}
+            onPress={() => {
+              onPressNearbyUser(value.user_id);
+            }}
+          >
+            <NearbyUser
+              screenWidth={userViewerSize}
+              myLocation={myLocation!}
+              userLocation={{ lat: value.lat, lon: value.lon }}
+              children={<Text>{value.name}</Text>}
+            />
+          </TouchableOpacity>
+        ))}
+      </ImageBackground>
+    </>
   );
 }
 
@@ -252,9 +264,45 @@ function NearbyUser({
   );
 }
 
+function BackgroundAnimation() {
+  const { width, height } = Dimensions.get("window");
+  const userViewerSize = Math.min(width, height) - 20;
+
+  const rotation = useSharedValue(0);
+
+  useEffect(() => {
+    rotation.value = withRepeat(
+      withTiming(360, {
+        duration: 5000,
+        easing: Easing.linear,
+      }),
+      -1 // infinite
+    );
+  }, []);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${rotation.value}deg` }, { scale: 1.5 }],
+  }));
+
+  return (
+    <Animated.Image
+      style={[
+        {
+          position: "absolute",
+          marginVertical: 20,
+          width: userViewerSize,
+          height: userViewerSize,
+        },
+        animatedStyle,
+      ]}
+      source={require("../assets/from_figma/MainScreenBackground.png")}
+    />
+  );
+}
+
 const styles = StyleSheet.create({
   nearbyUserViewer: {
-    backgroundColor: "tomato",
+    backgroundColor: "transparent",
     marginVertical: 20,
   },
   profileBG: {
