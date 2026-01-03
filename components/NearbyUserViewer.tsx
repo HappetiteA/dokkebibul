@@ -285,18 +285,27 @@ function BackgroundAnimation() {
   }));
 
   return (
-    <Animated.Image
-      style={[
-        {
-          position: "absolute",
-          marginVertical: 20,
-          width: userViewerSize,
-          height: userViewerSize,
-        },
-        animatedStyle,
-      ]}
-      source={require("../assets/from_figma/MainScreenBackground.png")}
-    />
+    <View
+      pointerEvents="none"
+      style={{
+        position: "absolute",
+        marginVertical: 20,
+        width: userViewerSize,
+        height: userViewerSize,
+      }}
+    >
+      <Animated.Image
+        style={[
+          {
+            position: "absolute",
+            width: userViewerSize,
+            height: userViewerSize,
+          },
+          animatedStyle,
+        ]}
+        source={require("../assets/from_figma/MainScreenBackground.png")}
+      />
+    </View>
   );
 }
 
