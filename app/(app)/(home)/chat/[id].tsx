@@ -16,6 +16,9 @@ import {
 import { useEffect, useState } from "react";
 import {
   Button,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
   StyleSheet,
   Switch,
   Text,
@@ -224,23 +227,32 @@ export default function ChatScreen() {
         updateAISetting={updateAISetting}
         otherName={getOtherName()}
       ></ChatScreenHeader>
-      <View>
-        <ChatHistory chat={chat} user_ids={user_ids} user_names={user_names} />
-      </View>
-      <ShadowWrap>
-        <View style={styles.textInputView}>
-          <TextInput
-            editable={!aiEnabled}
-            value={text}
-            onChangeText={onChangeText}
-            placeholder={aiEnabled ? "AI가 대신 채팅중" : "Say Something..."}
-            style={{ flex: 5, fontSize: 20 }}
+      <KeyboardAvoidingView
+        style={{ flex: 1, marginBottom: 40 }}
+        behavior={Platform.OS == "ios" ? "padding" : undefined}
+      >
+        <View style={{ flex: 1 }}>
+          <ChatHistory
+            chat={chat}
+            user_ids={user_ids}
+            user_names={user_names}
           />
-          <TouchableOpacity onPress={onSubmit} disabled={aiEnabled}>
-            <SendIcon />
-          </TouchableOpacity>
         </View>
-      </ShadowWrap>
+        <ShadowWrap>
+          <View style={styles.textInputView}>
+            <TextInput
+              editable={!aiEnabled}
+              value={text}
+              onChangeText={onChangeText}
+              placeholder={aiEnabled ? "AI가 대신 채팅중" : "Say Something..."}
+              style={{ flex: 5, fontSize: 20 }}
+            />
+            <TouchableOpacity onPress={onSubmit} disabled={aiEnabled}>
+              <SendIcon />
+            </TouchableOpacity>
+          </View>
+        </ShadowWrap>
+      </KeyboardAvoidingView>
     </>
   );
 }

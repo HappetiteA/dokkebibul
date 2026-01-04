@@ -1,4 +1,4 @@
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { FlatList, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Message } from "@/types/model.types";
 import { useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -129,7 +129,6 @@ export default function ChatHistory({
   return (
     <>
       <ScrollView
-        style={{ height: "50%" }}
         ref={scrollRef}
         onContentSizeChange={() => {
           scrollRef.current?.scrollToEnd({ animated: false });
