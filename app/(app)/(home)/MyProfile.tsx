@@ -37,20 +37,20 @@ export default function MyProfileScreen() {
           <TouchableOpacity
             style={styles.followViewBtn}
             onPress={() => {
-              router.navigate("/FollowersList");
-            }}
-          >
-            <Text>{followerNumber}</Text>
-            <Text>팔로우</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.followViewBtn}
-            onPress={() => {
               router.navigate("/FollowingsList");
             }}
           >
             <Text>{followingNumber}</Text>
             <Text>팔로잉</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.followViewBtn}
+            onPress={() => {
+              router.navigate("/FollowersList");
+            }}
+          >
+            <Text>{followerNumber}</Text>
+            <Text>팔로워</Text>
           </TouchableOpacity>
         </View>
 

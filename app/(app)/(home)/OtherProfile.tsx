@@ -5,15 +5,18 @@ import {
   View,
   Button,
   Modal,
+  Image,
+  SafeAreaView,
+  ScrollView,
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import headerStyle from "@/components/style/headerStyle";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { getProfileById, getFollowings } from "@/services/supabase";
 import useModal from "@/hooks/useModal";
 import { useAuth } from "@/contexts/AuthContext";
 import { Profile } from "@/types/model.types";
+import { Ionicons } from "@expo/vector-icons";
 
 function BlockModal({
   isOpen,
@@ -32,20 +35,21 @@ function BlockModal({
     <Modal
       visible={isOpen}
       transparent
-      animationType="slide"
+      animationType="fade"
       onRequestClose={onClose}
     >
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
           <Text style={styles.modalText}>{name} 님을 차단하시겠습니까?</Text>
-          <>
+          <View style={styles.modalBtnRow}>
             <Button
               title="차단"
               onPress={onBlockBtnPressed}
               disabled={!blockBtnEnabled}
+              color="#FF6B6B"
             />
             <Button title="취소" onPress={onClose} />
-          </>
+          </View>
         </View>
       </View>
     </Modal>
@@ -65,15 +69,13 @@ function BlockSuccessModal({
     <Modal
       visible={isOpen}
       transparent
-      animationType="slide"
+      animationType="fade"
       onRequestClose={onClose}
     >
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
           <Text style={styles.modalText}>{name} 님을 차단했습니다.</Text>
-          <>
-            <Button title="확인" onPress={onClose} />
-          </>
+          <Button title="확인" onPress={onClose} />
         </View>
       </View>
     </Modal>
@@ -91,7 +93,7 @@ function BlockFailModal({
     <Modal
       visible={isOpen}
       transparent
-      animationType="slide"
+      animationType="fade"
       onRequestClose={onClose}
     >
       <View style={styles.modalOverlay}>
@@ -99,9 +101,7 @@ function BlockFailModal({
           <Text style={styles.modalText}>
             알 수 없는 오류로 차단에 실패했습니다. 잠시 후에 다시 시도해주세요.
           </Text>
-          <>
-            <Button title="확인" onPress={onClose} />
-          </>
+          <Button title="확인" onPress={onClose} />
         </View>
       </View>
     </Modal>
@@ -138,32 +138,33 @@ function ReportModal({
     <Modal
       visible={isOpen}
       transparent
-      animationType="slide"
+      animationType="fade"
       onRequestClose={onClose}
     >
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
           <Text style={styles.modalText}>{name} 님을 신고하시겠습니까?</Text>
-          <>
+          <View style={{ marginBottom: 10 }}>
             {reportReasons.map((reason) => (
-              <Button
-                key={reason}
-                title={reason}
-                onPress={() => {
-                  toggleReason(reason);
-                }}
-                disabled={!reportBtnEnabled}
-              />
+              <View key={reason} style={{ marginVertical: 2 }}>
+                <Button
+                  title={reason + (reasons[reason] ? " (V)" : "")}
+                  onPress={() => toggleReason(reason)}
+                  color={reasons[reason] ? "#FF6B6B" : "#888"}
+                  disabled={!reportBtnEnabled}
+                />
+              </View>
             ))}
-          </>
-          <>
+          </View>
+          <View style={styles.modalBtnRow}>
             <Button
               title="신고하기"
               onPress={onReportBtnPressed}
               disabled={!reportBtnEnabled}
+              color="#FF6B6B"
             />
             <Button title="취소" onPress={onClose} />
-          </>
+          </View>
         </View>
       </View>
     </Modal>
@@ -183,15 +184,13 @@ function ReportSuccessModal({
     <Modal
       visible={isOpen}
       transparent
-      animationType="slide"
+      animationType="fade"
       onRequestClose={onClose}
     >
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
           <Text style={styles.modalText}>{name} 님을 신고했습니다.</Text>
-          <>
-            <Button title="확인" onPress={onClose} />
-          </>
+          <Button title="확인" onPress={onClose} />
         </View>
       </View>
     </Modal>
@@ -209,7 +208,7 @@ function ReportFailModal({
     <Modal
       visible={isOpen}
       transparent
-      animationType="slide"
+      animationType="fade"
       onRequestClose={onClose}
     >
       <View style={styles.modalOverlay}>
@@ -217,19 +216,18 @@ function ReportFailModal({
           <Text style={styles.modalText}>
             알 수 없는 오류로 신고에 실패했습니다. 잠시 후에 다시 시도해주세요.
           </Text>
-          <>
-            <Button title="확인" onPress={onClose} />
-          </>
+          <Button title="확인" onPress={onClose} />
         </View>
       </View>
     </Modal>
   );
 }
 
+// --- MAIN SCREEN ---
+
 export default function OtherProfileScreen() {
   const router = useRouter();
   const { profile } = useAuth();
-
   const params = useLocalSearchParams();
   const user_id = params.user_id as string;
 
@@ -385,97 +383,260 @@ export default function OtherProfileScreen() {
   };
 
   return (
-    <View>
+    <SafeAreaView style={styles.safeArea}>
       <OtherProfileScreenHeader />
-      <View>
-        <Text>{userInfo?.name}</Text>
-        <Text>Location</Text>
-        <Text>Description</Text>
-        <Text>Account Info</Text>
 
-        <View style={styles.horizontalBtn}>
-          <TouchableOpacity
-            onPress={onFollowBtnPressed}
-            disabled={!followBtnEnabled}
-          >
-            <Text>{follow ? "팔로우 취소" : "팔로우"}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={onChatBtnPressed} disabled={!follow}>
-            <Text>대화하기</Text>
-          </TouchableOpacity>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        {/* Avatar Section - Transparent, No Border, No Shadow */}
+        <View style={styles.avatarContainer}>
+          <Image
+            source={require("@/assets/from_figma/icon-wisp-list.png")}
+            style={styles.avatarImage}
+            resizeMode="contain"
+          />
         </View>
 
-        <TouchableOpacity
-          onPress={() =>
-            openReportModal({
-              onClose: closeReportModal,
-              name: userInfo?.name,
-              onReportBtnPressed: onReportBtnPressed,
-              reportBtnEnabled: reportBtnEnabled,
-              reasons: reasons,
-              setReasons: setReasons,
-            })
-          }
-        >
-          <Text>신고하기</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() =>
-            openBlockModal({
-              onClose: closeBlockModal,
-              name: userInfo?.name,
-              onBlockBtnPressed: onBlockBtnPressed,
-              blockBtnEnabled: blockBtnEnabled,
-            })
-          }
-        >
-          <Text>차단하기</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+        {/* Name Tag - With Shadow */}
+        <View style={[styles.commonShadow, styles.nameTag]}>
+          <Text style={styles.nameText}>{userInfo?.name ?? "김뿁뿁"}</Text>
+        </View>
+
+        {/* Status Message Box - With Shadow */}
+        <View style={[styles.commonShadow, styles.statusBox]}>
+          <Text style={styles.statusText}>상태 메시지 상태 메시지</Text>
+        </View>
+
+        {/* Action Buttons Container - Fixed Width */}
+        <View style={styles.actionButtonContainer}>
+          {!follow ? (
+            // State 1: Single Button
+            <TouchableOpacity
+              style={[
+                styles.buttonBase,
+                styles.commonShadow,
+                styles.followButtonWide,
+              ]}
+              onPress={onFollowBtnPressed}
+              disabled={!followBtnEnabled}
+            >
+              <Text style={styles.followButtonText}>팔로우</Text>
+            </TouchableOpacity>
+          ) : (
+            // State 2: Two Buttons
+            <View style={styles.doubleButtonRow}>
+              <TouchableOpacity
+                style={[
+                  styles.buttonBase,
+                  styles.commonShadow,
+                  styles.unfollowButton,
+                ]}
+                onPress={onFollowBtnPressed}
+                disabled={!followBtnEnabled}
+              >
+                <Text style={styles.unfollowButtonText}>팔로우 취소</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[
+                  styles.buttonBase,
+                  styles.commonShadow,
+                  styles.chatButton,
+                ]}
+                onPress={onChatBtnPressed}
+              >
+                <Text style={styles.chatButtonText}>대화하기</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
+
+        <View style={styles.footerOptions}>
+          <TouchableOpacity
+            onPress={() =>
+              openReportModal({
+                onClose: closeReportModal,
+                name: userInfo?.name,
+                onReportBtnPressed: onReportBtnPressed,
+                reportBtnEnabled: reportBtnEnabled,
+                reasons: reasons,
+                setReasons: setReasons,
+              })
+            }
+          >
+            <Text style={styles.footerLinkText}>신고하기</Text>
+          </TouchableOpacity>
+          <Text style={styles.footerDivider}>|</Text>
+          <TouchableOpacity
+            onPress={() =>
+              openBlockModal({
+                onClose: closeBlockModal,
+                name: userInfo?.name,
+                onBlockBtnPressed: onBlockBtnPressed,
+                blockBtnEnabled: blockBtnEnabled,
+              })
+            }
+          >
+            <Text style={styles.footerLinkText}>차단하기</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 function OtherProfileScreenHeader() {
   const router = useRouter();
-  const onPressBackBtn = () => {
-    if (router.canGoBack()) {
-      router.back();
-    }
-  };
-
   return (
-    <View style={headerStyle.container}>
-      <View style={headerStyle.content}>
-        <View style={headerStyle.left}>
-          <TouchableOpacity style={headerStyle.button} onPress={onPressBackBtn}>
-            <Text>Back</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={headerStyle.right}></View>
-      </View>
+    <View style={styles.headerContainer}>
+      <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+        <Ionicons name="chevron-back" size={28} color="#aaa" />
+      </TouchableOpacity>
     </View>
   );
 }
 
+
 const styles = StyleSheet.create({
-  horizontalBtn: {
-    flexDirection: "row",
-  },
-  container: {
+  safeArea: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#F8F9FA",
+  },
+  headerContainer: {
+    height: 50,
+    paddingHorizontal: 16,
+    justifyContent: "center",
+    zIndex: 10,
+  },
+  backButton: {
+    padding: 8,
+  },
+  scrollContent: {
+    alignItems: "center",
+    paddingTop: 80, // Moved everything down
+    paddingBottom: 40,
+  },
+
+  // --- REUSABLE SHADOW STYLE ---
+  commonShadow: {
+    backgroundColor: "#ffffff", // Needed for shadow to be visible
+    shadowColor: "#000",
+    shadowOffset: { width: 7, height: 7 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+
+  // Avatar (Transparent, No Shadow)
+  avatarContainer: {
+    marginBottom: 20,
+    backgroundColor: "transparent",
+  },
+  avatarImage: {
+    width: 100,
+    height: 100,
+    // Removed borderRadius to ensure no clipping if the image is irregular
+    // If you want a circle crop, keep borderRadius: 50
+  },
+
+  // Name Tag
+  nameTag: {
+    paddingVertical: 8,
+    paddingHorizontal: 24,
+    borderRadius: 20,
+    marginBottom: 40,
+  },
+  nameText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#333",
+  },
+
+  // Status Box
+  statusBox: {
+    width: "85%", // Fixed width relative to screen
+    borderRadius: 24,
+    paddingVertical: 50,
+    paddingHorizontal: 20,
     alignItems: "center",
     justifyContent: "center",
+    marginBottom: 60,
   },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 20,
+  statusText: {
+    color: "#888",
+    fontSize: 14,
   },
+
+  // --- BUTTONS ---
+  // Container keeps the layout width stable
+  actionButtonContainer: {
+    width: "85%", // Same width as status box
+    height: 50, // Fixed height so buttons don't jump in size
+    marginBottom: 40,
+    justifyContent: "center",
+  },
+  buttonBase: {
+    justifyContent: "center",
+    alignItems: "center",
+    height: "100%", // Fill container height
+    borderRadius: 30,
+  },
+
+  followButtonWide: {
+    width: "50%",
+    alignSelf: "center",
+    backgroundColor: "#ffffff",
+  },
+  followButtonText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#333",
+  },
+
+  // Double Buttons (Split container)
+  doubleButtonRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+    height: "100%",
+    gap: 12, // Space between buttons
+  },
+  unfollowButton: {
+    flex: 1, // Takes 50% - gap
+    backgroundColor: "#E6E6E6",
+  },
+  unfollowButtonText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#333",
+  },
+  chatButton: {
+    flex: 1, // Takes 50% - gap
+    backgroundColor: "#AEE4FF",
+  },
+  chatButtonText: {
+    fontSize: 16,
+    fontWeight: "600",
+  },
+
+  // Footer
+  footerOptions: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  footerLinkText: {
+    fontSize: 13,
+    color: "#999",
+    padding: 8,
+  },
+  footerDivider: {
+    color: "#ddd",
+    marginHorizontal: 4,
+  },
+
+  // Modal styles...
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: "rgba(0,0,0,0.5)",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -483,11 +644,9 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     padding: 20,
     borderRadius: 10,
-    minWidth: 300,
+    width: 300,
     alignItems: "center",
   },
-  modalText: {
-    fontSize: 18,
-    marginBottom: 20,
-  },
+  modalText: { marginBottom: 20 },
+  modalBtnRow: { flexDirection: "row", gap: 10 },
 });

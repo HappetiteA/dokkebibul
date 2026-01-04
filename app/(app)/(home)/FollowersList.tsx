@@ -2,10 +2,18 @@ import DefaultHeader from "@/components/DefaultHeader";
 import { getFollowers } from "@/services/supabase";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import {
+  Text,
+  TouchableOpacity,
+  View,
+  FlatList,
+  Image,
+  StyleSheet,
+  ListRenderItem,
+} from "react-native";
 import { SelectFollowersResponse } from "@/types/orm.types";
 
-export default function FollowerList() {
+export default function FollowersList() {
   const router = useRouter();
   const [followers, setFollowers] = useState<SelectFollowersResponse>([]);
 
@@ -23,21 +31,104 @@ export default function FollowerList() {
     });
   };
 
+  const handleChat = (user_id: string) => {
+    router.navigate({ pathname: "/chat/[id]", params: { id: user_id } });
+  };
+
+  const renderItem: ListRenderItem<SelectFollowersResponse[0]> = ({ item }) => (
+    <View style={styles.cardContainer}>
+      {/* Left Section: Profile Click */}
+      <TouchableOpacity
+        style={styles.profileSection}
+        onPress={() => MoveToOtherProfile(item.src_id)}
+      >
+        <Image
+          source={require("@/assets/from_figma/icon-wisp-list.png")}
+          style={styles.avatar}
+        />
+        <Text style={styles.nameText}>{item.src_name}</Text>
+      </TouchableOpacity>
+
+      {/* Right Section: Chat Button (Bordered Text) */}
+      <TouchableOpacity
+        style={styles.chatButton}
+        onPress={() => handleChat(item.src_id)}
+      >
+        <Text style={styles.chatButtonText}>대화하기</Text>
+      </TouchableOpacity>
+    </View>
+  );
+
   return (
     <>
-      <DefaultHeader title="팔로우 목록" />
-      <View>
-        {followers.map((value) => (
-          <TouchableOpacity
-            key={value.src_id}
-            onPress={() => {
-              MoveToOtherProfile(value.src_id);
-            }}
-          >
-            <Text>{value.src_name}</Text>
-          </TouchableOpacity>
-        ))}
+      <DefaultHeader title="팔로워 목록" />
+      <View style={styles.container}>
+        <FlatList
+          data={followers}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.src_id}
+          contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
+        />
       </View>
     </>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#f9f9f9", // Slightly off-white background for the screen to make white cards pop
+  },
+  listContent: {
+    padding: 16,
+  },
+  cardContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: "#ffffff", // White background
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderRadius: 30, // Higher border radius for the fully rounded pill look
+    marginBottom: 12,
+
+    // --- SHADOW EFFECT ---
+    boxShadow: "0px 0px 2px 2px #ffffff",
+    shadowColor: "#000",
+    shadowOffset: { width: 7, height: 7 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3, // Essential for Android shadow
+  },
+  profileSection: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+  },
+  avatar: {
+    width: 40,
+    height: 40,
+    backgroundColor: "#ffffff",
+    marginRight: 12,
+  },
+  nameText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#333",
+  },
+  // --- BUTTON STYLES ---
+  chatButton: {
+    borderWidth: 1,
+    borderColor: "#d1d1d1", // Light gray border
+    borderRadius: 20, // Rounded pill shape
+    paddingVertical: 6,
+    paddingHorizontal: 14,
+    backgroundColor: "transparent",
+  },
+  chatButtonText: {
+    fontSize: 14,
+    color: "#333",
+    fontWeight: "500",
+  },
+});
