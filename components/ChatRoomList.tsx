@@ -4,6 +4,7 @@ import { getChatRooms } from "@/services/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 import { Link } from "expo-router";
 import ChatListElement from "./ChatListElement";
+import { convertTimestampToTime } from "@/utils/time_converter";
 
 interface IChatRoomListProp {
   openModal: (name: string | undefined) => void;
@@ -12,6 +13,8 @@ interface IChatRoomListProp {
 interface IChatRoomData {
   created_at: string;
   id: string;
+  last_msg: string;
+  last_msg_created_at: string;
   user1_ai_enabled: boolean;
   user1_chat_enabled: boolean;
   user1_id: string;
@@ -56,6 +59,10 @@ export default function ChatRoomList({ openModal }: IChatRoomListProp) {
 
     var user_ids = JSON.stringify([value.user1_id, value.user2_id]);
     var user_names = JSON.stringify([value.user1_name, value.user2_name]);
+    var time_string =
+      value.last_msg == undefined
+        ? ""
+        : convertTimestampToTime(value.last_msg_created_at);
 
     return (
       <ChatListElement
@@ -64,6 +71,8 @@ export default function ChatRoomList({ openModal }: IChatRoomListProp) {
         user_ids={user_ids}
         user_names={user_names}
         other_name={other_name}
+        last_msg={value.last_msg}
+        time_string={time_string}
         onLongPress={() => {
           openModal(other_name);
         }}
@@ -71,5 +80,11 @@ export default function ChatRoomList({ openModal }: IChatRoomListProp) {
     );
   };
 
-  return <>{chatRooms.map((value) => ChatList(value))}</>;
+  return (
+    <>
+      {chatRooms.map((value) => (
+        <View key={value.id}>{ChatList(value)}</View>
+      ))}
+    </>
+  );
 }
