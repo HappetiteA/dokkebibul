@@ -1,16 +1,16 @@
 export const convertTimestampToTime = (timestamp: string): string => {
   const date = new Date(timestamp);
 
-  var afternoon = date.getHours() > 12 ? "오후" : "오전";
+  const hours24 = date.getHours();
+  const minutes = date.getMinutes();
 
-  var hours = (date.getHours() % 12).toString();
-  hours = hours.length == 1 ? "0" + hours : hours;
+  const period = hours24 < 12 ? "오전" : "오후";
+  const hours12 = hours24 % 12 == 0 ? 12 : hours24 % 12;
 
-  var minutes = date.getMinutes().toString();
-  minutes = minutes.length == 1 ? "0" + minutes : minutes;
+  const hh = hours12.toString().padStart(2, "0");
+  const mm = minutes.toString().padStart(2, "0");
 
-  const timeString = afternoon + " " + hours + ":" + minutes;
-  return timeString;
+  return `${period} ${hh}:${mm}`;
 };
 
 export const convertTimestampToDate = (timestamp: string): string => {
