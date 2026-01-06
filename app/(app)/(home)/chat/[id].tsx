@@ -15,12 +15,9 @@ import {
 } from "expo-router";
 import { useEffect, useState } from "react";
 import {
-  Button,
   KeyboardAvoidingView,
   Platform,
-  ScrollView,
   StyleSheet,
-  Switch,
   Text,
   TextInput,
   TouchableOpacity,
@@ -28,7 +25,7 @@ import {
 } from "react-native";
 import { NeumorphicSwitch } from "@/components/style/Switch";
 
-type Chat = Omit<Message, "id" | "conversation_id">;
+type Chat = Omit<Message, "conversation_id">;
 
 export default function ChatScreen() {
   const navigation = useNavigation();
@@ -53,6 +50,7 @@ export default function ChatScreen() {
       return;
     }
 
+    setText("");
     updateStorageData(value);
     (async () => {
       if (profile?.user_id == user_ids[0]) {
@@ -151,7 +149,7 @@ export default function ChatScreen() {
     (async () => {
       const { data, error } = await supabase
         .from("messages")
-        .select("sender_id, content, created_at, is_read, is_human")
+        .select("id, sender_id, content, created_at, is_read, is_human")
         .eq("conversation_id", conversation_id)
         .order("created_at", { ascending: true });
       if (error) {
@@ -172,6 +170,7 @@ export default function ChatScreen() {
         },
         (payload) => {
           const new_chat: Chat = {
+            id: payload.new.id,
             sender_id: payload.new.sender_id,
             content: payload.new.content,
             created_at: payload.new.created_at,
@@ -237,21 +236,23 @@ export default function ChatScreen() {
             user_ids={user_ids}
             user_names={user_names}
           />
+          <ShadowWrap>
+            <View style={styles.textInputView}>
+              <TextInput
+                editable={!aiEnabled}
+                value={text}
+                onChangeText={onChangeText}
+                placeholder={
+                  aiEnabled ? "AI가 대신 채팅중" : "Say Something..."
+                }
+                style={{ flex: 5, fontSize: 20 }}
+              />
+              <TouchableOpacity onPress={onSubmit} disabled={aiEnabled}>
+                <SendIcon />
+              </TouchableOpacity>
+            </View>
+          </ShadowWrap>
         </View>
-        <ShadowWrap>
-          <View style={styles.textInputView}>
-            <TextInput
-              editable={!aiEnabled}
-              value={text}
-              onChangeText={onChangeText}
-              placeholder={aiEnabled ? "AI가 대신 채팅중" : "Say Something..."}
-              style={{ flex: 5, fontSize: 20 }}
-            />
-            <TouchableOpacity onPress={onSubmit} disabled={aiEnabled}>
-              <SendIcon />
-            </TouchableOpacity>
-          </View>
-        </ShadowWrap>
       </KeyboardAvoidingView>
     </>
   );

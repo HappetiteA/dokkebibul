@@ -1,13 +1,21 @@
-import { FlatList, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  FlatList,
+  InteractionManager,
+  ListRenderItemInfo,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { Message } from "@/types/model.types";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   convertTimestampToDate,
   convertTimestampToTime,
 } from "@/utils/time_converter";
 
-type Chat = Omit<Message, "id" | "conversation_id">;
+type Chat = Omit<Message, "conversation_id">;
 
 interface ChatHistoryProp {
   chat?: Array<Chat>;
@@ -20,6 +28,7 @@ export default function ChatHistory({
   user_names,
 }: ChatHistoryProp) {
   const { profile } = useAuth();
+  chat = chat ?? [];
 
   const TextBox = (value: Chat, color: string) => {
     return (
@@ -100,6 +109,24 @@ export default function ChatHistory({
     }
   };
 
+  const renderItem = ({ item, index }: ListRenderItemInfo<Chat>) => {
+    return (
+      <View key={index}>
+        {showDate(chat, item, index) ? (
+          <View style={styles.timeText}>
+            <Text style={{ color: "#96969D" }}>
+              {convertTimestampToDate(item.created_at)}
+            </Text>
+          </View>
+        ) : (
+          ""
+        )}
+
+        {TextElement(chat, item, index, isMe(item.sender_id))}
+      </View>
+    );
+  };
+
   const convertUIDtoUserName = (user_id: string) => {
     var idx = user_ids.findIndex((value) => value == user_id);
     return user_names[idx];
@@ -124,33 +151,18 @@ export default function ChatHistory({
     );
   };
 
-  const scrollRef = useRef<ScrollView>(null);
+  const scrollRef = useRef<FlatList>(null);
 
   return (
-    <>
-      <ScrollView
-        ref={scrollRef}
-        onContentSizeChange={() => {
-          scrollRef.current?.scrollToEnd({ animated: false });
-        }}
-      >
-        {chat?.map((value, index) => (
-          <View key={index}>
-            {showDate(chat, value, index) ? (
-              <View style={styles.timeText}>
-                <Text style={{ color: "#96969D" }}>
-                  {convertTimestampToDate(value.created_at)}
-                </Text>
-              </View>
-            ) : (
-              ""
-            )}
-
-            {TextElement(chat, value, index, isMe(value.sender_id))}
-          </View>
-        ))}
-      </ScrollView>
-    </>
+    <FlatList
+      data={chat}
+      renderItem={renderItem}
+      keyExtractor={(item) => item.id}
+      ref={scrollRef}
+      style={{ flex: 1, marginBottom: 10 }}
+      inverted
+      contentContainerStyle={{ flexDirection: "column-reverse" }}
+    ></FlatList>
   );
 }
 
