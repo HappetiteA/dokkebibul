@@ -52,11 +52,16 @@ export default function FollowersList() {
   const handleFollowBack = async (targetUserId: string, index: number) => {
     if (!profile) return;
 
+    // Store original value for potential rollback
+    const originalTwoWay = followers[index].is_two_way;
+    
     // 1. Optimistic UI Update: Immediately toggle state to "two way"
     // This makes the button switch to "Chat" instantly
-    const updatedFollowers = [...followers];
-    updatedFollowers[index].is_two_way = true;
-    setFollowers(updatedFollowers);
+    setFollowers((prev) =>
+      prev.map((item, i) =>
+        i === index ? { ...item, is_two_way: true } : item
+      )
+    );
 
     // 2. API Call to follow back
     const { error } = await supabase
@@ -66,8 +71,11 @@ export default function FollowersList() {
     if (error) {
       console.error("Follow back failed:", error);
       // Revert change if failed
-      updatedFollowers[index].is_two_way = false;
-      setFollowers([...updatedFollowers]); // Create new reference to force render
+      setFollowers((prev) =>
+      prev.map((item, i) =>
+        i === index ? { ...item, is_two_way: originalTwoWay } : item
+      )
+    );
     }
   };
 

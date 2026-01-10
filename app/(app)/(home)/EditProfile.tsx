@@ -134,7 +134,7 @@ export default function ProfileEditScreen() {
             <View style={styles.footerContainer}>
               <TouchableOpacity
                 // CHANGED: Removed commonShadow, applied specific styles
-                style={[, styles.commonShadow, styles.saveButton]}
+                style={[styles.commonShadow, styles.saveButton]}
                 onPress={onSavePressed}
               >
                 <Text style={styles.saveButtonText}>저장</Text>
