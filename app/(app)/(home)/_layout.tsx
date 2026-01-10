@@ -27,6 +27,13 @@ export default function HomeLayout() {
         }}
       />
       <Stack.Screen
+        name="EditProfile"
+        options={{
+          title: "EditProfile",
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
         name="OtherProfile"
         options={{
           title: "OtherProfile",

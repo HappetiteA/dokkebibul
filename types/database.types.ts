@@ -4,450 +4,496 @@ export type Json =
   | boolean
   | null
   | { [key: string]: Json | undefined }
-  | Json[];
+  | Json[]
 
 export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "12.2.3 (519615d)";
-  };
+    PostgrestVersion: "12.2.3 (519615d)"
+  }
   public: {
     Tables: {
       blocks: {
         Row: {
-          created_at: string;
-          dst_id: string;
-          id: string;
-          src_id: string;
-        };
+          created_at: string
+          dst_id: string
+          id: string
+          src_id: string
+        }
         Insert: {
-          created_at?: string;
-          dst_id: string;
-          id?: string;
-          src_id: string;
-        };
+          created_at?: string
+          dst_id: string
+          id?: string
+          src_id: string
+        }
         Update: {
-          created_at?: string;
-          dst_id?: string;
-          id?: string;
-          src_id?: string;
-        };
-        Relationships: [];
-      };
+          created_at?: string
+          dst_id?: string
+          id?: string
+          src_id?: string
+        }
+        Relationships: []
+      }
       conversations: {
         Row: {
-          created_at: string;
-          id: string;
-          user1_ai_enabled: boolean;
-          user1_chat_enabled: boolean;
-          user1_id: string;
-          user1_noti_enabled: boolean;
-          user2_ai_enabled: boolean;
-          user2_chat_enabled: boolean;
-          user2_id: string;
-          user2_noti_enabled: boolean;
-        };
+          created_at: string
+          id: string
+          user1_ai_enabled: boolean
+          user1_chat_enabled: boolean
+          user1_id: string
+          user1_noti_enabled: boolean
+          user2_ai_enabled: boolean
+          user2_chat_enabled: boolean
+          user2_id: string
+          user2_noti_enabled: boolean
+        }
         Insert: {
-          created_at?: string;
-          id?: string;
-          user1_ai_enabled?: boolean;
-          user1_chat_enabled?: boolean;
-          user1_id: string;
-          user1_noti_enabled?: boolean;
-          user2_ai_enabled?: boolean;
-          user2_chat_enabled?: boolean;
-          user2_id: string;
-          user2_noti_enabled?: boolean;
-        };
+          created_at?: string
+          id?: string
+          user1_ai_enabled?: boolean
+          user1_chat_enabled?: boolean
+          user1_id: string
+          user1_noti_enabled?: boolean
+          user2_ai_enabled?: boolean
+          user2_chat_enabled?: boolean
+          user2_id: string
+          user2_noti_enabled?: boolean
+        }
         Update: {
-          created_at?: string;
-          id?: string;
-          user1_ai_enabled?: boolean;
-          user1_chat_enabled?: boolean;
-          user1_id?: string;
-          user1_noti_enabled?: boolean;
-          user2_ai_enabled?: boolean;
-          user2_chat_enabled?: boolean;
-          user2_id?: string;
-          user2_noti_enabled?: boolean;
-        };
-        Relationships: [];
-      };
-      follows: {
+          created_at?: string
+          id?: string
+          user1_ai_enabled?: boolean
+          user1_chat_enabled?: boolean
+          user1_id?: string
+          user1_noti_enabled?: boolean
+          user2_ai_enabled?: boolean
+          user2_chat_enabled?: boolean
+          user2_id?: string
+          user2_noti_enabled?: boolean
+        }
+        Relationships: []
+      }
+      documents: {
         Row: {
-          created_at: string;
-          dst_id: string;
-          id: string;
-          src_id: string;
-        };
+          body: string
+          embedding: string | null
+          id: number
+          user_id: string
+        }
         Insert: {
-          created_at?: string;
-          dst_id: string;
-          id?: string;
-          src_id: string;
-        };
+          body: string
+          embedding?: string | null
+          id?: number
+          user_id: string
+        }
         Update: {
-          created_at?: string;
-          dst_id?: string;
-          id?: string;
-          src_id?: string;
-        };
-        Relationships: [];
-      };
-      locations: {
-        Row: {
-          location: unknown;
-          updated_at: string;
-          user_id: string;
-        };
-        Insert: {
-          location: unknown;
-          updated_at?: string;
-          user_id: string;
-        };
-        Update: {
-          location?: unknown;
-          updated_at?: string;
-          user_id?: string;
-        };
-        Relationships: [];
-      };
-      messages: {
-        Row: {
-          content: string;
-          conversation_id: string;
-          created_at: string;
-          id: string;
-          is_human: boolean;
-          is_read: boolean | null;
-          sender_id: string;
-        };
-        Insert: {
-          content: string;
-          conversation_id: string;
-          created_at?: string;
-          id?: string;
-          is_human: boolean;
-          is_read?: boolean | null;
-          sender_id: string;
-        };
-        Update: {
-          content?: string;
-          conversation_id?: string;
-          created_at?: string;
-          id?: string;
-          is_human?: boolean;
-          is_read?: boolean | null;
-          sender_id?: string;
-        };
+          body?: string
+          embedding?: string | null
+          id?: number
+          user_id?: string
+        }
         Relationships: [
           {
-            foreignKeyName: "messages_conversation_id_fkey";
-            columns: ["conversation_id"];
-            isOneToOne: false;
-            referencedRelation: "conversations";
-            referencedColumns: ["id"];
-          }
-        ];
-      };
+            foreignKeyName: "documents_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      follows: {
+        Row: {
+          created_at: string
+          dst_id: string
+          id: string
+          src_id: string
+        }
+        Insert: {
+          created_at?: string
+          dst_id: string
+          id?: string
+          src_id: string
+        }
+        Update: {
+          created_at?: string
+          dst_id?: string
+          id?: string
+          src_id?: string
+        }
+        Relationships: []
+      }
+      locations: {
+        Row: {
+          location: unknown
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          location: unknown
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          location?: unknown
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      messages: {
+        Row: {
+          content: string
+          conversation_id: string
+          created_at: string
+          id: string
+          is_human: boolean
+          is_read: boolean | null
+          sender_id: string
+        }
+        Insert: {
+          content: string
+          conversation_id: string
+          created_at?: string
+          id?: string
+          is_human: boolean
+          is_read?: boolean | null
+          sender_id: string
+        }
+        Update: {
+          content?: string
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          is_human?: boolean
+          is_read?: boolean | null
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
-          coins: number;
-          color_hex: string | null;
-          created_at: string;
-          is_ai_enabled: boolean;
-          is_banned: boolean;
-          name: string;
-          updated_at: string;
-          user_id: string;
-        };
+          coins: number
+          color_hex: string | null
+          created_at: string
+          is_ai_enabled: boolean
+          is_banned: boolean
+          name: string
+          updated_at: string
+          user_id: string
+        }
         Insert: {
-          coins?: number;
-          color_hex?: string | null;
-          created_at?: string;
-          is_ai_enabled?: boolean;
-          is_banned?: boolean;
-          name: string;
-          updated_at?: string;
-          user_id: string;
-        };
+          coins?: number
+          color_hex?: string | null
+          created_at?: string
+          is_ai_enabled?: boolean
+          is_banned?: boolean
+          name: string
+          updated_at?: string
+          user_id: string
+        }
         Update: {
-          coins?: number;
-          color_hex?: string | null;
-          created_at?: string;
-          is_ai_enabled?: boolean;
-          is_banned?: boolean;
-          name?: string;
-          updated_at?: string;
-          user_id?: string;
-        };
-        Relationships: [];
-      };
+          coins?: number
+          color_hex?: string | null
+          created_at?: string
+          is_ai_enabled?: boolean
+          is_banned?: boolean
+          name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       reports: {
         Row: {
-          created_at: string;
-          dst_id: string;
-          id: string;
-          reason: string;
-          src_id: string;
-        };
+          created_at: string
+          dst_id: string
+          id: string
+          reason: string
+          src_id: string
+        }
         Insert: {
-          created_at?: string;
-          dst_id: string;
-          id?: string;
-          reason: string;
-          src_id: string;
-        };
+          created_at?: string
+          dst_id: string
+          id?: string
+          reason: string
+          src_id: string
+        }
         Update: {
-          created_at?: string;
-          dst_id?: string;
-          id?: string;
-          reason?: string;
-          src_id?: string;
-        };
-        Relationships: [];
-      };
+          created_at?: string
+          dst_id?: string
+          id?: string
+          reason?: string
+          src_id?: string
+        }
+        Relationships: []
+      }
       user_push_tokens: {
         Row: {
-          created_at: string;
-          expo_push_token: string;
-          id: string;
-          user_id: string;
-        };
+          created_at: string
+          expo_push_token: string
+          id: string
+          user_id: string
+        }
         Insert: {
-          created_at?: string;
-          expo_push_token: string;
-          id?: string;
-          user_id: string;
-        };
+          created_at?: string
+          expo_push_token: string
+          id?: string
+          user_id: string
+        }
         Update: {
-          created_at?: string;
-          expo_push_token?: string;
-          id?: string;
-          user_id?: string;
-        };
-        Relationships: [];
-      };
-    };
+          created_at?: string
+          expo_push_token?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+    }
     Views: {
-      [_ in never]: never;
-    };
+      [_ in never]: never
+    }
     Functions: {
-      match_documents: {
-        Args: { filter?: Json; match_count?: number; query_embedding: string };
-        Returns: {
-          content: string;
-          id: string;
-          metadata: Json;
-          similarity: number;
-        }[];
-      };
+      match_documents:
+        | {
+            Args: {
+              match_count: number
+              match_threshold: number
+              query_embedding: string
+            }
+            Returns: {
+              body: string
+              id: number
+              similarity: number
+              user_id: string
+            }[]
+          }
+        | {
+            Args: {
+              match_count: number
+              match_threshold: number
+              p_user_id: string
+              query_embedding: string
+            }
+            Returns: {
+              body: string
+              id: number
+              similarity: number
+              user_id: string
+            }[]
+          }
       select_blocks: {
-        Args: never;
+        Args: never
         Returns: {
-          created_at: string;
-          dst_id: string;
-          dst_name: string;
-          id: string;
-          src_id: string;
-          src_name: string;
-        }[];
-      };
+          created_at: string
+          dst_id: string
+          dst_name: string
+          id: string
+          src_id: string
+          src_name: string
+        }[]
+      }
       select_conversations: {
-        Args: never;
+        Args: never
         Returns: {
-          created_at: string;
-          id: string;
-          last_msg: string;
-          last_msg_created_at: string;
-          user1_ai_enabled: boolean;
-          user1_chat_enabled: boolean;
-          user1_id: string;
-          user1_name: string;
-          user1_noti_enabled: boolean;
-          user2_ai_enabled: boolean;
-          user2_chat_enabled: boolean;
-          user2_id: string;
-          user2_name: string;
-          user2_noti_enabled: boolean;
-        }[];
-      };
+          created_at: string
+          id: string
+          last_msg: string
+          last_msg_created_at: string
+          user1_ai_enabled: boolean
+          user1_chat_enabled: boolean
+          user1_id: string
+          user1_name: string
+          user1_noti_enabled: boolean
+          user2_ai_enabled: boolean
+          user2_chat_enabled: boolean
+          user2_id: string
+          user2_name: string
+          user2_noti_enabled: boolean
+        }[]
+      }
       select_followers: {
-        Args: never;
+        Args: never
         Returns: {
-          created_at: string;
-          dst_id: string;
-          dst_name: string;
-          id: string;
-          src_id: string;
-          src_name: string;
-        }[];
-      };
+          created_at: string
+          dst_id: string
+          dst_name: string
+          id: string
+          is_two_way: boolean
+          src_id: string
+          src_name: string
+        }[]
+      }
       select_followings: {
-        Args: never;
+        Args: never
         Returns: {
-          created_at: string;
-          dst_id: string;
-          dst_name: string;
-          id: string;
-          src_id: string;
-          src_name: string;
-        }[];
-      };
+          created_at: string
+          dst_id: string
+          dst_name: string
+          id: string
+          src_id: string
+          src_name: string
+        }[]
+      }
       select_nearby_users: {
-        Args: { max_distance: number; ref_lat: number; ref_lon: number };
+        Args: { max_distance: number; ref_lat: number; ref_lon: number }
         Returns: {
-          distance: number;
-          lat: number;
-          lon: number;
-          name: string;
-          user_id: string;
-        }[];
-      };
+          distance: number
+          lat: number
+          lon: number
+          name: string
+          user_id: string
+        }[]
+      }
       select_profile_by_user_id: {
-        Args: { uid: string };
+        Args: { uid: string }
         Returns: {
-          name: string;
-          user_id: string;
-        }[];
-      };
+          name: string
+          user_id: string
+        }[]
+      }
       update_conversations_chat_enabled: {
-        Args: { new_chat_enabled: boolean; u1id: string; u2id: string };
-        Returns: boolean;
-      };
-    };
+        Args: { new_chat_enabled: boolean; u1id: string; u2id: string }
+        Returns: boolean
+      }
+    }
     Enums: {
-      [_ in never]: never;
-    };
+      [_ in never]: never
+    }
     CompositeTypes: {
-      [_ in never]: never;
-    };
-  };
-};
+      [_ in never]: never
+    }
+  }
+}
 
-type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">;
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
 
-type DefaultSchema = DatabaseWithoutInternals[Extract<
-  keyof Database,
-  "public"
->];
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals;
+    schema: keyof DatabaseWithoutInternals
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never
+    : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals;
+  schema: keyof DatabaseWithoutInternals
 }
   ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
       DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
-      Row: infer R;
+      Row: infer R
     }
     ? R
     : never
   : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
-      DefaultSchema["Views"])
-  ? (DefaultSchema["Tables"] &
-      DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
-      Row: infer R;
-    }
-    ? R
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R
+      }
+      ? R
+      : never
     : never
-  : never;
 
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals;
+    schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never
+    : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals;
+  schema: keyof DatabaseWithoutInternals
 }
   ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-      Insert: infer I;
+      Insert: infer I
     }
     ? I
     : never
   : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-  ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-      Insert: infer I;
-    }
-    ? I
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I
+      }
+      ? I
+      : never
     : never
-  : never;
 
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals;
+    schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never
+    : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals;
+  schema: keyof DatabaseWithoutInternals
 }
   ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-      Update: infer U;
+      Update: infer U
     }
     ? U
     : never
   : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-  ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-      Update: infer U;
-    }
-    ? U
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U
+      }
+      ? U
+      : never
     : never
-  : never;
 
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
   EnumName extends DefaultSchemaEnumNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals;
+    schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never
+    : never = never,
 > = DefaultSchemaEnumNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals;
+  schema: keyof DatabaseWithoutInternals
 }
   ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
-  ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
-  : never;
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never
 
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals;
+    schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never
+    : never = never,
 > = PublicCompositeTypeNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals;
+  schema: keyof DatabaseWithoutInternals
 }
   ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
   : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
-  ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
-  : never;
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never
 
 export const Constants = {
   public: {
     Enums: {},
   },
-} as const;
+} as const

@@ -1,3 +1,4 @@
+import { useRouter } from "expo-router";
 import DefaultHeader from "@/components/DefaultHeader";
 import { IAIenabled } from "@/components/interfaces";
 import { useAuthActions } from "@/hooks/useAuthActions";
@@ -10,6 +11,7 @@ import { TouchableOpacity } from "react-native";
 
 export default function Settings() {
   const { logout } = useAuthActions();
+  const router = useRouter();
   const { profile } = useAuth();
   const user_id = profile?.user_id as string;
   const [isOn, setIsOn] = useState(false);
@@ -120,6 +122,13 @@ export default function Settings() {
           }}
         >
           <Text>Log Out</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            router.navigate("/BlocksList");
+          }}
+        >
+          <Text>차단 목록 관리</Text>
         </TouchableOpacity>
         <TouchableOpacity>
           <Text>Delete Account</Text>
