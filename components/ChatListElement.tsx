@@ -7,6 +7,8 @@ interface IChatListElementProp {
   user_ids: string;
   user_names: string;
   other_name: string;
+  last_msg: string;
+  time_string: string;
   onLongPress: () => void;
 }
 
@@ -15,6 +17,8 @@ export default function ChatListElement({
   user_ids,
   user_names,
   other_name,
+  last_msg,
+  time_string,
   onLongPress,
 }: IChatListElementProp) {
   return (
@@ -39,9 +43,9 @@ export default function ChatListElement({
             <View style={styles.contents}>
               <View style={styles.horizontal}>
                 <Text style={styles.name}>{other_name}</Text>
-                <Text style={styles.time}>오후 2:00</Text>
+                <Text style={styles.time}>{time_string}</Text>
               </View>
-              <Text style={styles.chat}>채팅 미리보기</Text>
+              <Text style={styles.chat}>{last_msg}</Text>
             </View>
           </View>
         </TouchableOpacity>

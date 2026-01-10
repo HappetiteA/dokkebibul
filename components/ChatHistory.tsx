@@ -1,7 +1,11 @@
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { FlatList, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Message } from "@/types/model.types";
 import { useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import {
+  convertTimestampToDate,
+  convertTimestampToTime,
+} from "@/utils/time_converter";
 
 type Chat = Omit<Message, "id" | "conversation_id">;
 
@@ -22,34 +26,75 @@ export default function ChatHistory({
       <View
         style={{
           width: "auto",
-          maxWidth: 200,
+          maxWidth: 250,
           backgroundColor: color,
           padding: 8,
-          marginHorizontal: 10,
-          marginVertical: 3,
-          borderRadius: 10,
+          marginVertical: 5,
+          marginHorizontal: 5,
+          borderRadius: 15,
         }}
       >
-        <Text style={{ textAlign: "left", fontSize: 16 }}>{value.content}</Text>
+        <Text style={{ textAlign: "justify", fontSize: 16 }}>
+          {value.content}
+        </Text>
       </View>
     );
   };
 
-  const TextElement = (isMe: boolean, value: Chat) => {
+  const TextElement = (
+    chat: Chat[],
+    value: Chat,
+    index: number,
+    isMe: boolean
+  ) => {
     if (isMe) {
       //Right Aligned
       return (
-        <View style={{ flexDirection: "row" }}>
+        <View key={index} style={{ flexDirection: "row" }}>
           <View style={{ flex: 1 }} />
-          {TextBox(value, "#99D8EE")}
+          <View style={{ flexDirection: "row" }}>
+            <Text style={{ marginTop: "auto", color: "#909090" }}>
+              {convertTimestampToTime(value.created_at)}
+            </Text>
+            {TextBox(value, "#99D8EE")}
+          </View>
         </View>
       );
     } else {
       // Left Aligned
       return (
-        <View style={{ flexDirection: "row" }}>
-          {TextBox(value, "#E4E4EA")}
-          <View style={{ flex: 1 }} />
+        <View key={index} style={{ flexDirection: "row" }}>
+          <View
+            style={{
+              width: 40,
+              height: 40,
+              borderRadius: 20,
+              backgroundColor: showName(chat, value, index)
+                ? "red"
+                : "transparent",
+              marginLeft: 5,
+            }}
+          ></View>
+          <View>
+            {showName(chat, value, index) ? (
+              <View>
+                <Text style={styles.otherName}>
+                  {convertUIDtoUserName(value.sender_id)}
+                </Text>
+              </View>
+            ) : (
+              ""
+            )}
+            <View style={{ flexDirection: "row" }}>
+              <View style={{ flexDirection: "row" }}>
+                {TextBox(value, "#E4E4EA")}
+                <Text style={{ marginTop: "auto", color: "#909090" }}>
+                  {convertTimestampToTime(value.created_at)}
+                </Text>
+              </View>
+              <View style={{ flex: 1 }} />
+            </View>
+          </View>
         </View>
       );
     }
@@ -60,28 +105,23 @@ export default function ChatHistory({
     return user_names[idx];
   };
 
-  const convertTimestampToTime = (timestamp: string): string => {
-    const date = new Date(timestamp);
-
-    var hours = date.getHours().toString();
-    hours = hours.length == 1 ? "0" + hours : hours;
-
-    var minutes = date.getMinutes().toString();
-    minutes = minutes.length == 1 ? "0" + minutes : minutes;
-
-    const timeString = hours + ":" + minutes;
-    return timeString;
-  };
-
   const isMe = (id: string) => {
     return id == profile?.user_id;
   };
 
   const showName = (chat: Chat[], value: Chat, index: number) => {
-    if (isMe(value.sender_id)) return false;
+    //if (isMe(value.sender_id)) return false;
     if (index == 0) return true;
-
     return value.sender_id != chat[index - 1].sender_id;
+  };
+
+  const showDate = (chat: Chat[], value: Chat, index: number) => {
+    //if (isMe(value.sender_id)) return false;
+    if (index == 0) return true;
+    return (
+      convertTimestampToDate(value.created_at) !=
+      convertTimestampToDate(chat[index - 1].created_at)
+    );
   };
 
   const scrollRef = useRef<ScrollView>(null);
@@ -89,7 +129,6 @@ export default function ChatHistory({
   return (
     <>
       <ScrollView
-        style={{ height: "50%" }}
         ref={scrollRef}
         onContentSizeChange={() => {
           scrollRef.current?.scrollToEnd({ animated: false });
@@ -97,18 +136,17 @@ export default function ChatHistory({
       >
         {chat?.map((value, index) => (
           <View key={index}>
-            {showName(chat, value, index) ? (
-              <View>
-                <Text style={styles.counterpartView}>
-                  {convertUIDtoUserName(value.sender_id)}(
-                  {convertTimestampToTime(value.created_at)})
+            {showDate(chat, value, index) ? (
+              <View style={styles.timeText}>
+                <Text style={{ color: "#96969D" }}>
+                  {convertTimestampToDate(value.created_at)}
                 </Text>
               </View>
             ) : (
               ""
             )}
 
-            {TextElement(isMe(value.sender_id), value)}
+            {TextElement(chat, value, index, isMe(value.sender_id))}
           </View>
         ))}
       </ScrollView>
@@ -121,8 +159,19 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
     flexDirection: "row",
   },
-  counterpartView: {
+  timeText: {
+    marginVertical: 10,
+    marginHorizontal: "auto",
+    justifyContent: "center",
+    paddingHorizontal: 20,
+    height: 20,
+    borderRadius: 15,
+    backgroundColor: "#E4E4EA",
+  },
+  otherName: {
     alignItems: "flex-start",
+    marginHorizontal: 5,
+    fontSize: 20,
   },
   leftAlignText: {
     color: "black",

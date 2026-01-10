@@ -18,7 +18,11 @@ import useModal from "@/hooks/useModal";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import BottomSheet, { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import ShadowWrap from "@/components/style/Shadow";
-import { ProfilesIcon, SettingsIcon } from "@/components/style/Icons";
+import {
+  PlaceIcon,
+  ProfilesIcon,
+  SettingsIcon,
+} from "@/components/style/Icons";
 
 function DetailsModal({
   isOpen,
@@ -51,7 +55,7 @@ function DetailsModal({
 
 export default function MainScreen() {
   const bottomSheetRef = useRef<BottomSheet>(null);
-  const snapPoints = useMemo(() => ["20%", "60%"], []);
+  const snapPoints = useMemo(() => ["20%", "60%", "90%"], []);
 
   const { open: openDetailsModal, close: closeDetailsModal } =
     useModal(DetailsModal);
@@ -72,16 +76,35 @@ export default function MainScreen() {
           snapPoints={snapPoints}
           index={1}
         >
-          <BottomSheetScrollView style={styles.contentContainer}>
-            <Text>채팅방 목록</Text>
-            <ChatRoomList
-              openModal={(name) =>
-                openDetailsModal({ onClose: closeDetailsModal, name: name })
-              }
-            />
+          <BottomSheetScrollView>
+            <View style={styles.contentContainer}>
+              <ChatRoomList
+                openModal={(name) =>
+                  openDetailsModal({ onClose: closeDetailsModal, name: name })
+                }
+              />
+            </View>
           </BottomSheetScrollView>
         </BottomSheet>
       </GestureHandlerRootView>
+      <View
+        style={{
+          width: 80,
+          height: 80,
+          borderRadius: 40,
+          justifyContent: "center",
+          alignItems: "center",
+          position: "absolute",
+          top: 35,
+          left: 10,
+        }}
+      >
+        <ShadowWrap>
+          <TouchableOpacity onPress={() => {}}>
+            <PlaceIcon />
+          </TouchableOpacity>
+        </ShadowWrap>
+      </View>
     </>
   );
 }
@@ -99,9 +122,7 @@ function MainScreenHeader() {
   return (
     <View style={headerStyle.container}>
       <View style={headerStyle.content}>
-        <View style={headerStyle.left}>
-          <Text>LOGO & TEXT</Text>
-        </View>
+        <View style={headerStyle.left}></View>
         <View style={headerStyle.right}>
           <ShadowWrap>
             <TouchableOpacity
@@ -133,6 +154,8 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     width: "100%",
+    height: "auto",
+    borderRadius: 10,
     paddingHorizontal: 10,
     backgroundColor: "#F8F8FA",
   },
