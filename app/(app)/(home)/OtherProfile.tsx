@@ -330,7 +330,7 @@ export default function OtherProfileScreen() {
     } else {
       openBlockSuccessModal({
         onClose: () => {
-          router.navigate("/(app)/(home)");
+          router.replace("/(app)/(home)");
           closeBlockSuccessModal();
         },
         name: userInfo?.name,

@@ -87,7 +87,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const refreshProfile = async () => {
     if (!session?.user) return;
-    setLoading(true);
+    if (!profile) {
+      setLoading(true);
+    }
     try {
       const { data, error } = await supabase
         .from("profiles")
