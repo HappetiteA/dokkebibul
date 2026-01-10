@@ -1,8 +1,8 @@
-export interface IAIenabled {
-  [type: string]: AIenabledDetail;
-}
+import { ChatRoom } from "@/types/model.types";
 
-interface AIenabledDetail {
-  enabled: boolean;
+export type ChatRoomDatas = Map<string, Omit<ChatRoom, "id">>;
+
+export interface IGlobalSetting {
+  AIenabled: boolean;
   last_fetched: number;
 }

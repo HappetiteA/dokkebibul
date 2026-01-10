@@ -19,13 +19,17 @@ type Chat = Omit<Message, "conversation_id">;
 
 interface ChatHistoryProp {
   chat?: Array<Chat>;
-  user_ids: string[];
-  user_names: string[];
+  user1_id: string;
+  user2_id: string;
+  user1_name: string;
+  user2_name: string;
 }
 export default function ChatHistory({
   chat,
-  user_ids,
-  user_names,
+  user1_id,
+  user2_id,
+  user1_name,
+  user2_name,
 }: ChatHistoryProp) {
   const { profile } = useAuth();
   chat = chat ?? [];
@@ -128,8 +132,8 @@ export default function ChatHistory({
   };
 
   const convertUIDtoUserName = (user_id: string) => {
-    var idx = user_ids.findIndex((value) => value == user_id);
-    return user_names[idx];
+    var idx = [user1_id, user2_id].findIndex((value) => value == user_id);
+    return [user1_name, user2_name][idx];
   };
 
   const isMe = (id: string) => {

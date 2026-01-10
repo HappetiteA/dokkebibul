@@ -28,8 +28,6 @@ export default function ChatListElement({
           pathname: "/chat/[id]",
           params: {
             id: conversation_id,
-            user_ids: user_ids,
-            user_names: user_names,
           },
         }}
         asChild
