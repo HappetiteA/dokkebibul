@@ -90,6 +90,7 @@ export default function Settings() {
       // can use asyncstorage data
       const { last_fetched, ...data } = GlobalSettingFromStorage;
       setSettingData(data);
+      setIsOn(data.AIenabled);
     })();
   }, [profile]);
 
@@ -101,8 +102,8 @@ export default function Settings() {
         <Switch
           value={isOn}
           onChange={() => {
-            updateGlobalAISetting({ AIenabled: isOn });
             setIsOn((c) => !c);
+            updateGlobalAISetting({ AIenabled: isOn });
           }}
         ></Switch>
         <TouchableOpacity

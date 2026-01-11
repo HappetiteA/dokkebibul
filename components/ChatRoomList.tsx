@@ -30,7 +30,7 @@ export default function ChatRoomList({ openModal }: IChatRoomListProp) {
       });
 
       const jsonStr = JSON.stringify(Object.fromEntries(map));
-      AsyncStorage.setItem("ChatRoomData", jsonStr);
+      await AsyncStorage.setItem("ChatRoomData", jsonStr);
       setChatRooms(chatRoomData);
     })();
   }, []);

@@ -84,7 +84,7 @@ export default function ChatScreen() {
       const jsonStr = JSON.stringify(
         Object.fromEntries(ChatRoomDataFromStorage)
       );
-      AsyncStorage.setItem("ChatRoomData", jsonStr);
+      await AsyncStorage.setItem("ChatRoomData", jsonStr);
     })();
   };
 
@@ -164,7 +164,7 @@ export default function ChatScreen() {
 
         const jsonStr = JSON.stringify(Object.fromEntries(map));
         setChatRoomData(map.get(conversation_id));
-        AsyncStorage.setItem("ChatRoomData", jsonStr);
+        await AsyncStorage.setItem("ChatRoomData", jsonStr);
 
         return;
       }
@@ -277,13 +277,15 @@ function ChatScreenHeader({
   };
 
   const onSwitchChange = () => {
-    if (user_id == chatRoomData.user1_id) {
-      chatRoomData.user1_ai_enabled = !AIenabled;
-    } else if (user_id == chatRoomData.user2_id) {
-      chatRoomData.user2_ai_enabled = !AIenabled;
-    }
-    updateSetting(chatRoomData);
     setAIenabled((c) => !c);
+
+    const newData = { ...chatRoomData };
+    if (user_id == newData.user1_id) {
+      newData.user1_ai_enabled = AIenabled;
+    } else if (user_id == newData.user2_id) {
+      newData.user2_ai_enabled = AIenabled;
+    }
+    updateSetting(newData);
   };
 
   return (
