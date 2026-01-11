@@ -57,8 +57,6 @@ export default function ChatScreen() {
       ...rest,
     };
 
-    setText("");
-    setChatRoomData(value);
     (async () => {
       const { error } = await supabase
         .from("conversations")
@@ -82,7 +80,16 @@ export default function ChatScreen() {
       const jsonStr = JSON.stringify(
         Object.fromEntries(ChatRoomDataFromStorage)
       );
-      await AsyncStorage.setItem("ChatRoomData", jsonStr);
+
+      try {
+        await AsyncStorage.setItem("ChatRoomData", jsonStr);
+      } catch {
+        console.error("Error : updateSetting asyncstorage setItem failed");
+        return;
+      }
+
+      setText("");
+      setChatRoomData(value);
     })();
   };
 
@@ -162,8 +169,13 @@ export default function ChatScreen() {
 
         const jsonStr = JSON.stringify(Object.fromEntries(map));
         setChatRoomData(map.get(conversation_id));
-        await AsyncStorage.setItem("ChatRoomData", jsonStr);
-
+        try {
+          await AsyncStorage.setItem("ChatRoomData", jsonStr);
+        } catch {
+          console.error(
+            "Error : storage is null case, load data from server and save in async storage failed"
+          );
+        }
         return;
       }
 
@@ -215,7 +227,7 @@ export default function ChatScreen() {
               <ShadowWrap>
                 <View style={styles.textInputView}>
                   <TextInput
-                    editable={AIenabled}
+                    editable={!AIenabled}
                     value={text}
                     onChangeText={onChangeText}
                     placeholder={
@@ -272,6 +284,7 @@ function ChatScreenHeader({
     } else if (user_id == chatRoomData.user2_id) {
       return chatRoomData.user1_name;
     }
+    return "Unknown";
   };
 
   const onSwitchChange = () => {

@@ -18,9 +18,6 @@ export default function Settings() {
   const [isOn, setIsOn] = useState(false);
 
   const updateGlobalAISetting = (value: SettingData) => {
-    setSettingData(value);
-    setIsOn(value.AIenabled);
-
     (async () => {
       await updateStorageData(value);
       const { error } = await supabase
@@ -32,6 +29,8 @@ export default function Settings() {
         console.log(error);
       }
     })();
+    setSettingData(value);
+    setIsOn(value.AIenabled);
   };
 
   const loadDataFromServer = () => {
@@ -41,22 +40,17 @@ export default function Settings() {
     return profile.is_ai_enabled;
   };
 
-  const insertStorageData = async (data: SettingData) => {
-    const json: IGlobalSetting = {
-      ...data,
-      last_fetched: Date.now(),
-    };
-    const jsonStr = JSON.stringify(json);
-    await AsyncStorage.setItem("GlobalSetting", jsonStr);
-  };
-
   const updateStorageData = async (data: SettingData) => {
     const json: IGlobalSetting = {
       ...data,
       last_fetched: Date.now(),
     };
     const jsonStr = JSON.stringify(json);
-    await AsyncStorage.setItem("GlobalSetting", jsonStr);
+    try {
+      await AsyncStorage.setItem("GlobalSetting", jsonStr);
+    } catch {
+      console.error("Error : updateStorageData");
+    }
   };
 
   useEffect(() => {
@@ -66,7 +60,7 @@ export default function Settings() {
         // load data from server and save at local storage
         // need to make new key value pair
         const dataFromServer = loadDataFromServer();
-        insertStorageData({ AIenabled: dataFromServer });
+        updateStorageData({ AIenabled: dataFromServer });
         setSettingData({ AIenabled: dataFromServer });
         return;
       }
