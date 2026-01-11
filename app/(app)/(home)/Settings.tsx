@@ -18,6 +18,7 @@ export default function Settings() {
   const [isOn, setIsOn] = useState(false);
 
   const updateGlobalAISetting = (value: SettingData) => {
+    setSettingData(value);
     setIsOn(value.AIenabled);
 
     (async () => {
@@ -84,6 +85,8 @@ export default function Settings() {
         const dataFromServer = loadDataFromServer();
         updateStorageData({ AIenabled: dataFromServer });
         setSettingData({ AIenabled: dataFromServer });
+        setIsOn(dataFromServer);
+
         return;
       }
 
@@ -102,8 +105,7 @@ export default function Settings() {
         <Switch
           value={isOn}
           onChange={() => {
-            setIsOn((c) => !c);
-            updateGlobalAISetting({ AIenabled: isOn });
+            updateGlobalAISetting({ AIenabled: !isOn });
           }}
         ></Switch>
         <TouchableOpacity

@@ -50,8 +50,6 @@ export default function ChatScreen() {
       return;
     }
 
-    console.log(value);
-
     const { last_msg, last_msg_created_at, user1_name, user2_name, ...rest } =
       value;
     const newData = {
@@ -277,15 +275,14 @@ function ChatScreenHeader({
   };
 
   const onSwitchChange = () => {
-    setAIenabled((c) => !c);
-
     const newData = { ...chatRoomData };
     if (user_id == newData.user1_id) {
-      newData.user1_ai_enabled = AIenabled;
+      newData.user1_ai_enabled = !AIenabled;
     } else if (user_id == newData.user2_id) {
-      newData.user2_ai_enabled = AIenabled;
+      newData.user2_ai_enabled = !AIenabled;
     }
     updateSetting(newData);
+    setAIenabled((c) => !c);
   };
 
   return (
