@@ -6,8 +6,10 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useState } from "react";
-import { Alert, Switch, Text, View } from "react-native";
+import { Alert, Image, StyleSheet, Switch, Text, View } from "react-native";
 import { TouchableOpacity } from "react-native";
+import ShadowWrap from "@/components/style/Shadow";
+import { NeumorphicSwitch } from "@/components/style/Switch";
 
 type SettingData = Omit<IGlobalSetting, "last_fetched">;
 
@@ -115,36 +117,173 @@ export default function Settings() {
   return (
     <>
       <DefaultHeader title="Settings" />
-      <View>
-        <Text>Global AI Enable</Text>
-        <Switch
-          value={isOn}
-          onChange={() => {
-            updateGlobalSetting({ AIenabled: !isOn });
-          }}
-        ></Switch>
-        <TouchableOpacity
-          onPress={async () => {
-            try {
-              await logout();
-            } catch (err: any) {
-              Alert.alert("Logout Error", err.message);
-            }
-          }}
-        >
-          <Text>Log Out</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => {
-            router.navigate("/BlocksList");
-          }}
-        >
-          <Text>차단 목록 관리</Text>
-        </TouchableOpacity>
-        <TouchableOpacity>
-          <Text>Delete Account</Text>
-        </TouchableOpacity>
+      <View style={styles.container}>
+        <View>
+          <View style={[styles.settingListElement, { marginTop: 40 }]}>
+            <Text style={styles.h1}>기기 설정</Text>
+          </View>
+          <View style={styles.settingListElement}>
+            <Text style={styles.h2}>푸시 알림</Text>
+            <NeumorphicSwitch
+              width={60}
+              height={30}
+              padding={5}
+              value={isOn}
+              onValueChange={() => {
+                updateGlobalSetting({ AIenabled: !isOn });
+              }}
+              onColor="#93D7EA"
+              offColor="#D7D7E2"
+            />
+          </View>
+          <View style={styles.settingListElement}>
+            <Text style={styles.h2}>위치 접근 허용</Text>
+            <NeumorphicSwitch
+              width={60}
+              height={30}
+              padding={5}
+              value={isOn}
+              onValueChange={() => {
+                updateGlobalSetting({ AIenabled: !isOn });
+              }}
+              onColor="#93D7EA"
+              offColor="#D7D7E2"
+            />
+          </View>
+          <View style={styles.settingListElement}>
+            <Text style={styles.h2}>앱 사용 중 알림</Text>
+            <NeumorphicSwitch
+              width={60}
+              height={30}
+              padding={5}
+              value={isOn}
+              onValueChange={() => {
+                updateGlobalSetting({ AIenabled: !isOn });
+              }}
+              onColor="#93D7EA"
+              offColor="#D7D7E2"
+            />
+          </View>
+
+          <View style={[styles.settingListElement, { marginTop: 40 }]}>
+            <Text style={styles.h1}>채팅 설정</Text>
+          </View>
+          <View style={styles.settingListElement}>
+            <Text style={styles.h2}>백그라운드 AI 채팅</Text>
+            <NeumorphicSwitch
+              width={60}
+              height={30}
+              padding={5}
+              value={isOn}
+              onValueChange={() => {
+                updateGlobalSetting({ AIenabled: !isOn });
+              }}
+              onColor="#93D7EA"
+              offColor="#D7D7E2"
+            />
+          </View>
+
+          <View style={[styles.settingListElement, { marginTop: 40 }]}>
+            <Text style={styles.h1}>차단 목록 관리</Text>
+            <TouchableOpacity
+              onPress={() => {
+                router.navigate("/BlocksList");
+              }}
+            >
+              <View style={{ flexDirection: "row" }}>
+                <Text style={[styles.textButton, { marginRight: 10 }]}>
+                  {" "}
+                  30{" "}
+                </Text>
+                <Image
+                  style={{ width: 16, height: 25 }}
+                  resizeMode="contain"
+                  source={require("../../../assets/from_figma/right_arrow.png")}
+                />
+              </View>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.settingListElement}>
+            <Text style={styles.h1}>계정 관리</Text>
+            <TouchableOpacity>
+              <Text style={styles.textButton}>회원탈퇴</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={{ marginTop: 40 }}>
+            <ShadowWrap>
+              <TouchableOpacity
+                style={styles.button}
+                onPress={async () => {
+                  try {
+                    await logout();
+                  } catch (err: any) {
+                    Alert.alert("Logout Error", err.message);
+                  }
+                }}
+              >
+                <Text style={styles.innerButtonText}>로그아웃</Text>
+              </TouchableOpacity>
+            </ShadowWrap>
+          </View>
+
+          <View
+            style={[
+              styles.settingListElement,
+              { justifyContent: "space-evenly", marginTop: 20 },
+            ]}
+          >
+            <TouchableOpacity>
+              <Text style={styles.legalLinkText}>이용 약관</Text>
+            </TouchableOpacity>
+            <TouchableOpacity>
+              <Text style={styles.legalLinkText}>개인정보처리방침</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
       </View>
     </>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    justifyContent: "center",
+  },
+  settingListElement: {
+    flexDirection: "row",
+    alignItems: "center",
+    width: "70%",
+    marginHorizontal: "auto",
+    marginVertical: 10,
+    justifyContent: "space-between",
+  },
+
+  button: {
+    backgroundColor: "#F8F8FA",
+    borderRadius: 30,
+    marginVertical: 10,
+    width: 180,
+    marginHorizontal: "auto",
+    paddingHorizontal: 30,
+    paddingVertical: 10,
+  },
+  h1: {
+    fontSize: 24,
+    color: "#8F8F9A",
+    fontWeight: "bold",
+  },
+  h2: {
+    fontSize: 24,
+    paddingHorizontal: 5,
+    color: "#8F8F9A",
+  },
+  textButton: {
+    fontSize: 20,
+    color: "#B4B4B8",
+  },
+  legalLinkText: {
+    fontSize: 15,
+    color: "#B4B4B8",
+  },
+  innerButtonText: { textAlign: "center", fontSize: 20, color: "#8F8F9A" },
+});
