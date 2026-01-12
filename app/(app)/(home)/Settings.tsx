@@ -20,12 +20,6 @@ export default function Settings() {
   const updateGlobalSetting = async (value: SettingData) => {
     setIsOn(value.AIenabled);
 
-    const failed = await updateStorageData(value);
-    if (failed) {
-      setIsOn(!value.AIenabled);
-      return;
-    }
-
     const { error } = await supabase
       .from("profiles")
       .update({ is_ai_enabled: value.AIenabled })
@@ -36,6 +30,13 @@ export default function Settings() {
       setIsOn(!value.AIenabled);
       return;
     }
+
+    const failed = await updateStorageData(value);
+    if (failed) {
+      console.warn("Server updated but local cache write failed");
+      return;
+    }
+
     setSettingData(value);
   };
 
@@ -63,17 +64,20 @@ export default function Settings() {
 
   useEffect(() => {
     (async () => {
-      const storageData = await AsyncStorage.getItem("GlobalSetting");
-      if (storageData == null) {
-        // load data from server and save at local storage
-        // need to make new key value pair
-        const dataFromServer = loadDataFromServer();
-        updateStorageData({ AIenabled: dataFromServer });
-        setSettingData({ AIenabled: dataFromServer });
-        return;
-      }
-
       try {
+        const storageData = await AsyncStorage.getItem("GlobalSetting");
+        if (storageData == null) {
+          // load data from server and save at local storage
+          // need to make new key value pair
+          const dataFromServer = loadDataFromServer();
+          const failed = await updateStorageData({ AIenabled: dataFromServer });
+          if (!failed) {
+            setSettingData({ AIenabled: dataFromServer });
+            setIsOn(dataFromServer);
+          }
+          return;
+        }
+
         const GlobalSettingFromStorage = JSON.parse(
           storageData
         ) as IGlobalSetting;
@@ -89,10 +93,10 @@ export default function Settings() {
           const failed = await updateStorageData({
             AIenabled: dataFromServer,
           });
-          if (failed) return;
-
-          setSettingData({ AIenabled: dataFromServer });
-          setIsOn(dataFromServer);
+          if (!failed) {
+            setSettingData({ AIenabled: dataFromServer });
+            setIsOn(dataFromServer);
+          }
           return;
         }
 

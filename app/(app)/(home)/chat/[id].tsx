@@ -67,6 +67,7 @@ export default function ChatScreen() {
     try {
       const storageData = await AsyncStorage.getItem("ChatRoomData");
       if (storageData == null) {
+        console.warn("ChatRoomData not found, cannot update setting");
         return true;
       }
 
@@ -166,8 +167,9 @@ export default function ChatScreen() {
 
         try {
           const jsonStr = JSON.stringify(Object.fromEntries(map));
-          const data = map.get(conversation_id);
+          await AsyncStorage.setItem("ChatRoomData", jsonStr);
 
+          const data = map.get(conversation_id);
           setChatRoomData(data);
           if (profile?.user_id == data?.user1_id) {
             setAIenabled(data?.user1_ai_enabled ?? false);
@@ -176,7 +178,6 @@ export default function ChatScreen() {
           } else {
             setAIenabled(false);
           }
-          await AsyncStorage.setItem("ChatRoomData", jsonStr);
         } catch (err: any) {
           Alert.alert("Asyncstorage Error", err.message);
         }
