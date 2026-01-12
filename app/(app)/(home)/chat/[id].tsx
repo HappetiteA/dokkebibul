@@ -15,6 +15,7 @@ import {
 } from "expo-router";
 import { useEffect, useState } from "react";
 import {
+  Alert,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
@@ -40,14 +41,10 @@ export default function ChatScreen() {
   const [AIenabled, setAIenabled] = useState<boolean>(false);
   const [chatRoomData, setChatRoomData] = useState<ChatRoomData>();
 
-  const onChangeText = (inputText: string) => {
-    setText(inputText);
-  };
-
-  const updateSetting = (value: ChatRoomData) => {
+  const updateSetting = async (value: ChatRoomData) => {
     if (profile == null || profile.user_id == null) {
       console.warn("Cannot update AI setting: user not authenticated");
-      return;
+      return true;
     }
 
     const { last_msg, last_msg_created_at, user1_name, user2_name, ...rest } =
@@ -57,20 +54,20 @@ export default function ChatScreen() {
       ...rest,
     };
 
-    (async () => {
-      const { error } = await supabase
-        .from("conversations")
-        .update(newData)
-        .eq("id", conversation_id);
+    const { error } = await supabase
+      .from("conversations")
+      .update(newData)
+      .eq("id", conversation_id);
 
-      if (error) {
-        console.log(error);
-        return;
-      }
+    if (error) {
+      console.log(error);
+      return true;
+    }
 
+    try {
       const storageData = await AsyncStorage.getItem("ChatRoomData");
       if (storageData == null) {
-        return;
+        return true;
       }
 
       const ChatRoomDataFromStorage = new Map<string, ChatRoomData>(
@@ -80,17 +77,17 @@ export default function ChatScreen() {
       const jsonStr = JSON.stringify(
         Object.fromEntries(ChatRoomDataFromStorage)
       );
-
-      try {
-        await AsyncStorage.setItem("ChatRoomData", jsonStr);
-      } catch {
-        console.error("Error : updateSetting asyncstorage setItem failed");
-        return;
-      }
-
-      setText("");
+      await AsyncStorage.setItem("ChatRoomData", jsonStr);
       setChatRoomData(value);
-    })();
+      return false;
+    } catch (err: any) {
+      Alert.alert("Error while updating setting", err.message);
+      return true;
+    }
+  };
+
+  const onChangeText = (inputText: string) => {
+    setText(inputText);
   };
 
   const onSubmit = async () => {
@@ -167,31 +164,42 @@ export default function ChatScreen() {
           map.set(id, rest);
         });
 
-        const jsonStr = JSON.stringify(Object.fromEntries(map));
-        setChatRoomData(map.get(conversation_id));
         try {
+          const jsonStr = JSON.stringify(Object.fromEntries(map));
+          const data = map.get(conversation_id);
+
+          setChatRoomData(data);
+          if (profile?.user_id == data?.user1_id) {
+            setAIenabled(data?.user1_ai_enabled ?? false);
+          } else if (profile?.user_id == data?.user2_id) {
+            setAIenabled(data?.user2_ai_enabled ?? false);
+          } else {
+            setAIenabled(false);
+          }
           await AsyncStorage.setItem("ChatRoomData", jsonStr);
-        } catch {
-          console.error(
-            "Error : storage is null case, load data from server and save in async storage failed"
-          );
+        } catch (err: any) {
+          Alert.alert("Asyncstorage Error", err.message);
         }
         return;
       }
 
       // can use asyncstorage data
-      const ChatRoomDataFromStorage = new Map<string, ChatRoomData>(
-        Object.entries(JSON.parse(storageData))
-      );
+      try {
+        const ChatRoomDataFromStorage = new Map<string, ChatRoomData>(
+          Object.entries(JSON.parse(storageData))
+        );
+        const data = ChatRoomDataFromStorage.get(conversation_id);
 
-      const data = ChatRoomDataFromStorage.get(conversation_id);
-      setChatRoomData(data);
-      if (profile?.user_id == data?.user1_id) {
-        setAIenabled(data?.user1_ai_enabled ?? false);
-      } else if (profile?.user_id == data?.user2_id) {
-        setAIenabled(data?.user2_ai_enabled ?? false);
-      } else {
-        setAIenabled(false);
+        setChatRoomData(data);
+        if (profile?.user_id == data?.user1_id) {
+          setAIenabled(data?.user1_ai_enabled ?? false);
+        } else if (profile?.user_id == data?.user2_id) {
+          setAIenabled(data?.user2_ai_enabled ?? false);
+        } else {
+          setAIenabled(false);
+        }
+      } catch (err: any) {
+        Alert.alert("ChatRoomData parsing error", err.message);
       }
     })();
 
@@ -207,6 +215,7 @@ export default function ChatScreen() {
           <ChatScreenHeader
             conversation_id={conversation_id}
             user_id={profile.user_id}
+            setText={setText}
             AIenabled={AIenabled}
             setAIenabled={setAIenabled}
             chatRoomData={chatRoomData}
@@ -256,15 +265,17 @@ export default function ChatScreen() {
 interface ChatScreenHeaderProp {
   conversation_id: string;
   user_id: string;
+  setText: React.Dispatch<React.SetStateAction<string>>;
   AIenabled: boolean;
   setAIenabled: React.Dispatch<React.SetStateAction<boolean>>;
   chatRoomData: ChatRoomData;
-  updateSetting: (value: ChatRoomData) => void;
+  updateSetting: (value: ChatRoomData) => Promise<boolean>;
 }
 
 function ChatScreenHeader({
   conversation_id,
   user_id,
+  setText,
   AIenabled,
   setAIenabled,
   chatRoomData,
@@ -287,15 +298,22 @@ function ChatScreenHeader({
     return "Unknown";
   };
 
-  const onSwitchChange = () => {
+  const onSwitchChange = async () => {
     const newData = { ...chatRoomData };
     if (user_id == newData.user1_id) {
       newData.user1_ai_enabled = !AIenabled;
     } else if (user_id == newData.user2_id) {
       newData.user2_ai_enabled = !AIenabled;
     }
-    updateSetting(newData);
+
     setAIenabled((c) => !c);
+    const failed = await updateSetting(newData);
+    if (failed) {
+      setAIenabled((c) => !c);
+      return;
+    }
+
+    setText("");
   };
 
   return (

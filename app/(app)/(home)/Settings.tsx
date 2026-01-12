@@ -17,20 +17,26 @@ export default function Settings() {
   const [settingData, setSettingData] = useState<SettingData>();
   const [isOn, setIsOn] = useState(false);
 
-  const updateGlobalAISetting = (value: SettingData) => {
-    (async () => {
-      await updateStorageData(value);
-      const { error } = await supabase
-        .from("profiles")
-        .update({ is_ai_enabled: value.AIenabled })
-        .eq("user_id", user_id);
-
-      if (error) {
-        console.log(error);
-      }
-    })();
-    setSettingData(value);
+  const updateGlobalSetting = async (value: SettingData) => {
     setIsOn(value.AIenabled);
+
+    const failed = await updateStorageData(value);
+    if (failed) {
+      setIsOn(!value.AIenabled);
+      return;
+    }
+
+    const { error } = await supabase
+      .from("profiles")
+      .update({ is_ai_enabled: value.AIenabled })
+      .eq("user_id", user_id);
+
+    if (error) {
+      console.error("Error while updating global setting", error.message);
+      setIsOn(!value.AIenabled);
+      return;
+    }
+    setSettingData(value);
   };
 
   const loadDataFromServer = () => {
@@ -41,15 +47,17 @@ export default function Settings() {
   };
 
   const updateStorageData = async (data: SettingData) => {
-    const json: IGlobalSetting = {
-      ...data,
-      last_fetched: Date.now(),
-    };
-    const jsonStr = JSON.stringify(json);
     try {
+      const json: IGlobalSetting = {
+        ...data,
+        last_fetched: Date.now(),
+      };
+      const jsonStr = JSON.stringify(json);
       await AsyncStorage.setItem("GlobalSetting", jsonStr);
-    } catch {
-      console.error("Error : updateStorageData");
+      return false;
+    } catch (err: any) {
+      Alert.alert("Asyncstorage Error", err.message);
+      return true;
     }
   };
 
@@ -65,29 +73,36 @@ export default function Settings() {
         return;
       }
 
-      const GlobalSettingFromStorage = JSON.parse(
-        storageData
-      ) as IGlobalSetting;
-      const ONE_DAY = 24 * 60 * 60 * 1000;
-      // do not exist or expired
-      if (
-        GlobalSettingFromStorage == null ||
-        GlobalSettingFromStorage.last_fetched < Date.now() - ONE_DAY
-      ) {
-        // load data from server and save at local storage
-        // need to add new row
-        const dataFromServer = loadDataFromServer();
-        updateStorageData({ AIenabled: dataFromServer });
-        setSettingData({ AIenabled: dataFromServer });
-        setIsOn(dataFromServer);
+      try {
+        const GlobalSettingFromStorage = JSON.parse(
+          storageData
+        ) as IGlobalSetting;
+        const ONE_DAY = 24 * 60 * 60 * 1000;
+        // do not exist or expired
+        if (
+          GlobalSettingFromStorage == null ||
+          GlobalSettingFromStorage.last_fetched < Date.now() - ONE_DAY
+        ) {
+          // load data from server and save at local storage
+          // need to add new row
+          const dataFromServer = loadDataFromServer();
+          const failed = await updateStorageData({
+            AIenabled: dataFromServer,
+          });
+          if (failed) return;
 
-        return;
+          setSettingData({ AIenabled: dataFromServer });
+          setIsOn(dataFromServer);
+          return;
+        }
+
+        // can use asyncstorage data
+        const { last_fetched, ...data } = GlobalSettingFromStorage;
+        setSettingData(data);
+        setIsOn(data.AIenabled);
+      } catch (err: any) {
+        console.error("Asyncstorage error", err.message);
       }
-
-      // can use asyncstorage data
-      const { last_fetched, ...data } = GlobalSettingFromStorage;
-      setSettingData(data);
-      setIsOn(data.AIenabled);
     })();
   }, [profile]);
 
@@ -99,7 +114,7 @@ export default function Settings() {
         <Switch
           value={isOn}
           onChange={() => {
-            updateGlobalAISetting({ AIenabled: !isOn });
+            updateGlobalSetting({ AIenabled: !isOn });
           }}
         ></Switch>
         <TouchableOpacity
