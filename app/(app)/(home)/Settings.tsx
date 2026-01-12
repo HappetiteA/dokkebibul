@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import DefaultHeader from "@/components/DefaultHeader";
-import { IAIenabled } from "@/components/interfaces";
+import { IGlobalSetting } from "@/components/interfaces";
 import { useAuthActions } from "@/hooks/useAuthActions";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
@@ -9,27 +9,37 @@ import { useEffect, useState } from "react";
 import { Alert, Switch, Text, View } from "react-native";
 import { TouchableOpacity } from "react-native";
 
+type SettingData = Omit<IGlobalSetting, "last_fetched">;
+
 export default function Settings() {
   const { logout } = useAuthActions();
   const router = useRouter();
   const { profile } = useAuth();
   const user_id = profile?.user_id as string;
+  const [settingData, setSettingData] = useState<SettingData>();
   const [isOn, setIsOn] = useState(false);
 
-  const updateGlobalAISetting = (value: boolean) => {
-    setIsOn(value);
+  const updateGlobalSetting = async (value: SettingData) => {
+    setIsOn(value.AIenabled);
 
-    (async () => {
-      await updateStorageData(value);
-      const { error } = await supabase
-        .from("profiles")
-        .update({ is_ai_enabled: value })
-        .eq("user_id", user_id);
+    const { error } = await supabase
+      .from("profiles")
+      .update({ is_ai_enabled: value.AIenabled })
+      .eq("user_id", user_id);
 
-      if (error) {
-        console.log(error);
-      }
-    })();
+    if (error) {
+      console.error("Error while updating global setting", error.message);
+      setIsOn(!value.AIenabled);
+      return;
+    }
+
+    const failed = await updateStorageData(value);
+    if (failed) {
+      console.warn("Server updated but local cache write failed");
+      return;
+    }
+
+    setSettingData(value);
   };
 
   const loadDataFromServer = () => {
@@ -39,65 +49,66 @@ export default function Settings() {
     return profile.is_ai_enabled;
   };
 
-  const insertStorageData = async (aiEnabled: boolean) => {
-    const newData: IAIenabled = {
-      global: {
-        enabled: aiEnabled,
+  const updateStorageData = async (data: SettingData) => {
+    try {
+      const json: IGlobalSetting = {
+        ...data,
         last_fetched: Date.now(),
-      },
-    };
-    const jsonStr = JSON.stringify(newData);
-    await AsyncStorage.setItem("AIenabled", jsonStr);
-  };
-
-  const updateStorageData = async (aiEnabled: boolean) => {
-    const aiEnableDataFromStorage = await AsyncStorage.getItem("AIenabled");
-    if (aiEnableDataFromStorage == null) {
-      return;
+      };
+      const jsonStr = JSON.stringify(json);
+      await AsyncStorage.setItem("GlobalSetting", jsonStr);
+      return false;
+    } catch (err: any) {
+      Alert.alert("Asyncstorage Error", err.message);
+      return true;
     }
-
-    const aiEnabledData = JSON.parse(aiEnableDataFromStorage) as IAIenabled;
-    aiEnabledData["global"] = {
-      enabled: aiEnabled,
-      last_fetched: Date.now(),
-    };
-    const jsonStr = JSON.stringify(aiEnabledData);
-    await AsyncStorage.setItem("AIenabled", jsonStr);
-  };
-
-  const resetStorageData = async () => {
-    await AsyncStorage.removeItem("AIenabled");
   };
 
   useEffect(() => {
     (async () => {
-      const aiEnableDataFromStorage = await AsyncStorage.getItem("AIenabled");
-      if (aiEnableDataFromStorage == null) {
-        // load data from server and save at local storage
-        // need to make new key value pair
-        const dataFromServer = loadDataFromServer();
-        insertStorageData(dataFromServer);
-        setIsOn(dataFromServer);
-        return;
-      }
+      try {
+        const storageData = await AsyncStorage.getItem("GlobalSetting");
+        if (storageData == null) {
+          // load data from server and save at local storage
+          // need to make new key value pair
+          const dataFromServer = loadDataFromServer();
+          const failed = await updateStorageData({ AIenabled: dataFromServer });
+          if (!failed) {
+            setSettingData({ AIenabled: dataFromServer });
+            setIsOn(dataFromServer);
+          }
+          return;
+        }
 
-      const aiEnabledData = JSON.parse(aiEnableDataFromStorage) as IAIenabled;
-      const ONE_DAY = 24 * 60 * 60 * 1000;
-      // do not exist or expired
-      if (
-        aiEnabledData["global"] == null ||
-        aiEnabledData["global"].last_fetched < Date.now() - ONE_DAY
-      ) {
-        // load data from server and save at local storage
-        // need to add new row
-        const dataFromServer = loadDataFromServer();
-        updateStorageData(dataFromServer);
-        setIsOn(dataFromServer);
-        return;
-      }
+        const GlobalSettingFromStorage = JSON.parse(
+          storageData
+        ) as IGlobalSetting;
+        const ONE_DAY = 24 * 60 * 60 * 1000;
+        // do not exist or expired
+        if (
+          GlobalSettingFromStorage == null ||
+          GlobalSettingFromStorage.last_fetched < Date.now() - ONE_DAY
+        ) {
+          // load data from server and save at local storage
+          // need to add new row
+          const dataFromServer = loadDataFromServer();
+          const failed = await updateStorageData({
+            AIenabled: dataFromServer,
+          });
+          if (!failed) {
+            setSettingData({ AIenabled: dataFromServer });
+            setIsOn(dataFromServer);
+          }
+          return;
+        }
 
-      // can use asyncstorage data
-      setIsOn(aiEnabledData["global"].enabled);
+        // can use asyncstorage data
+        const { last_fetched, ...data } = GlobalSettingFromStorage;
+        setSettingData(data);
+        setIsOn(data.AIenabled);
+      } catch (err: any) {
+        console.error("Asyncstorage error", err.message);
+      }
     })();
   }, [profile]);
 
@@ -109,7 +120,7 @@ export default function Settings() {
         <Switch
           value={isOn}
           onChange={() => {
-            updateGlobalAISetting(!isOn);
+            updateGlobalSetting({ AIenabled: !isOn });
           }}
         ></Switch>
         <TouchableOpacity

@@ -5,40 +5,37 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Link } from "expo-router";
 import ChatListElement from "./ChatListElement";
 import { convertTimestampToTime } from "@/utils/time_converter";
+import { ChatRoom } from "@/types/model.types";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { ChatRoomDatas } from "./interfaces";
 
 interface IChatRoomListProp {
   openModal: (name: string | undefined) => void;
 }
 
-interface IChatRoomData {
-  created_at: string;
-  id: string;
-  last_msg: string;
-  last_msg_created_at: string;
-  user1_ai_enabled: boolean;
-  user1_chat_enabled: boolean;
-  user1_id: string;
-  user1_name: string;
-  user1_noti_enabled: boolean;
-  user2_ai_enabled: boolean;
-  user2_chat_enabled: boolean;
-  user2_id: string;
-  user2_name: string;
-  user2_noti_enabled: boolean;
-}
-
 export default function ChatRoomList({ openModal }: IChatRoomListProp) {
   const { profile } = useAuth();
-  const [chatRooms, setChatRooms] = useState<IChatRoomData[]>([]);
+  const [chatRooms, setChatRooms] = useState<ChatRoom[]>([]);
 
   useEffect(() => {
     (async () => {
-      const chatRoomData = await getChatRooms();
-      setChatRooms(chatRoomData ?? []);
+      const chatRoomData = (await getChatRooms()) ?? [];
+      // 여기서 새로 업데이트 된 데이터를 asyncstorage에 넣고, setChatRoom 설정해준다.
+      // asyncstorage에 넣을 때, map 형식으로 바꿔서 넣는다.
+
+      const map: ChatRoomDatas = new Map();
+      chatRoomData.forEach((value) => {
+        const { id, ...rest } = value;
+        map.set(id, rest);
+      });
+
+      const jsonStr = JSON.stringify(Object.fromEntries(map));
+      await AsyncStorage.setItem("ChatRoomData", jsonStr);
+      setChatRooms(chatRoomData);
     })();
   }, []);
 
-  const ChatList = (value: IChatRoomData) => {
+  const ChatList = (value: ChatRoom) => {
     var is_user1 = profile?.user_id == value.user1_id;
     var other_id: string;
     var other_name: string;
