@@ -19,10 +19,13 @@ export default function Settings() {
   const { profile } = useAuth();
   const user_id = profile?.user_id as string;
   const [settingData, setSettingData] = useState<SettingData>();
-  const [isOn, setIsOn] = useState(false);
+  const [pushNotif, setPushNotif] = useState(false);
+  const [notifWhenUse, setNotifWhenUse] = useState(false);
+  const [posAccess, setPosAccess] = useState(false);
+  const [AIchat, setAIchat] = useState(false);
 
   const updateGlobalSetting = async (value: SettingData) => {
-    setIsOn(value.AIenabled);
+    setAIchat(value.AIenabled);
 
     const { error } = await supabase
       .from("profiles")
@@ -31,7 +34,7 @@ export default function Settings() {
 
     if (error) {
       console.error("Error while updating global setting", error.message);
-      setIsOn(!value.AIenabled);
+      setAIchat(!value.AIenabled);
       return;
     }
 
@@ -77,7 +80,7 @@ export default function Settings() {
           const failed = await updateStorageData({ AIenabled: dataFromServer });
           if (!failed) {
             setSettingData({ AIenabled: dataFromServer });
-            setIsOn(dataFromServer);
+            setAIchat(dataFromServer);
           }
           return;
         }
@@ -99,7 +102,7 @@ export default function Settings() {
           });
           if (!failed) {
             setSettingData({ AIenabled: dataFromServer });
-            setIsOn(dataFromServer);
+            setAIchat(dataFromServer);
           }
           return;
         }
@@ -107,7 +110,7 @@ export default function Settings() {
         // can use asyncstorage data
         const { last_fetched, ...data } = GlobalSettingFromStorage;
         setSettingData(data);
-        setIsOn(data.AIenabled);
+        setAIchat(data.AIenabled);
       } catch (err: any) {
         console.error("Asyncstorage error", err.message);
       }
@@ -128,9 +131,10 @@ export default function Settings() {
               width={60}
               height={30}
               padding={5}
-              value={isOn}
+              value={pushNotif}
               onValueChange={() => {
-                updateGlobalSetting({ AIenabled: !isOn });
+                setPushNotif((c) => !c);
+                //updateGlobalSetting({ AIenabled: !AI });
               }}
               onColor="#93D7EA"
               offColor="#D7D7E2"
@@ -142,9 +146,9 @@ export default function Settings() {
               width={60}
               height={30}
               padding={5}
-              value={isOn}
+              value={posAccess}
               onValueChange={() => {
-                updateGlobalSetting({ AIenabled: !isOn });
+                setPosAccess((c) => !c);
               }}
               onColor="#93D7EA"
               offColor="#D7D7E2"
@@ -156,9 +160,10 @@ export default function Settings() {
               width={60}
               height={30}
               padding={5}
-              value={isOn}
+              value={notifWhenUse}
               onValueChange={() => {
-                updateGlobalSetting({ AIenabled: !isOn });
+                setNotifWhenUse((c) => !c);
+                //updateGlobalSetting({ AIenabled: !isOn });
               }}
               onColor="#93D7EA"
               offColor="#D7D7E2"
@@ -174,9 +179,9 @@ export default function Settings() {
               width={60}
               height={30}
               padding={5}
-              value={isOn}
+              value={AIchat}
               onValueChange={() => {
-                updateGlobalSetting({ AIenabled: !isOn });
+                updateGlobalSetting({ AIenabled: !AIchat });
               }}
               onColor="#93D7EA"
               offColor="#D7D7E2"
