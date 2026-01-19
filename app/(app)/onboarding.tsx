@@ -179,15 +179,31 @@ const Onboarding = () => {
       return;
     }
     try {
-      const { error } = await supabase.from("profiles").insert({
+      const { error: profileError } = await supabase.from("profiles").insert({
         user_id: user.id,
         name: answers["name"]?.trim(),
       });
-      if (error) {
-        console.error(error);
-        Alert.alert(`Failed to insert profile to DB: ${error.message}`);
+      if (profileError) {
+        console.error(profileError);
+        Alert.alert(`Failed to insert profile to DB: ${profileError.message}`);
         return;
       }
+
+      const { error: personaError } = await supabase.from("personas").insert({
+        user_id: user.id,
+        name: answers["name"]?.trim(),
+        age: Number(answers["age"].trim()),
+        job: answers["job"]?.trim(),
+        hobby: answers["hobby"]?.trim(),
+        memo: answers["memo"]?.trim(),
+      });
+
+      if (personaError) {
+        console.error(personaError);
+        Alert.alert(`Failed to insert profile to DB: ${personaError.message}`);
+        return;
+      }
+
       await refreshProfile();
       router.replace("/(app)/(home)");
     } catch (err: any) {
