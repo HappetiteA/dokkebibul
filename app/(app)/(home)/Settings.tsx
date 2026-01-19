@@ -10,6 +10,7 @@ import { Alert, Image, StyleSheet, Switch, Text, View } from "react-native";
 import { TouchableOpacity } from "react-native";
 import ShadowWrap from "@/components/style/Shadow";
 import { NeumorphicSwitch } from "@/components/style/Switch";
+import { getBlocks } from "@/services/supabase";
 
 type SettingData = Omit<IGlobalSetting, "last_fetched">;
 
@@ -20,9 +21,8 @@ export default function Settings() {
   const user_id = profile?.user_id as string;
   const [settingData, setSettingData] = useState<SettingData>();
   const [pushNotif, setPushNotif] = useState(false);
-  const [notifWhenUse, setNotifWhenUse] = useState(false);
-  const [posAccess, setPosAccess] = useState(false);
   const [AIchat, setAIchat] = useState(false);
+  const [blockNum, setBlockNum] = useState(0);
 
   const updateGlobalSetting = async (value: SettingData) => {
     setAIchat(value.AIenabled);
@@ -70,6 +70,10 @@ export default function Settings() {
   };
 
   useEffect(() => {
+    (async () => {
+      const blockData = await getBlocks();
+      setBlockNum(blockData?.length ?? 0);
+    })();
     (async () => {
       try {
         const storageData = await AsyncStorage.getItem("GlobalSetting");
@@ -140,35 +144,6 @@ export default function Settings() {
               offColor="#D7D7E2"
             />
           </View>
-          <View style={styles.settingListElement}>
-            <Text style={styles.h2}>위치 접근 허용</Text>
-            <NeumorphicSwitch
-              width={60}
-              height={30}
-              padding={5}
-              value={posAccess}
-              onValueChange={() => {
-                setPosAccess((c) => !c);
-              }}
-              onColor="#93D7EA"
-              offColor="#D7D7E2"
-            />
-          </View>
-          <View style={styles.settingListElement}>
-            <Text style={styles.h2}>앱 사용 중 알림</Text>
-            <NeumorphicSwitch
-              width={60}
-              height={30}
-              padding={5}
-              value={notifWhenUse}
-              onValueChange={() => {
-                setNotifWhenUse((c) => !c);
-                //updateGlobalSetting({ AIenabled: !isOn });
-              }}
-              onColor="#93D7EA"
-              offColor="#D7D7E2"
-            />
-          </View>
 
           <View style={[styles.settingListElement, { marginTop: 40 }]}>
             <Text style={styles.h1}>채팅 설정</Text>
@@ -197,8 +172,7 @@ export default function Settings() {
             >
               <View style={{ flexDirection: "row" }}>
                 <Text style={[styles.textButton, { marginRight: 10 }]}>
-                  {" "}
-                  30{" "}
+                  {blockNum}
                 </Text>
                 <Image
                   style={{ width: 16, height: 25 }}

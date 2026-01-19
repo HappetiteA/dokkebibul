@@ -192,7 +192,7 @@ const Onboarding = () => {
       const { error: personaError } = await supabase.from("personas").insert({
         user_id: user.id,
         name: answers["name"]?.trim(),
-        age: Number(answers["age"].trim()),
+        age: Number(answers["age"]?.trim()) ?? 0,
         job: answers["job"]?.trim(),
         hobby: answers["hobby"]?.trim(),
         memo: answers["memo"]?.trim(),
@@ -200,7 +200,7 @@ const Onboarding = () => {
 
       if (personaError) {
         console.error(personaError);
-        Alert.alert(`Failed to insert profile to DB: ${personaError.message}`);
+        Alert.alert(`Failed to insert persona to DB: ${personaError.message}`);
         return;
       }
 
