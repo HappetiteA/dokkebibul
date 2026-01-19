@@ -189,10 +189,15 @@ const Onboarding = () => {
         return;
       }
 
+      let age = Number(answers["age"]?.trim());
+      if (Number.isNaN(age)) {
+        age = 0;
+      }
+
       const { error: personaError } = await supabase.from("personas").insert({
         user_id: user.id,
         name: answers["name"]?.trim(),
-        age: Number(answers["age"]?.trim()) ?? 0,
+        age: age,
         job: answers["job"]?.trim(),
         hobby: answers["hobby"]?.trim(),
         memo: answers["memo"]?.trim(),
