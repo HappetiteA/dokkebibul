@@ -35,7 +35,7 @@ export default function MyProfileScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <MyProfileScreenHeader coins={profile ? profile.coins : 0}/>
+      <MyProfileScreenHeader coins={profile ? profile.coins : 0} />
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* 1. Avatar Image (Transparent, No Border) */}
@@ -76,10 +76,7 @@ export default function MyProfileScreen() {
 
         {/* 4. Status Message Box (Large + Shadow) */}
         <View style={[styles.statusBox, styles.commonShadow]}>
-          <Text style={styles.statusText}>
-            상태 메시지 상태 메시지
-            {/* {profile?.status_message} */}
-          </Text>
+          <Text style={styles.statusText}>{profile?.status_message}</Text>
         </View>
 
         {/* 5. Bottom Location Info */}
@@ -96,7 +93,7 @@ export default function MyProfileScreen() {
 }
 
 // --- Header Component ---
-function MyProfileScreenHeader({ coins }: {coins: number}) {
+function MyProfileScreenHeader({ coins }: { coins: number }) {
   const router = useRouter();
 
   return (

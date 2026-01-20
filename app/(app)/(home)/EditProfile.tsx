@@ -24,14 +24,14 @@ export default function ProfileEditScreen() {
 
   // State for inputs
   const [name, setName] = useState(profile ? profile.name : "");
-  const [bio, setBio] = useState("상태 메시지\n상태 메시지");
+  const [bio, setBio] = useState(profile ? profile?.status_message : "");
 
   const onSavePressed = async () => {
     if (!profile) return;
     if (!name) return;
     const { error } = await supabase
       .from("profiles")
-      .update({ "name": name })
+      .update({ name: name, status_message: bio })
       .eq("user_id", profile?.user_id);
     if (error) {
       console.error(error);
