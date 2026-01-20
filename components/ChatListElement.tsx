@@ -25,7 +25,7 @@ export default function ChatListElement({
     <ShadowWrap>
       <Link
         href={{
-          pathname: "/chat/[id]",
+          pathname: "/(app)/(home)/chat/ChatScreen",
           params: {
             id: conversation_id,
           },

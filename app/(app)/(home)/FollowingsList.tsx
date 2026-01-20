@@ -12,9 +12,11 @@ import {
   ListRenderItem,
 } from "react-native";
 import { SelectFollowingsResponse } from "@/types/orm.types";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function FollowingsList() {
   const router = useRouter();
+  const { profile } = useAuth();
   const [followings, setFollowings] = useState<SelectFollowingsResponse>([]);
 
   useEffect(() => {
@@ -32,10 +34,15 @@ export default function FollowingsList() {
   };
 
   const handleChat = (user_id: string) => {
-    router.navigate({ pathname: "/(app)/(home)/chat/[id]", params: { id: user_id } });
+    router.navigate({
+      pathname: "/(app)/(home)/chat/ChatScreen",
+      params: { user1_id: profile?.user_id, user2_id: user_id },
+    });
   };
 
-  const renderItem: ListRenderItem<SelectFollowingsResponse[0]> = ({ item }) => (
+  const renderItem: ListRenderItem<SelectFollowingsResponse[0]> = ({
+    item,
+  }) => (
     <View style={styles.cardContainer}>
       {/* Left Section: Profile Click */}
       <TouchableOpacity
