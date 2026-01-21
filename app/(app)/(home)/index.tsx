@@ -10,14 +10,15 @@ import {
   Modal,
 } from "react-native";
 import { Link, useRouter } from "expo-router";
-import NearbyUserViewer from "@/components/NearbyUserViewer";
-import { useCallback, useMemo, useRef, useState } from "react";
+import NearbyUserViewer, { startTracking } from "@/components/NearbyUserViewer";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import headerStyle from "@/components/style/headerStyle";
 import ChatRoomList from "@/components/ChatRoomList";
 import useModal from "@/hooks/useModal";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import BottomSheet, { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import ShadowWrap from "@/components/style/Shadow";
+import PlaceModal from "@/components/modals/PlaceModal";
 import {
   PlaceIcon,
   ProfilesIcon,
@@ -37,6 +38,9 @@ import { DetailsModal } from "@/components/modals/DetailsModal";
 import { LeaveChatModal, LeaveChatSuccessModal, LeaveChatFailModal } from "@/components/modals/LeaveChatModals";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
+import React from "react";
+import { SelectNearbyUsersResponse } from "@/types/orm.types";
+import { getNearbyUsers } from "@/services/supabase";
 
 
 export default function MainScreen() {
@@ -69,6 +73,50 @@ export default function MainScreen() {
     useModal(ReportSuccessModal);
   const { open: openReportFailModal, close: closeReportFailModal } =
     useModal(ReportFailModal);
+
+  const { open: openPlaceModal, close: closePlaceModal } = useModal(PlaceModal);
+  const [placeBtnEnabled, setPlaceBtnEnabled] = useState(true);
+
+  const [myLocation, setMyLocation] = useState<{
+    lat: number;
+    lon: number;
+  } | null>(null);
+  const myLocationRef = useRef<{
+    lat: number;
+    lon: number;
+  } | null>(null);
+
+  const [nearbyUsersLocations, setNearbyUsersLocations] =
+    useState<SelectNearbyUsersResponse>([]);
+
+  useEffect(() => {
+    myLocationRef.current = myLocation;
+  }, [myLocation]);
+
+  useEffect(() => {
+    let watcher: any;
+    let interval: any;
+
+    async function start() {
+      watcher = await startTracking(async (lat, lon) => {
+        setMyLocation({ lat, lon });
+      });
+
+      interval = setInterval(async () => {
+        const loc = myLocationRef.current;
+        // console.log(loc);
+        if (!loc) return;
+        const data = await getNearbyUsers(loc.lat, loc.lon, 5000);
+        setNearbyUsersLocations(data);
+      }, 3000);
+    }
+
+    start();
+    return () => {
+      watcher?.remove?.();
+      clearInterval(interval);
+    };
+  }, []);
 
   const handleSheetChanges = useCallback((index: number) => {
     // console.log("handleSheetChanges", index);
@@ -155,11 +203,29 @@ export default function MainScreen() {
     }
   };
 
+  const onPlaceBtnPressed = async () => {
+    setPlaceBtnEnabled(false);
+    if (!myLocation || !profile) {
+      console.error("Failed to fetch current location");
+      setPlaceBtnEnabled(true);
+      return;
+    }
+    const { error } = await supabase.from("locations").upsert({
+      user_id: profile.user_id,
+      location: `POINT(${myLocation.lon} ${myLocation.lat})`,
+    });
+    if (error) {
+      console.error(error);
+    }
+    closePlaceModal();
+    setPlaceBtnEnabled(true);
+  };
+
   return (
     <>
       <MainScreenHeader />
       <GestureHandlerRootView style={styles.container}>
-        <NearbyUserViewer />
+        <NearbyUserViewer nearbyUsersLocations={nearbyUsersLocations} myLocation={myLocation}/>
 
         <BottomSheet
           ref={bottomSheetRef}
@@ -178,9 +244,10 @@ export default function MainScreen() {
                       closeDetailsModal();
                       openLeaveChatModal({
                         onClose: closeLeaveChatModal,
-                        onLeaveChatBtnPressed: () => onLeaveChatBtnPressed(chat_id, is_user1),
-                        leaveChatBtnEnabled: LeaveChatBtnEnabled
-                      })
+                        onLeaveChatBtnPressed: () =>
+                          onLeaveChatBtnPressed(chat_id, is_user1),
+                        leaveChatBtnEnabled: LeaveChatBtnEnabled,
+                      });
                     },
                     onBlock: () => {
                       closeDetailsModal();
@@ -190,7 +257,7 @@ export default function MainScreen() {
                         onBlockBtnPressed: () =>
                           onBlockBtnPressed(other_name, other_id),
                         blockBtnEnabled: blockBtnEnabled,
-                      })
+                      });
                     },
                     onReport: () => {
                       closeDetailsModal();
@@ -201,11 +268,11 @@ export default function MainScreen() {
                           onReportBtnPressed(
                             other_name,
                             other_id,
-                            joinedReasons
+                            joinedReasons,
                           ),
                         reportBtnEnabled: reportBtnEnabled,
-                      })
-                    }
+                      });
+                    },
                   })
                 }
               />
@@ -226,7 +293,17 @@ export default function MainScreen() {
         }}
       >
         <ShadowWrap>
-          <TouchableOpacity onPress={() => {}}>
+          <TouchableOpacity
+            onPress={() =>
+              openPlaceModal({
+                onClose: closePlaceModal,
+                origAddr: profile?.user_id,
+                newAddr: `POINT(${myLocation?.lon}, ${myLocation?.lat})`,
+                onPlaceBtnPressed: onPlaceBtnPressed,
+                placeBtnEnabled: placeBtnEnabled,
+              })
+            }
+          >
             <PlaceIcon />
           </TouchableOpacity>
         </ShadowWrap>
