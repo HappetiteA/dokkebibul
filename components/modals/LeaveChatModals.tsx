@@ -32,7 +32,7 @@ export function LeaveChatModal({
             <TouchableOpacity
               onPress={onLeaveChatBtnPressed}
               disabled={!leaveChatBtnEnabled}
-              style={[styles.baseButton, styles.blueButton]}
+              style={[styles.baseButton, styles.blueButton, !leaveChatBtnEnabled && styles.disabledButton,]}
             >
               <Text style={styles.blueButtonText}>나가기</Text>
             </TouchableOpacity>

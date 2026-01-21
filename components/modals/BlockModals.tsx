@@ -30,7 +30,8 @@ export function BlockModal({
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
           <Text style={styles.modalText}>
-            {name}님을{"\n"}차단하시겠습니까?
+            {name ? name + "님을" : "이 사용자를"}
+            {"\n"}차단하시겠습니까?
           </Text>
 
           <View style={styles.modalBtnRow}>
@@ -38,7 +39,11 @@ export function BlockModal({
             <TouchableOpacity
               onPress={onBlockBtnPressed}
               disabled={!blockBtnEnabled}
-              style={[styles.baseButton, styles.blueButton]}
+              style={[
+                styles.baseButton,
+                styles.blueButton,
+                !blockBtnEnabled && styles.disabledButton,
+              ]}
             >
               <Text style={styles.blueButtonText}>차단</Text>
             </TouchableOpacity>
@@ -77,7 +82,7 @@ export function BlockSuccessModal({
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
           <Text style={styles.modalText}>
-            {name}님을{"\n"}차단했습니다.
+            {name ? name + "님을" : "이 사용자를"}{"\n"}차단했습니다.
           </Text>
 
           {/* Single White "Confirm" Button */}

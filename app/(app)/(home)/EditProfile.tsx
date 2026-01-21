@@ -23,8 +23,10 @@ export default function ProfileEditScreen() {
   const { profile, refreshProfile } = useAuth();
 
   // State for inputs
-  const [name, setName] = useState(profile ? profile.name : "");
-  const [statusMessage, setStatusMessage] = useState(profile ? profile.status_message : "");
+  const [name, setName] = useState(profile?.name ?? "");
+  const [statusMessage, setStatusMessage] = useState(
+    profile?.status_message ?? "",
+  );
 
   const onSavePressed = async () => {
     if (!profile) return;

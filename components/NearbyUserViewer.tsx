@@ -66,7 +66,8 @@ export default function NearbyUserViewer({
     .filter((user) => user.distance <= MAX_RADIUS_METERS)
     .slice(0, MAX_VISIBLE_USERS);
 
-  const onPressNearbyUser = (user_id: string) => {
+  const onPressNearbyUser = (user_id?: string) => {
+    if (!user_id) return;
     if (user_id === profile?.user_id)
       router.navigate("/(app)/(home)/MyProfile");
     else
@@ -94,7 +95,7 @@ export default function NearbyUserViewer({
         {/* --- 2. Center Avatar (Myself) --- */}
         <TouchableOpacity
           activeOpacity={0.8}
-          onPress={() => onPressNearbyUser(profile?.user_id ?? "")}
+          onPress={() => onPressNearbyUser(profile?.user_id)}
           style={styles.centerAvatarContainer}
         >
           <Image
@@ -137,7 +138,7 @@ export default function NearbyUserViewer({
             >
               <Image
                 // Using random placeholder avatars based on ID to make them look different
-                source={getAvatarSource(profile?.color_code)}
+                source={getAvatarSource(user?.color_code)}
                 style={styles.nearbyAvatarImage}
               />
               {/* Optional: Add name label below avatar if needed */}

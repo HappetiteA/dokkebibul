@@ -58,7 +58,7 @@ export function ReportModal({
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
           <Text style={styles.modalText}>
-            {name}님을{"\n"}신고하시겠습니까?
+            {name ? name + "님을" : "이 사용자를"}{"\n"}신고하시겠습니까?
           </Text>
 
           {/* Reason List */}
@@ -134,7 +134,7 @@ export function ReportSuccessModal({
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
           <Text style={styles.modalText}>
-            {name}님을{"\n"}신고했습니다.
+            {name ? name + "님을" : "이 사용자를"}{"\n"}신고했습니다.
           </Text>
           <TouchableOpacity
             onPress={onClose}

@@ -29,14 +29,19 @@ export function UnblockModal({
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
           <Text style={styles.modalText}>
-            {name}님{"\n"}차단을 취소하시겠습니까?
+            {name ? name + "님" : "이 사용자의"}
+            {"\n"}차단을 취소하시겠습니까?
           </Text>
 
           <View style={styles.modalBtnRow}>
             <TouchableOpacity
               onPress={onUnblockBtnPressed}
               disabled={!unblockBtnEnabled}
-              style={[styles.baseButton, styles.blueButton]}
+              style={[
+                styles.baseButton,
+                styles.blueButton,
+                !unblockBtnEnabled && styles.disabledButton,
+              ]}
             >
               <Text style={styles.blueButtonText}>네</Text>
             </TouchableOpacity>
@@ -74,7 +79,7 @@ export function UnblockSuccessModal({
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
           <Text style={styles.modalText}>
-            {name}님{"\n"}차단을 취소했습니다.
+            {name ? name + "님" : "이 사용자의"}{"\n"}차단을 취소했습니다.
           </Text>
           <TouchableOpacity
             onPress={onClose}
