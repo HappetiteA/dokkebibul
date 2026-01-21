@@ -248,7 +248,6 @@ const styles = StyleSheet.create({
   centerAvatarContainer: {
     width: CENTER_AVATAR_SIZE,
     height: CENTER_AVATAR_SIZE,
-    zIndex: 10, // Keep zIndex to ensure it is clickable
     justifyContent: "center",
     alignItems: "center",
   },
@@ -265,7 +264,6 @@ const styles = StyleSheet.create({
   nearbyAvatarImage: {
     width: AVATAR_SIZE,
     height: AVATAR_SIZE,
-    zIndex: 10, // Keep zIndex to ensure it is clickable
     justifyContent: "center",
     alignItems: "center",
   },
