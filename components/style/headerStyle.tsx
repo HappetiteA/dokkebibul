@@ -1,13 +1,16 @@
 import { StyleSheet } from "react-native";
 
+export const headerHeight = 100;
+export const headerMargin = 50;
+
 const headerStyle = StyleSheet.create({
   container: {
-    height: 100,
+    height: headerHeight,
     backgroundColor: "#F8F8FA",
   },
   content: {
-    marginTop: 50,
-    height: 50,
+    marginTop: headerMargin,
+    height: headerHeight - headerMargin,
     flexDirection: "row",
     textAlignVertical: "center",
     justifyContent: "space-between",

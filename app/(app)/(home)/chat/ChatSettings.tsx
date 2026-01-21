@@ -14,31 +14,7 @@ export default function ChatSettings() {
       <View style={styles.container}>
         <View>
           <View style={styles.settingListElement}>
-            <Text>채팅 알림</Text>
-            <NeumorphicSwitch
-              width={60}
-              height={30}
-              padding={5}
-              value={false}
-              onValueChange={() => {}}
-              onColor="#93D7EA"
-              offColor="#D7D7E2"
-            />
-          </View>
-          <View style={styles.settingListElement}>
-            <Text>채팅 알림</Text>
-            <NeumorphicSwitch
-              width={60}
-              height={30}
-              padding={5}
-              value={false}
-              onValueChange={() => {}}
-              onColor="#93D7EA"
-              offColor="#D7D7E2"
-            />
-          </View>
-          <View style={styles.settingListElement}>
-            <Text>채팅 알림</Text>
+            <Text style={styles.h2}>채팅 알림</Text>
             <NeumorphicSwitch
               width={60}
               height={30}
@@ -55,21 +31,21 @@ export default function ChatSettings() {
           <ShadowWrap>
             <TouchableOpacity>
               <View style={styles.button}>
-                <Text style={styles.buttonText}>신고하기</Text>
+                <Text style={styles.innerButtonText}>신고하기</Text>
               </View>
             </TouchableOpacity>
           </ShadowWrap>
           <ShadowWrap>
             <TouchableOpacity>
               <View style={styles.button}>
-                <Text style={styles.buttonText}>차단하기</Text>
+                <Text style={styles.innerButtonText}>차단하기</Text>
               </View>
             </TouchableOpacity>
           </ShadowWrap>
           <ShadowWrap>
             <TouchableOpacity>
               <View style={styles.button}>
-                <Text style={styles.buttonText}>채팅방 나가기</Text>
+                <Text style={styles.innerButtonText}>채팅방 나가기</Text>
               </View>
             </TouchableOpacity>
           </ShadowWrap>
@@ -89,7 +65,7 @@ const styles = StyleSheet.create({
     width: "70%",
     marginHorizontal: "auto",
     marginVertical: 10,
-    justifyContent: "space-evenly",
+    justifyContent: "space-between",
   },
 
   button: {
@@ -101,5 +77,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
     paddingVertical: 10,
   },
-  buttonText: { textAlign: "center", fontSize: 20, color: "#8F8F9A" },
+  h2: {
+    fontSize: 24,
+    paddingHorizontal: 5,
+    color: "#8F8F9A",
+  },
+  innerButtonText: { textAlign: "center", fontSize: 20, color: "#8F8F9A" },
 });
