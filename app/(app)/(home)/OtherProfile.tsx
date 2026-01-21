@@ -16,6 +16,7 @@ import { Profile } from "@/types/model.types";
 import { Ionicons } from "@expo/vector-icons";
 import { BlockModal, BlockSuccessModal, BlockFailModal } from "@/components/modals/BlockModals";
 import { ReportModal, ReportSuccessModal, ReportFailModal } from "@/components/modals/ReportModals"
+import { getAvatarSource } from "@/utils/avatarColor";
 
 
 export default function OtherProfileScreen() {
@@ -175,7 +176,7 @@ export default function OtherProfileScreen() {
         {/* Avatar Section - Transparent, No Border, No Shadow */}
         <View style={styles.avatarContainer}>
           <Image
-            source={require("@/assets/from_figma/icon-wisp-list.png")}
+            source={getAvatarSource(userInfo?.color_code)}
             style={styles.avatarImage}
             resizeMode="contain"
           />
@@ -183,12 +184,12 @@ export default function OtherProfileScreen() {
 
         {/* Name Tag - With Shadow */}
         <View style={[styles.commonShadow, styles.nameTag]}>
-          <Text style={styles.nameText}>{userInfo?.name ?? "김뿁뿁"}</Text>
+          <Text style={styles.nameText}>{userInfo?.name ?? ""}</Text>
         </View>
 
         {/* Status Message Box - With Shadow */}
         <View style={[styles.commonShadow, styles.statusBox]}>
-          <Text style={styles.statusText}>상태 메시지 상태 메시지</Text>
+          <Text style={styles.statusText}>{userInfo?.status_message ?? ""}</Text>
         </View>
 
         {/* Action Buttons Container - Fixed Width */}

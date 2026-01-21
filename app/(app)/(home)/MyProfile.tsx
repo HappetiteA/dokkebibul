@@ -11,6 +11,8 @@ import { useRouter } from "expo-router";
 import { useAuth } from "@/contexts/AuthContext";
 import { getFollowers, getFollowings } from "@/services/supabase";
 import { Ionicons } from "@expo/vector-icons";
+import { getAvatarSource } from "@/utils/avatarColor";
+import React from "react";
 
 export default function MyProfileScreen() {
   const { profile } = useAuth();
@@ -40,7 +42,7 @@ export default function MyProfileScreen() {
         {/* 1. Avatar Image (Transparent, No Border) */}
         <View style={styles.avatarContainer}>
           <Image
-            source={require("@/assets/from_figma/icon-wisp-list.png")} // Placeholder
+            source={getAvatarSource(profile?.color_code)} // Placeholder
             style={styles.avatarImage}
             resizeMode="contain"
           />
@@ -48,7 +50,7 @@ export default function MyProfileScreen() {
 
         {/* 2. Name Tag (Pill shape + Shadow) */}
         <View style={[styles.nameTag, styles.commonShadow]}>
-          <Text style={styles.nameText}>{profile?.name ?? "길동홍"}</Text>
+          <Text style={styles.nameText}>{profile?.name ?? ""}</Text>
         </View>
 
         {/* 3. Follow Stats */}
@@ -76,8 +78,7 @@ export default function MyProfileScreen() {
         {/* 4. Status Message Box (Large + Shadow) */}
         <View style={[styles.statusBox, styles.commonShadow]}>
           <Text style={styles.statusText}>
-            상태 메시지 상태 메시지
-            {/* {profile?.status_message} */}
+            {profile?.status_message ?? ""}
           </Text>
         </View>
 
