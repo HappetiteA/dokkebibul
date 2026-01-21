@@ -3,11 +3,8 @@ import {
   Text,
   TouchableOpacity,
   View,
-  Button,
-  Modal,
   Image,
   SafeAreaView,
-  ScrollView,
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
@@ -17,213 +14,10 @@ import useModal from "@/hooks/useModal";
 import { useAuth } from "@/contexts/AuthContext";
 import { Profile } from "@/types/model.types";
 import { Ionicons } from "@expo/vector-icons";
+import { BlockModal, BlockSuccessModal, BlockFailModal } from "@/components/modals/BlockModals";
+import { ReportModal, ReportSuccessModal, ReportFailModal } from "@/components/modals/ReportModals"
+import { getAvatarSource } from "@/utils/avatarColor";
 
-function BlockModal({
-  isOpen,
-  onClose,
-  name,
-  onBlockBtnPressed,
-  blockBtnEnabled,
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-  name: string | undefined;
-  onBlockBtnPressed: () => Promise<void>;
-  blockBtnEnabled: boolean;
-}) {
-  return (
-    <Modal
-      visible={isOpen}
-      transparent
-      animationType="fade"
-      onRequestClose={onClose}
-    >
-      <View style={styles.modalOverlay}>
-        <View style={styles.modalContent}>
-          <Text style={styles.modalText}>{name} 님을 차단하시겠습니까?</Text>
-          <View style={styles.modalBtnRow}>
-            <Button
-              title="차단"
-              onPress={onBlockBtnPressed}
-              disabled={!blockBtnEnabled}
-              color="#FF6B6B"
-            />
-            <Button title="취소" onPress={onClose} />
-          </View>
-        </View>
-      </View>
-    </Modal>
-  );
-}
-
-function BlockSuccessModal({
-  isOpen,
-  onClose,
-  name,
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-  name: string | undefined;
-}) {
-  return (
-    <Modal
-      visible={isOpen}
-      transparent
-      animationType="fade"
-      onRequestClose={onClose}
-    >
-      <View style={styles.modalOverlay}>
-        <View style={styles.modalContent}>
-          <Text style={styles.modalText}>{name} 님을 차단했습니다.</Text>
-          <Button title="확인" onPress={onClose} />
-        </View>
-      </View>
-    </Modal>
-  );
-}
-
-function BlockFailModal({
-  isOpen,
-  onClose,
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-}) {
-  return (
-    <Modal
-      visible={isOpen}
-      transparent
-      animationType="fade"
-      onRequestClose={onClose}
-    >
-      <View style={styles.modalOverlay}>
-        <View style={styles.modalContent}>
-          <Text style={styles.modalText}>
-            알 수 없는 오류로 차단에 실패했습니다. 잠시 후에 다시 시도해주세요.
-          </Text>
-          <Button title="확인" onPress={onClose} />
-        </View>
-      </View>
-    </Modal>
-  );
-}
-
-const reportReasons = ["음담패설", "못생김", "짜증나게 함", "패드립 함"];
-
-function ReportModal({
-  isOpen,
-  onClose,
-  name,
-  onReportBtnPressed,
-  reportBtnEnabled,
-  reasons,
-  setReasons,
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-  name: string | undefined;
-  onReportBtnPressed: () => Promise<void>;
-  reportBtnEnabled: boolean;
-  reasons: Record<string, boolean>;
-  setReasons: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
-}) {
-  const toggleReason = (reason: string) => {
-    setReasons((prev) => ({
-      ...prev,
-      [reason]: !prev[reason],
-    }));
-  };
-
-  return (
-    <Modal
-      visible={isOpen}
-      transparent
-      animationType="fade"
-      onRequestClose={onClose}
-    >
-      <View style={styles.modalOverlay}>
-        <View style={styles.modalContent}>
-          <Text style={styles.modalText}>{name} 님을 신고하시겠습니까?</Text>
-          <View style={{ marginBottom: 10 }}>
-            {reportReasons.map((reason) => (
-              <View key={reason} style={{ marginVertical: 2 }}>
-                <Button
-                  title={reason + (reasons[reason] ? " (V)" : "")}
-                  onPress={() => toggleReason(reason)}
-                  color={reasons[reason] ? "#FF6B6B" : "#888"}
-                  disabled={!reportBtnEnabled}
-                />
-              </View>
-            ))}
-          </View>
-          <View style={styles.modalBtnRow}>
-            <Button
-              title="신고하기"
-              onPress={onReportBtnPressed}
-              disabled={!reportBtnEnabled}
-              color="#FF6B6B"
-            />
-            <Button title="취소" onPress={onClose} />
-          </View>
-        </View>
-      </View>
-    </Modal>
-  );
-}
-
-function ReportSuccessModal({
-  isOpen,
-  onClose,
-  name,
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-  name: string | undefined;
-}) {
-  return (
-    <Modal
-      visible={isOpen}
-      transparent
-      animationType="fade"
-      onRequestClose={onClose}
-    >
-      <View style={styles.modalOverlay}>
-        <View style={styles.modalContent}>
-          <Text style={styles.modalText}>{name} 님을 신고했습니다.</Text>
-          <Button title="확인" onPress={onClose} />
-        </View>
-      </View>
-    </Modal>
-  );
-}
-
-function ReportFailModal({
-  isOpen,
-  onClose,
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-}) {
-  return (
-    <Modal
-      visible={isOpen}
-      transparent
-      animationType="fade"
-      onRequestClose={onClose}
-    >
-      <View style={styles.modalOverlay}>
-        <View style={styles.modalContent}>
-          <Text style={styles.modalText}>
-            알 수 없는 오류로 신고에 실패했습니다. 잠시 후에 다시 시도해주세요.
-          </Text>
-          <Button title="확인" onPress={onClose} />
-        </View>
-      </View>
-    </Modal>
-  );
-}
-
-// --- MAIN SCREEN ---
 
 export default function OtherProfileScreen() {
   const router = useRouter();
@@ -250,11 +44,6 @@ export default function OtherProfileScreen() {
     useModal(ReportSuccessModal);
   const { open: openReportFailModal, close: closeReportFailModal } =
     useModal(ReportFailModal);
-  const defaultReasons = Object.fromEntries(
-    reportReasons.map((r) => [r, false])
-  );
-  const [reasons, setReasons] =
-    useState<Record<string, boolean>>(defaultReasons);
 
   useEffect(() => {
     (async () => {
@@ -338,16 +127,13 @@ export default function OtherProfileScreen() {
     }
   };
 
-  const onReportBtnPressed = async () => {
+  const onReportBtnPressed = async (joinedReasons: string) => {
     setReportBtnEnabled(false);
 
     if (!profile) {
       setReportBtnEnabled(true);
       return;
     }
-
-    const selectedReasons = Object.keys(reasons).filter((r) => reasons[r]);
-    const joinedReasons = selectedReasons.join(", ");
 
     const { error } = await supabase.from("reports").insert({
       src_id: profile.user_id,
@@ -386,11 +172,11 @@ export default function OtherProfileScreen() {
     <SafeAreaView style={styles.safeArea}>
       <OtherProfileScreenHeader />
 
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <View style={styles.scrollContent}>
         {/* Avatar Section - Transparent, No Border, No Shadow */}
         <View style={styles.avatarContainer}>
           <Image
-            source={require("@/assets/from_figma/icon-wisp-list.png")}
+            source={getAvatarSource(userInfo?.color_code)}
             style={styles.avatarImage}
             resizeMode="contain"
           />
@@ -398,12 +184,12 @@ export default function OtherProfileScreen() {
 
         {/* Name Tag - With Shadow */}
         <View style={[styles.commonShadow, styles.nameTag]}>
-          <Text style={styles.nameText}>{userInfo?.name ?? "김뿁뿁"}</Text>
+          <Text style={styles.nameText}>{userInfo?.name ?? ""}</Text>
         </View>
 
         {/* Status Message Box - With Shadow */}
         <View style={[styles.commonShadow, styles.statusBox]}>
-          <Text style={styles.statusText}>상태 메시지 상태 메시지</Text>
+          <Text style={styles.statusText}>{userInfo?.status_message ?? ""}</Text>
         </View>
 
         {/* Action Buttons Container - Fixed Width */}
@@ -458,8 +244,6 @@ export default function OtherProfileScreen() {
                 name: userInfo?.name,
                 onReportBtnPressed: onReportBtnPressed,
                 reportBtnEnabled: reportBtnEnabled,
-                reasons: reasons,
-                setReasons: setReasons,
               })
             }
           >
@@ -479,7 +263,7 @@ export default function OtherProfileScreen() {
             <Text style={styles.footerLinkText}>차단하기</Text>
           </TouchableOpacity>
         </View>
-      </ScrollView>
+      </View>
     </SafeAreaView>
   );
 }
@@ -636,17 +420,102 @@ const styles = StyleSheet.create({
   // Modal styles...
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
+    backgroundColor: "rgba(0,0,0,0.5)", // Dark overlay
     justifyContent: "center",
     alignItems: "center",
   },
   modalContent: {
     backgroundColor: "white",
-    padding: 20,
-    borderRadius: 10,
+    paddingVertical: 35,
+    paddingHorizontal: 30,
+    borderRadius: 20, // Rounded container
     width: 300,
     alignItems: "center",
+
+    // Shadow for depth
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
-  modalText: { marginBottom: 20 },
-  modalBtnRow: { flexDirection: "row", gap: 10 },
+  modalText: {
+    marginBottom: 25,
+    fontSize: 16, // Slightly smaller than 20 for better fit
+    fontWeight: "600", // Semi-bold
+    textAlign: "center",
+    lineHeight: 24, // Better spacing for newlines
+    color: "#333",
+  },
+  modalBtnRow: {
+    flexDirection: "row",
+    gap: 12, // Space between buttons
+    justifyContent: "center",
+    width: "100%",
+  },
+
+  // --- BUTTON STYLES ---
+  baseButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 24,
+    borderRadius: 20, // Fully rounded pill shape
+    minWidth: 80,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  // Blue Filled Button (For "Block" or primary actions)
+  blueButton: {
+    backgroundColor: "#89CFF0", // The light blue from your image
+    borderWidth: 0,
+  },
+  blueButtonText: {
+    color: "#ffffff",
+    fontWeight: "600",
+    fontSize: 14,
+  },
+
+  // White Bordered Button (For "Cancel" or "Confirm")
+  whiteButton: {
+    backgroundColor: "#ffffff",
+    borderWidth: 1,
+    borderColor: "#E0E0E0", // Light grey border
+  },
+  whiteButtonText: {
+    color: "#555555", // Grey text
+    fontWeight: "600",
+    fontSize: 14,
+  },
+  disabledButton: {
+    backgroundColor: "#E0E0E0", // Grayed out if nothing selected
+  },
+
+  // --- REASON BUTTON STYLES ---
+  reasonListContainer: {
+    width: "100%",
+    marginBottom: 20,
+  },
+  reasonButton: {
+    width: "100%",
+    paddingVertical: 12,
+    borderRadius: 12, // Slightly squared corners for list items
+    borderWidth: 1,
+    borderColor: "#E0E0E0",
+    backgroundColor: "#ffffff",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  reasonButtonSelected: {
+    backgroundColor: "#4CD964", // Green toggle color
+    borderColor: "#4CD964",
+  },
+  reasonText: {
+    fontSize: 14,
+    color: "#555",
+    fontWeight: "500",
+  },
+  reasonTextSelected: {
+    color: "#ffffff", // White text when selected
+    fontWeight: "600",
+  },
 });

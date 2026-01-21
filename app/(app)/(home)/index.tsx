@@ -10,65 +10,222 @@ import {
   Modal,
 } from "react-native";
 import { Link, useRouter } from "expo-router";
-import NearbyUserViewer from "@/components/NearbyUserViewer";
-import { useCallback, useMemo, useRef, useState } from "react";
+import NearbyUserViewer, { startTracking } from "@/components/NearbyUserViewer";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import headerStyle from "@/components/style/headerStyle";
 import ChatRoomList from "@/components/ChatRoomList";
 import useModal from "@/hooks/useModal";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import BottomSheet, { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import ShadowWrap from "@/components/style/Shadow";
+import PlaceModal from "@/components/modals/PlaceModal";
 import {
   PlaceIcon,
   ProfilesIcon,
   SettingsIcon,
 } from "@/components/style/Icons";
+import {
+  BlockModal,
+  BlockSuccessModal,
+  BlockFailModal,
+} from "@/components/modals/BlockModals";
+import {
+  ReportModal,
+  ReportSuccessModal,
+  ReportFailModal,
+} from "@/components/modals/ReportModals";
+import { DetailsModal } from "@/components/modals/DetailsModal";
+import { LeaveChatModal, LeaveChatSuccessModal, LeaveChatFailModal } from "@/components/modals/LeaveChatModals";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/lib/supabase";
+import React from "react";
+import { SelectNearbyUsersResponse } from "@/types/orm.types";
+import { getNearbyUsers } from "@/services/supabase";
 
-function DetailsModal({
-  isOpen,
-  onClose,
-  name,
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-  name: string | undefined;
-}) {
-  return (
-    <Modal
-      visible={isOpen}
-      transparent
-      animationType="slide"
-      onRequestClose={onClose}
-    >
-      <View>
-        <View>
-          <Text>{name}</Text>
-          <Button title={"채팅방 나가기"} />
-          <Button title={"차단하기"} />
-          <Button title={"신고하기"} />
-          <Button title={"확인"} onPress={onClose} />
-        </View>
-      </View>
-    </Modal>
-  );
-}
 
 export default function MainScreen() {
+  const { profile } = useAuth();
   const bottomSheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ["20%", "60%", "90%"], []);
 
   const { open: openDetailsModal, close: closeDetailsModal } =
     useModal(DetailsModal);
 
+  const [LeaveChatBtnEnabled, setLeaveChatBtnEnabled] = useState(true);
+  const { open: openLeaveChatModal, close: closeLeaveChatModal } =
+    useModal(LeaveChatModal);
+  const { open: openLeaveChatSuccessModal, close: closeLeaveChatSuccessModal } =
+    useModal(LeaveChatSuccessModal);
+  const { open: openLeaveChatFailModal, close: closeLeaveChatFailModal } =
+    useModal(LeaveChatFailModal);
+
+  const [blockBtnEnabled, setBlockBtnEnabled] = useState(true);
+  const { open: openBlockModal, close: closeBlockModal } = useModal(BlockModal);
+  const { open: openBlockSuccessModal, close: closeBlockSuccessModal } =
+    useModal(BlockSuccessModal);
+  const { open: openBlockFailModal, close: closeBlockFailModal } =
+    useModal(BlockFailModal);
+
+  const [reportBtnEnabled, setReportBtnEnabled] = useState(true);
+  const { open: openReportModal, close: closeReportModal } =
+    useModal(ReportModal);
+  const { open: openReportSuccessModal, close: closeReportSuccessModal } =
+    useModal(ReportSuccessModal);
+  const { open: openReportFailModal, close: closeReportFailModal } =
+    useModal(ReportFailModal);
+
+  const { open: openPlaceModal, close: closePlaceModal } = useModal(PlaceModal);
+  const [placeBtnEnabled, setPlaceBtnEnabled] = useState(true);
+
+  const [myLocation, setMyLocation] = useState<{
+    lat: number;
+    lon: number;
+  } | null>(null);
+  const myLocationRef = useRef<{
+    lat: number;
+    lon: number;
+  } | null>(null);
+
+  const [nearbyUsersLocations, setNearbyUsersLocations] =
+    useState<SelectNearbyUsersResponse>([]);
+
+  useEffect(() => {
+    myLocationRef.current = myLocation;
+  }, [myLocation]);
+
+  useEffect(() => {
+    let watcher: any;
+    let interval: any;
+
+    async function start() {
+      watcher = await startTracking(async (lat, lon) => {
+        setMyLocation({ lat, lon });
+      });
+
+      interval = setInterval(async () => {
+        const loc = myLocationRef.current;
+        // console.log(loc);
+        if (!loc) return;
+        const data = await getNearbyUsers(loc.lat, loc.lon, 5000);
+        setNearbyUsersLocations(data);
+      }, 3000);
+    }
+
+    start();
+    return () => {
+      watcher?.remove?.();
+      clearInterval(interval);
+    };
+  }, []);
+
   const handleSheetChanges = useCallback((index: number) => {
     // console.log("handleSheetChanges", index);
   }, []);
+
+  const onLeaveChatBtnPressed = async (chat_id: string, is_user1: boolean) => {
+    setLeaveChatBtnEnabled(false);
+
+    if (!profile) {
+      setLeaveChatBtnEnabled(true);
+      return;
+    }
+
+    const { error } = await supabase
+      .from("conversations")
+      .update(is_user1 ? { user1_chat_enabled: false } : { user2_chat_enabled: false })
+      .eq('id', chat_id);
+
+    closeLeaveChatModal();
+    setLeaveChatBtnEnabled(true);
+    if (error) {
+      console.error(error);
+      openLeaveChatFailModal({ onClose: closeLeaveChatFailModal });
+    } else {
+      openLeaveChatSuccessModal({
+        onClose: closeLeaveChatSuccessModal
+      });
+    }
+  };
+
+  const onBlockBtnPressed = async (other_name: string, other_id: string) => {
+    setBlockBtnEnabled(false);
+
+    if (!profile) {
+      setBlockBtnEnabled(true);
+      return;
+    }
+
+    const { error } = await supabase
+      .from("blocks")
+      .insert({ src_id: profile.user_id, dst_id: other_id });
+
+    closeBlockModal();
+    setBlockBtnEnabled(true);
+    if (error) {
+      console.error(error);
+      openBlockFailModal({ onClose: closeBlockFailModal });
+    } else {
+      openBlockSuccessModal({
+        onClose: () => {
+          closeBlockSuccessModal();
+        },
+        name: other_name,
+      });
+    }
+  };
+
+  const onReportBtnPressed = async (other_name: string, other_id: string, joinedReasons: string) => {
+    setReportBtnEnabled(false);
+
+    if (!profile) {
+      setReportBtnEnabled(true);
+      return;
+    }
+
+    const { error } = await supabase.from("reports").insert({
+      src_id: profile.user_id,
+      dst_id: other_id,
+      reason: joinedReasons,
+    });
+
+    closeReportModal();
+    setReportBtnEnabled(true);
+    if (error) {
+      console.error(error);
+      openReportFailModal({ onClose: closeReportFailModal });
+    } else {
+      openReportSuccessModal({
+        onClose: () => {
+          closeReportSuccessModal();
+        },
+        name: other_name,
+      });
+    }
+  };
+
+  const onPlaceBtnPressed = async () => {
+    setPlaceBtnEnabled(false);
+    if (!myLocation || !profile) {
+      console.error("Failed to fetch current location");
+      setPlaceBtnEnabled(true);
+      return;
+    }
+    const { error } = await supabase.from("locations").upsert({
+      user_id: profile.user_id,
+      location: `POINT(${myLocation.lon} ${myLocation.lat})`,
+    });
+    if (error) {
+      console.error(error);
+    }
+    closePlaceModal();
+    setPlaceBtnEnabled(true);
+  };
 
   return (
     <>
       <MainScreenHeader />
       <GestureHandlerRootView style={styles.container}>
-        <NearbyUserViewer />
+        <NearbyUserViewer nearbyUsersLocations={nearbyUsersLocations} myLocation={myLocation}/>
 
         <BottomSheet
           ref={bottomSheetRef}
@@ -79,8 +236,44 @@ export default function MainScreen() {
           <BottomSheetScrollView>
             <View style={styles.contentContainer}>
               <ChatRoomList
-                openModal={(name) =>
-                  openDetailsModal({ onClose: closeDetailsModal, name: name })
+                openModal={(other_name, other_id, chat_id, is_user1) =>
+                  openDetailsModal({
+                    onClose: closeDetailsModal,
+                    name: other_name,
+                    onLeaveChat: () => {
+                      closeDetailsModal();
+                      openLeaveChatModal({
+                        onClose: closeLeaveChatModal,
+                        onLeaveChatBtnPressed: () =>
+                          onLeaveChatBtnPressed(chat_id, is_user1),
+                        leaveChatBtnEnabled: LeaveChatBtnEnabled,
+                      });
+                    },
+                    onBlock: () => {
+                      closeDetailsModal();
+                      openBlockModal({
+                        onClose: closeBlockModal,
+                        name: other_name,
+                        onBlockBtnPressed: () =>
+                          onBlockBtnPressed(other_name, other_id),
+                        blockBtnEnabled: blockBtnEnabled,
+                      });
+                    },
+                    onReport: () => {
+                      closeDetailsModal();
+                      openReportModal({
+                        onClose: closeReportModal,
+                        name: other_name,
+                        onReportBtnPressed: (joinedReasons) =>
+                          onReportBtnPressed(
+                            other_name,
+                            other_id,
+                            joinedReasons,
+                          ),
+                        reportBtnEnabled: reportBtnEnabled,
+                      });
+                    },
+                  })
                 }
               />
             </View>
@@ -100,7 +293,17 @@ export default function MainScreen() {
         }}
       >
         <ShadowWrap>
-          <TouchableOpacity onPress={() => {}}>
+          <TouchableOpacity
+            onPress={() =>
+              openPlaceModal({
+                onClose: closePlaceModal,
+                origAddr: profile?.user_id,
+                newAddr: `POINT(${myLocation?.lon}, ${myLocation?.lat})`,
+                onPlaceBtnPressed: onPlaceBtnPressed,
+                placeBtnEnabled: placeBtnEnabled,
+              })
+            }
+          >
             <PlaceIcon />
           </TouchableOpacity>
         </ShadowWrap>
