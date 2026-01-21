@@ -13,12 +13,20 @@ import {
 import { SelectBlocksResponse } from "@/types/orm.types";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
+import { UnblockModal, UnblockSuccessModal, UnblockFailModal } from "@/components/modals/UnblockModals";
+import useModal from "@/hooks/useModal";
 
 export default function BlocksList() {
   const { profile } = useAuth();
   const [blocks, setBlocks] = useState<SelectBlocksResponse>([]);
   // We can track specific IDs being unblocked if needed, but a global lock works too
-  const [unblockEnabled, setUnblockEnabled] = useState(true);
+  
+  const [unblockBtnEnabled, setUnblockBtnEnabled] = useState(true);
+    const { open: openUnblockModal, close: closeUnblockModal } = useModal(UnblockModal);
+    const { open: openUnblockSuccessModal, close: closeUnblockSuccessModal } =
+      useModal(UnblockSuccessModal);
+    const { open: openUnblockFailModal, close: closeUnblockFailModal } =
+      useModal(UnblockFailModal);
 
   useEffect(() => {
     (async () => {
@@ -27,9 +35,13 @@ export default function BlocksList() {
     })();
   }, []);
 
-  const handleUnblock = async (block_id: string) => {
-    if (!profile) return;
-    setUnblockEnabled(false);
+  const onUnblockBtnPressed = async (block_id: string, name: string) => {
+    setUnblockBtnEnabled(false);
+
+    if (!profile) {
+      setUnblockBtnEnabled(true);
+      return;
+    }
 
     // 1. Optimistic Update: Immediately remove from UI
     const previousBlocks = [...blocks];
@@ -38,14 +50,16 @@ export default function BlocksList() {
     // 2. Perform API Call
     const { error } = await supabase.from("blocks").delete().eq("id", block_id);
 
+    closeUnblockModal();
+    setUnblockBtnEnabled(true);
+
     if (error) {
-      console.error("Unblock failed:", error);
       // Revert if API fails
       setBlocks(previousBlocks);
-      alert("차단 해제에 실패했습니다.");
+      openUnblockFailModal({ onClose: closeUnblockFailModal })
+    } else {
+      openUnblockSuccessModal({ onClose: closeUnblockSuccessModal, name: name })
     }
-
-    setUnblockEnabled(true);
   };
 
   const renderItem: ListRenderItem<SelectBlocksResponse[0]> = ({ item }) => (
@@ -62,8 +76,15 @@ export default function BlocksList() {
       {/* Minus Button: Gray Circle */}
       <TouchableOpacity
         style={styles.unblockButtonCircle}
-        onPress={() => handleUnblock(item.id)}
-        disabled={!unblockEnabled}
+        onPress={() =>
+          openUnblockModal({
+            onClose: closeUnblockModal,
+            onUnblockBtnPressed: () =>
+              onUnblockBtnPressed(item.id, item.dst_name),
+            unblockBtnEnabled: unblockBtnEnabled,
+            name: item.dst_name
+          })
+        }
       >
         {/* The White Rounded Minus Sign */}
         <View style={styles.minusSign} />

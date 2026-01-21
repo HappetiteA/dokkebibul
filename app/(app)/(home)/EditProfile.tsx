@@ -11,7 +11,6 @@ import {
   TouchableWithoutFeedback,
   KeyboardAvoidingView,
   Platform,
-  ScrollView,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
@@ -59,7 +58,7 @@ export default function ProfileEditScreen() {
         style={{ flex: 1 }}
       >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <ScrollView contentContainerStyle={styles.scrollContent}>
+          <View style={styles.scrollContent}>
             {/* Avatar Section */}
             <View style={styles.avatarContainer}>
               <Image
@@ -140,7 +139,7 @@ export default function ProfileEditScreen() {
                 <Text style={styles.saveButtonText}>저장</Text>
               </TouchableOpacity>
             </View>
-          </ScrollView>
+          </View>
         </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
     </SafeAreaView>

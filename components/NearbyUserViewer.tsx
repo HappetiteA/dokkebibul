@@ -157,7 +157,8 @@ export default function NearbyUserViewer() {
   };
 
   const onPressNearbyUser = (user_id: string) => {
-    router.navigate({
+    if (user_id === profile?.user_id) router.navigate("/(app)/(home)/MyProfile");
+    else router.navigate({
       pathname: "/(app)/(home)/OtherProfile",
       params: { user_id: user_id },
     });

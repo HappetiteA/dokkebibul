@@ -6,7 +6,6 @@ import {
   StyleSheet,
   Image,
   SafeAreaView,
-  ScrollView,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { useAuth } from "@/contexts/AuthContext";
@@ -37,7 +36,7 @@ export default function MyProfileScreen() {
     <SafeAreaView style={styles.safeArea}>
       <MyProfileScreenHeader coins={profile ? profile.coins : 0}/>
 
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <View style={styles.scrollContent}>
         {/* 1. Avatar Image (Transparent, No Border) */}
         <View style={styles.avatarContainer}>
           <Image
@@ -90,7 +89,7 @@ export default function MyProfileScreen() {
           </View>
           <Text style={styles.addressText}>강남구 봉은사로 81길</Text>
         </View>
-      </ScrollView>
+      </View>
     </SafeAreaView>
   );
 }
