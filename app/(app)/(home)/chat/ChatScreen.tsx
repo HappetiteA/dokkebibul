@@ -16,6 +16,7 @@ import {
 import { useEffect, useState } from "react";
 import {
   Alert,
+  Image,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
@@ -274,7 +275,7 @@ export default function ChatScreen() {
             style={{ flex: 1, marginBottom: 40 }}
             behavior={Platform.OS == "ios" ? "padding" : undefined}
           >
-            <View style={{ flex: 1 }}>
+            <View style={{ flex: 1, backgroundColor: "#F8F8FA" }}>
               <ChatHistory
                 chat={chat}
                 user1_id={chatRoomData.user1_id}
@@ -377,13 +378,27 @@ function ChatScreenHeader({
         <View style={headerStyle.right}>
           <View style={{ justifyContent: "center" }}>
             <NeumorphicSwitch
-              width={60}
+              width={54}
               height={30}
-              padding={5}
+              padding={3}
               value={AIenabled}
               onValueChange={onSwitchChange}
               onColor="#93D7EA"
               offColor="#D7D7E2"
+              renderThumbContent={({ value, size }) => (
+                <Image
+                  source={
+                    value
+                      ? require("@/assets/from_figma/fire_on.png")
+                      : require("@/assets/from_figma/fire_off.png")
+                  }
+                  style={{
+                    width: size,
+                    height: size,
+                    resizeMode: "contain",
+                  }}
+                />
+              )}
             ></NeumorphicSwitch>
           </View>
           <ShadowWrap>
