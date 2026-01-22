@@ -11,32 +11,34 @@ import {
   TouchableWithoutFeedback,
   KeyboardAvoidingView,
   Platform,
-  ScrollView,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
+import { getAvatarSource } from "@/utils/avatarColor";
 
 export default function ProfileEditScreen() {
   const router = useRouter();
   const { profile, refreshProfile } = useAuth();
 
   // State for inputs
-  const [name, setName] = useState(profile ? profile.name : "");
-  const [bio, setBio] = useState(profile ? profile?.status_message : "");
+  const [name, setName] = useState(profile?.name ?? "");
+  const [statusMessage, setStatusMessage] = useState(
+    profile?.status_message ?? "",
+  );
 
   const onSavePressed = async () => {
     if (!profile) return;
     if (!name) return;
     const { error } = await supabase
       .from("profiles")
-      .update({ name: name, status_message: bio })
+      .update({ "name": name, "status_message": statusMessage })
       .eq("user_id", profile?.user_id);
     if (error) {
       console.error(error);
     }
-    console.log("Saved:", name, bio);
+    console.log("Saved:", name, statusMessage);
     await refreshProfile();
     router.back();
   };
@@ -59,11 +61,11 @@ export default function ProfileEditScreen() {
         style={{ flex: 1 }}
       >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <ScrollView contentContainerStyle={styles.scrollContent}>
+          <View style={styles.scrollContent}>
             {/* Avatar Section */}
             <View style={styles.avatarContainer}>
               <Image
-                source={require("@/assets/from_figma/icon-wisp-list.png")}
+                source={getAvatarSource(profile?.color_code)}
                 style={styles.avatarImage}
                 resizeMode="contain"
               />
@@ -111,16 +113,16 @@ export default function ProfileEditScreen() {
               >
                 <TextInput
                   style={[styles.textInput, styles.multilineInput]}
-                  value={bio}
-                  onChangeText={setBio}
+                  value={statusMessage}
+                  onChangeText={setStatusMessage}
                   placeholder="자기소개를 입력하세요"
                   placeholderTextColor="#ccc"
                   multiline
                   textAlignVertical="top" // Android fix for multiline
                 />
-                {bio.length > 0 && (
+                {statusMessage.length > 0 && (
                   <TouchableOpacity
-                    onPress={() => setBio("")}
+                    onPress={() => setStatusMessage("")}
                     style={{ marginTop: 4 }}
                   >
                     {/* CHANGED: Simple gray cross icon */}
@@ -140,7 +142,7 @@ export default function ProfileEditScreen() {
                 <Text style={styles.saveButtonText}>저장</Text>
               </TouchableOpacity>
             </View>
-          </ScrollView>
+          </View>
         </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
     </SafeAreaView>

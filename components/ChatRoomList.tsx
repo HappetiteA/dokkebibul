@@ -2,7 +2,6 @@ import { Button, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useEffect, useState } from "react";
 import { getChatRooms } from "@/services/supabase";
 import { useAuth } from "@/contexts/AuthContext";
-import { Link } from "expo-router";
 import ChatListElement from "./ChatListElement";
 import { convertTimestampToTime } from "@/utils/time_converter";
 import { ChatRoom } from "@/types/model.types";
@@ -10,7 +9,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ChatRoomDatas } from "./interfaces";
 
 interface IChatRoomListProp {
-  openModal: (name: string | undefined) => void;
+  openModal: (name: string, id: string, chat_id: string, is_user1: boolean) => void;
 }
 
 export default function ChatRoomList({ openModal }: IChatRoomListProp) {
@@ -71,7 +70,7 @@ export default function ChatRoomList({ openModal }: IChatRoomListProp) {
         last_msg={value.last_msg}
         time_string={time_string}
         onLongPress={() => {
-          openModal(other_name);
+          openModal(other_name, other_id, value.id, is_user1);
         }}
       />
     );
