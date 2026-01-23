@@ -224,7 +224,8 @@ const ColorPicker = ({
           position: "absolute",
           bottom: H * 0.3,
         }}
-        onMomentumScrollEnd={(e) => {
+        scrollEventThrottle={16}
+        onScroll={(e) => {
           const x = e.nativeEvent.contentOffset.x;
           const idx = Math.round(x / W);
           setValue(idx);
@@ -238,6 +239,34 @@ const ColorPicker = ({
           index: i,
         })}
       ></FlatList>
+
+      <View
+        style={{ position: "absolute", bottom: "42%", flexDirection: "row" }}
+      >
+        {[0, 1, 2, 3, 4, 5, 6].map((v) => (
+          <View
+            key={v}
+            style={[
+              {
+                width: 12,
+                height: 12,
+                borderRadius: 6,
+                marginHorizontal: 3,
+                backgroundColor: value == v ? "#9DD8ED" : "#D9D9D9",
+              },
+              value == v
+                ? {
+                    shadowColor: "#3BA6C9",
+                    shadowOffset: { width: 0, height: 1 },
+                    shadowOpacity: 0.7,
+                    shadowRadius: 4,
+                    elevation: 4,
+                  }
+                : {},
+            ]}
+          ></View>
+        ))}
+      </View>
 
       <View style={{ position: "absolute", bottom: "30%" }}>
         <TouchableOpacity
