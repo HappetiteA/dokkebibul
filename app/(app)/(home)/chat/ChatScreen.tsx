@@ -16,6 +16,7 @@ import {
 import { useEffect, useState } from "react";
 import {
   Alert,
+  Image,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
@@ -33,9 +34,9 @@ export default function ChatScreen() {
   const navigation = useNavigation();
 
   const params = useLocalSearchParams();
-  const conversation_id = params.id as string;
 
   const { profile } = useAuth();
+  const [conversation_id, setConversationId] = useState<string>();
   const [chat, setChat] = useState<Array<Chat>>([]);
   const [text, setText] = useState<string>("");
   const [AIenabled, setAIenabled] = useState<boolean>(false);
@@ -44,6 +45,11 @@ export default function ChatScreen() {
   const updateSetting = async (value: ChatRoomData) => {
     if (profile == null || profile.user_id == null) {
       console.warn("Cannot update AI setting: user not authenticated");
+      return true;
+    }
+
+    if (conversation_id == null) {
+      console.warn("Cannot update AI setting: conversation doesn't exist");
       return true;
     }
 
@@ -98,6 +104,11 @@ export default function ChatScreen() {
       return;
     }
 
+    if (conversation_id == null) {
+      console.warn("Cannot send message: conversation doesn't exist");
+      return true;
+    }
+
     const { error } = await supabase.from("messages").insert({
       conversation_id: conversation_id,
       sender_id: profile.user_id,
@@ -114,7 +125,45 @@ export default function ChatScreen() {
   };
 
   useEffect(() => {
+    if (params.id) {
+      setConversationId(params.id as string);
+    } else {
+      let id1 = params.user1_id as string;
+      let id2 = params.user2_id as string;
+      const user1_id = id1 < id2 ? id1 : id2;
+      const user2_id = id1 > id2 ? id1 : id2;
+      (async () => {
+        const { data, error } = await supabase
+          .from("conversations")
+          .select("id")
+          .eq("user1_id", user1_id)
+          .eq("user2_id", user2_id)
+          .single();
+        if (error || !data) {
+          console.log("no conversation id found");
+          return;
+        }
+        setConversationId(data.id);
+      })();
+    }
+  }, [profile?.user_id]);
+
+  useEffect(() => {
+    if (!conversation_id) return;
+
     // get messages
+    (async () => {
+      const { data, error } = await supabase
+        .from("messages")
+        .select("id, sender_id, content, created_at, is_read, is_human")
+        .eq("conversation_id", conversation_id)
+        .order("created_at", { ascending: true });
+      if (error) {
+        console.log(error);
+      }
+      setChat(data ?? []);
+    })();
+
     navigation.setOptions({ title: `Chat #${conversation_id}` });
     (async () => {
       const { data, error } = await supabase
@@ -207,11 +256,11 @@ export default function ChatScreen() {
     return () => {
       channel.unsubscribe();
     };
-  }, [conversation_id, profile?.user_id]);
+  }, [conversation_id]);
 
   return (
     <>
-      {profile && chatRoomData ? (
+      {profile && conversation_id && chatRoomData ? (
         <>
           <ChatScreenHeader
             conversation_id={conversation_id}
@@ -226,7 +275,7 @@ export default function ChatScreen() {
             style={{ flex: 1, marginBottom: 40 }}
             behavior={Platform.OS == "ios" ? "padding" : undefined}
           >
-            <View style={{ flex: 1 }}>
+            <View style={{ flex: 1, backgroundColor: "#F8F8FA" }}>
               <ChatHistory
                 chat={chat}
                 user1_id={chatRoomData.user1_id}
@@ -329,13 +378,27 @@ function ChatScreenHeader({
         <View style={headerStyle.right}>
           <View style={{ justifyContent: "center" }}>
             <NeumorphicSwitch
-              width={60}
+              width={54}
               height={30}
-              padding={5}
+              padding={3}
               value={AIenabled}
               onValueChange={onSwitchChange}
               onColor="#93D7EA"
               offColor="#D7D7E2"
+              renderThumbContent={({ value, size }) => (
+                <Image
+                  source={
+                    value
+                      ? require("@/assets/from_figma/fire_on.png")
+                      : require("@/assets/from_figma/fire_off.png")
+                  }
+                  style={{
+                    width: size,
+                    height: size,
+                    resizeMode: "contain",
+                  }}
+                />
+              )}
             ></NeumorphicSwitch>
           </View>
           <ShadowWrap>

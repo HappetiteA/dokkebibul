@@ -36,7 +36,7 @@ export default function MyProfileScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <MyProfileScreenHeader coins={profile ? profile.coins : 0}/>
+      <MyProfileScreenHeader coins={profile ? profile.coins : 0} />
 
       <View style={styles.scrollContent}>
         {/* 1. Avatar Image (Transparent, No Border) */}
@@ -96,7 +96,7 @@ export default function MyProfileScreen() {
 }
 
 // --- Header Component ---
-function MyProfileScreenHeader({ coins }: {coins: number}) {
+function MyProfileScreenHeader({ coins }: { coins: number }) {
   const router = useRouter();
 
   return (

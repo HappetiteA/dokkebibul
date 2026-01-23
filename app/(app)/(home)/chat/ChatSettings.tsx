@@ -16,9 +16,9 @@ export default function ChatSettings() {
           <View style={styles.settingListElement}>
             <Text style={styles.h2}>채팅 알림</Text>
             <NeumorphicSwitch
-              width={60}
+              width={54}
               height={30}
-              padding={5}
+              padding={3}
               value={false}
               onValueChange={() => {}}
               onColor="#93D7EA"

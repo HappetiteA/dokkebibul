@@ -9,15 +9,15 @@ import {
   View,
   ViewStyle,
 } from "react-native";
-import ShadowWrap from "./Shadow";
+import ShadowWrap from "@/components/style/Shadow";
 
 type NeumorphicSwitchProps = {
   value: boolean;
   onValueChange: (next: boolean) => void;
 
-  width?: number; // 트랙 가로
-  height?: number; // 트랙 세로
-  padding?: number; // 트랙 내부 여백(thumb와 트랙 사이)
+  width?: number;
+  height?: number;
+  padding?: number;
 
   onColor?: string;
   offColor?: string;
@@ -27,6 +27,11 @@ type NeumorphicSwitchProps = {
 
   style?: StyleProp<ViewStyle>;
   testID?: string;
+
+  renderThumbContent?: (args: {
+    value: boolean;
+    size: number;
+  }) => React.ReactNode;
 };
 
 export function NeumorphicSwitch({
@@ -44,10 +49,17 @@ export function NeumorphicSwitch({
   disabled = false,
   style,
   testID,
+
+  renderThumbContent,
 }: NeumorphicSwitchProps) {
-  const radius = height / 2;
-  const thumbSize = height - padding * 2;
-  const travel = width - padding * 2 - thumbSize;
+  const border = Math.round(height * 0.06);
+
+  const innerWidth = width - border * 2;
+  const innerHeight = height - border * 2;
+  const radius = innerHeight / 2;
+
+  const thumbSize = innerHeight - padding * 2;
+  const travel = innerWidth - padding * 2 - thumbSize;
 
   const anim = useRef(new Animated.Value(value ? 1 : 0)).current;
 
@@ -58,7 +70,7 @@ export function NeumorphicSwitch({
       easing: Easing.out(Easing.cubic),
       useNativeDriver: true,
     }).start();
-  }, [value, anim]);
+  }, [value]);
 
   const trackBg = value ? onColor : offColor;
 
@@ -67,37 +79,25 @@ export function NeumorphicSwitch({
     outputRange: [0, travel],
   });
 
-  // 트랙은 “겉으로 튀어나온” 느낌(outer shadow)
-  // 썸은 더 진한 shadow로 둥글고 떠있는 느낌
-  // const trackShadow = useMemo(() => {
-  //   const common: ViewStyle = {
-  //     borderRadius: radius,
-  //     backgroundColor: trackBg,
-  //   };
-
-  //   if (Platform.OS === "android") {
-  //     // Android는 한 개 shadow만 가능 → elevation으로 근사
-  //     return [common, styles.androidTrackShadow];
-  //   }
-
-  //   // iOS: 두 개의 그림자를 겹쳐 네오모피즘 구현
-  //   return [common, styles.iosTrackLightShadow, styles.iosTrackDarkShadow];
-  // }, [radius, trackBg]);
-
-  const thumbShadow = useMemo(() => {
-    const common: ViewStyle = {
+  const thumbStyle: ViewStyle = useMemo(
+    () => ({
       width: thumbSize,
       height: thumbSize,
       borderRadius: thumbSize / 2,
       backgroundColor: thumbColor,
-    };
-
-    if (Platform.OS === "android") {
-      return [common, styles.androidThumbShadow];
-    }
-
-    return [common, styles.iosThumbShadow];
-  }, [thumbSize, thumbColor]);
+      alignItems: "center",
+      justifyContent: "center",
+      ...(Platform.OS === "android"
+        ? { elevation: 10 }
+        : {
+            shadowColor: "#000",
+            shadowOffset: { width: 6, height: 8 },
+            shadowOpacity: 0.25,
+            shadowRadius: 10,
+          }),
+    }),
+    [thumbSize, thumbColor]
+  );
 
   return (
     <Pressable
@@ -107,103 +107,57 @@ export function NeumorphicSwitch({
       style={[{ opacity: disabled ? 0.55 : 1 }, style]}
       hitSlop={10}
     >
-      {/* 트랙 */}
-      <View style={[styles.trackBase, { width, height, borderRadius: radius }]}>
-        {/* iOS에서 “두 그림자”를 제대로 만들려면 레이어를 2개로 겹치는 게 가장 확실 */}
-        {Platform.OS === "ios" ? (
-          <>
-            <ShadowWrap>
-              <View style={styles.inner_shadow}>
-                <View
-                  style={{
-                    width,
-                    height,
-                    borderRadius: radius,
-                    backgroundColor: trackBg,
-                  }}
-                />
-              </View>
-            </ShadowWrap>
-          </>
-        ) : (
-          <View
-            style={[
-              styles.androidTrackShadow,
-              { width, height, borderRadius: radius, backgroundColor: trackBg },
-            ]}
-          />
-        )}
-
-        {/* 썸 */}
-        <Animated.View
+      <ShadowWrap>
+        {/* white border */}
+        <View
           style={[
-            styles.thumbWrapper,
+            styles.outerRing,
             {
-              left: padding,
-              top: padding,
-              transform: [{ translateX: thumbTranslateX }],
+              width,
+              height,
+              borderRadius: height / 2,
+              padding: border,
             },
           ]}
         >
-          {/* iOS: thumb는 자체 shadow */}
-          <View style={thumbShadow as any} />
-        </Animated.View>
-
-        {/* 트랙 내부 “인셋 느낌”을 살짝 주고 싶으면 오버레이(선택) */}
-        <View
-          pointerEvents="none"
-          style={[
-            styles.innerSoftOverlay,
-            { borderRadius: radius, opacity: value ? 0.18 : 0.22 },
-          ]}
-        />
-      </View>
+          {/* track */}
+          <View
+            style={{
+              width: innerWidth,
+              height: innerHeight,
+              borderRadius: radius,
+              backgroundColor: trackBg,
+            }}
+          >
+            {/* thumb */}
+            <Animated.View
+              style={[
+                styles.thumbWrapper,
+                {
+                  left: padding,
+                  top: padding,
+                  transform: [{ translateX: thumbTranslateX }],
+                },
+              ]}
+            >
+              <View style={thumbStyle}>
+                {renderThumbContent
+                  ? renderThumbContent({ value, size: thumbSize })
+                  : null}
+              </View>
+            </Animated.View>
+          </View>
+        </View>
+      </ShadowWrap>
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  trackBase: {
-    position: "relative",
-    justifyContent: "center",
+  outerRing: {
+    backgroundColor: "#FFFFFF",
   },
-
-  // thumb 위치 래퍼(애니메이션 transform 적용)
   thumbWrapper: {
     position: "absolute",
-  },
-
-  inner_shadow: {
-    backgroundColor: "transparent",
-    borderRadius: 20,
-    borderWidth: 0.01,
-    borderColor: "transparent",
-    overflow: "hidden",
-    shadowOffset: { width: 2, height: 2 },
-    shadowColor: "#000000",
-    shadowOpacity: 0.2,
-    elevation: 1,
-  },
-
-  // iOS thumb shadow (좀 더 강하게)
-  iosThumbShadow: {
-    shadowColor: "#000000",
-    shadowOffset: { width: 8, height: 10 },
-    shadowOpacity: 0.22,
-    shadowRadius: 14,
-  },
-
-  // Android 근사
-  androidTrackShadow: {
-    elevation: 10,
-  },
-  androidThumbShadow: {
-    elevation: 12,
-  },
-
-  // 트랙 내부를 살짝 부드럽게(필수 아님)
-  innerSoftOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: "#FFFFFF",
   },
 });

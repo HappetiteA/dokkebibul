@@ -132,9 +132,9 @@ export default function Settings() {
           <View style={styles.settingListElement}>
             <Text style={styles.h2}>푸시 알림</Text>
             <NeumorphicSwitch
-              width={60}
+              width={54}
               height={30}
-              padding={5}
+              padding={3}
               value={pushNotif}
               onValueChange={() => {
                 setPushNotif((c) => !c);
@@ -151,9 +151,9 @@ export default function Settings() {
           <View style={styles.settingListElement}>
             <Text style={styles.h2}>백그라운드 AI 채팅</Text>
             <NeumorphicSwitch
-              width={60}
+              width={54}
               height={30}
-              padding={5}
+              padding={3}
               value={AIchat}
               onValueChange={() => {
                 updateGlobalSetting({ AIenabled: !AIchat });
@@ -226,7 +226,8 @@ export default function Settings() {
 
 const styles = StyleSheet.create({
   container: {
-    justifyContent: "center",
+    backgroundColor: "#F8F8FA",
+    height: "100%",
   },
   settingListElement: {
     flexDirection: "row",

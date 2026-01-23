@@ -165,7 +165,10 @@ export default function OtherProfileScreen() {
       u2id: user_id,
       new_chat_enabled: true,
     });
-    router.navigate({ pathname: "/chat/[id]", params: { id: user_id } });
+    router.navigate({
+      pathname: "/chat/ChatScreen",
+      params: { user1_id: profile.user_id, user2_id: user_id },
+    });
   };
 
   return (
@@ -278,7 +281,6 @@ function OtherProfileScreenHeader() {
     </View>
   );
 }
-
 
 const styles = StyleSheet.create({
   safeArea: {
