@@ -286,7 +286,7 @@ const Onboarding = () => {
 
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [answers, setAnswers] = useState<{ [key: string]: string }>({});
-  const [avatarColor, setAvatarColor] = useState<number>();
+  const [avatarColor, setAvatarColor] = useState<number>(0);
 
   const questions = [
     { key: "no_input", label: "안녕! 만나서 반가워." },
