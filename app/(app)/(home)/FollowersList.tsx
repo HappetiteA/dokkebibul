@@ -46,10 +46,14 @@ export default function FollowersList() {
 
   const handleChat = (user_id: string) => {
     // Navigate to chat
-    router.navigate({
-      pathname: "/(app)/(home)/chat/ChatScreen",
-      params: { user1_id: profile?.user_id, user2_id: user_id },
-    });
+    if (profile) {
+      router.navigate({
+        pathname: "/(app)/(home)/chat/ChatScreen",
+        params: { user1_id: profile?.user_id, user2_id: user_id },
+      });
+    } else {
+      console.error("Cannot move to chat screen: User not authenticated");
+    }
   };
 
   const handleFollowBack = async (targetUserId: string, index: number) => {
@@ -62,8 +66,8 @@ export default function FollowersList() {
     // This makes the button switch to "Chat" instantly
     setFollowers((prev) =>
       prev.map((item, i) =>
-        i === index ? { ...item, is_two_way: true } : item
-      )
+        i === index ? { ...item, is_two_way: true } : item,
+      ),
     );
 
     // 2. API Call to follow back
@@ -76,8 +80,8 @@ export default function FollowersList() {
       // Revert change if failed
       setFollowers((prev) =>
         prev.map((item, i) =>
-          i === index ? { ...item, is_two_way: originalTwoWay } : item
-        )
+          i === index ? { ...item, is_two_way: originalTwoWay } : item,
+        ),
       );
     }
   };

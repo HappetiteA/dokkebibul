@@ -47,8 +47,6 @@ export default function SignIn() {
         >
           <Image
             style={{ width: 184, height: 44 }}
-            width={184}
-            height={44}
             resizeMode="contain"
             source={require("../../assets/sign_in/android_light_rd_SI.png")}
           />
@@ -67,8 +65,6 @@ export default function SignIn() {
           >
             <Image
               style={{ width: 184, height: 44 }}
-              width={184}
-              height={44}
               resizeMode="contain"
               source={require("../../assets/sign_in/apple_light_SI.png")}
             />

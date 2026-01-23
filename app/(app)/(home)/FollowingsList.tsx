@@ -34,10 +34,14 @@ export default function FollowingsList() {
   };
 
   const handleChat = (user_id: string) => {
-    router.navigate({
-      pathname: "/(app)/(home)/chat/ChatScreen",
-      params: { user1_id: profile?.user_id, user2_id: user_id },
-    });
+    if (profile) {
+      router.navigate({
+        pathname: "/(app)/(home)/chat/ChatScreen",
+        params: { user1_id: profile?.user_id, user2_id: user_id },
+      });
+    } else {
+      console.error("Cannot move to chat screen: User not authenticated");
+    }
   };
 
   const renderItem: ListRenderItem<SelectFollowingsResponse[0]> = ({
