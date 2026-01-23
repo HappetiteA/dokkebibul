@@ -228,7 +228,8 @@ const ColorPicker = ({
         onScroll={(e) => {
           const x = e.nativeEvent.contentOffset.x;
           const idx = Math.round(x / W);
-          setValue(idx);
+          const bounded_idx = Math.max(Math.min(idx, 6), 0);
+          setValue(bounded_idx);
         }}
         data={[0, 1, 2, 3, 4, 5, 6]}
         keyExtractor={(item) => item.toString()}
