@@ -11,6 +11,8 @@ import { TouchableOpacity } from "react-native";
 import ShadowWrap from "@/components/style/Shadow";
 import { NeumorphicSwitch } from "@/components/style/Switch";
 import { getBlocks } from "@/services/supabase";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { BGStyle } from "@/components/style/commonStyle";
 
 type SettingData = Omit<IGlobalSetting, "last_fetched">;
 
@@ -90,7 +92,7 @@ export default function Settings() {
         }
 
         const GlobalSettingFromStorage = JSON.parse(
-          storageData
+          storageData,
         ) as IGlobalSetting;
         const ONE_DAY = 24 * 60 * 60 * 1000;
         // do not exist or expired
@@ -122,7 +124,7 @@ export default function Settings() {
   }, [profile]);
 
   return (
-    <>
+    <SafeAreaView style={BGStyle.BG}>
       <DefaultHeader title="Settings" />
       <View style={styles.container}>
         <View>
@@ -220,7 +222,7 @@ export default function Settings() {
           </View>
         </View>
       </View>
-    </>
+    </SafeAreaView>
   );
 }
 

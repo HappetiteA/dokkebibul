@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import headerStyle from "./style/headerStyle";
+import headerStyle from "@/components/style/commonStyle";
 import { BackIcon } from "./style/Icons";
 interface Prop {
   title?: string;

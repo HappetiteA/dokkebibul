@@ -14,6 +14,8 @@ import {
 import { SelectFollowersResponse } from "@/types/orm.types";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { BGStyle } from "@/components/style/commonStyle";
 
 export default function FollowersList() {
   const router = useRouter();
@@ -126,7 +128,7 @@ export default function FollowersList() {
   );
 
   return (
-    <>
+    <SafeAreaView style={BGStyle.BG}>
       <DefaultHeader title="팔로워 목록" />
       <View style={styles.container}>
         <FlatList
@@ -137,7 +139,7 @@ export default function FollowersList() {
           showsVerticalScrollIndicator={false}
         />
       </View>
-    </>
+    </SafeAreaView>
   );
 }
 

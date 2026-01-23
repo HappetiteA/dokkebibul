@@ -13,6 +13,8 @@ import {
 } from "react-native";
 import { SelectFollowingsResponse } from "@/types/orm.types";
 import { useAuth } from "@/contexts/AuthContext";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { BGStyle } from "@/components/style/commonStyle";
 
 export default function FollowingsList() {
   const router = useRouter();
@@ -71,7 +73,7 @@ export default function FollowingsList() {
   );
 
   return (
-    <>
+    <SafeAreaView style={BGStyle.BG}>
       <DefaultHeader title="팔로잉 목록" />
       <View style={styles.container}>
         <FlatList
@@ -82,7 +84,7 @@ export default function FollowingsList() {
           showsVerticalScrollIndicator={false}
         />
       </View>
-    </>
+    </SafeAreaView>
   );
 }
 
