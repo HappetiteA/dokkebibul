@@ -1,15 +1,17 @@
 import DefaultHeader from "@/components/DefaultHeader";
+import { BGStyle } from "@/components/style/commonStyle";
 import ShadowWrap from "@/components/style/Shadow";
 import { NeumorphicSwitch } from "@/components/style/Switch";
 import { useLocalSearchParams } from "expo-router";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ChatSettings() {
   const params = useLocalSearchParams();
   const conversation_id = params.id as string;
 
   return (
-    <>
+    <SafeAreaView style={BGStyle.BG}>
       <DefaultHeader title={"채팅 설정"} />
       <View style={styles.container}>
         <View>
@@ -51,7 +53,7 @@ export default function ChatSettings() {
           </ShadowWrap>
         </View>
       </View>
-    </>
+    </SafeAreaView>
   );
 }
 

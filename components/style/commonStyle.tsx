@@ -3,6 +3,10 @@ import { StyleSheet } from "react-native";
 export const headerHeight = 50;
 export const headerMargin = 50;
 
+export const BGStyle = StyleSheet.create({
+  BG: { flex: 1, backgroundColor: "#F8F8FA" },
+});
+
 const headerStyle = StyleSheet.create({
   container: {
     height: headerHeight,

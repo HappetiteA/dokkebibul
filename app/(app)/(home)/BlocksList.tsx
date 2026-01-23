@@ -13,20 +13,27 @@ import {
 import { SelectBlocksResponse } from "@/types/orm.types";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
-import { UnblockModal, UnblockSuccessModal, UnblockFailModal } from "@/components/modals/UnblockModals";
+import {
+  UnblockModal,
+  UnblockSuccessModal,
+  UnblockFailModal,
+} from "@/components/modals/UnblockModals";
 import useModal from "@/hooks/useModal";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { BGStyle } from "@/components/style/commonStyle";
 
 export default function BlocksList() {
   const { profile } = useAuth();
   const [blocks, setBlocks] = useState<SelectBlocksResponse>([]);
   // We can track specific IDs being unblocked if needed, but a global lock works too
-  
+
   const [unblockBtnEnabled, setUnblockBtnEnabled] = useState(true);
-    const { open: openUnblockModal, close: closeUnblockModal } = useModal(UnblockModal);
-    const { open: openUnblockSuccessModal, close: closeUnblockSuccessModal } =
-      useModal(UnblockSuccessModal);
-    const { open: openUnblockFailModal, close: closeUnblockFailModal } =
-      useModal(UnblockFailModal);
+  const { open: openUnblockModal, close: closeUnblockModal } =
+    useModal(UnblockModal);
+  const { open: openUnblockSuccessModal, close: closeUnblockSuccessModal } =
+    useModal(UnblockSuccessModal);
+  const { open: openUnblockFailModal, close: closeUnblockFailModal } =
+    useModal(UnblockFailModal);
 
   useEffect(() => {
     (async () => {
@@ -56,9 +63,12 @@ export default function BlocksList() {
     if (error) {
       // Revert if API fails
       setBlocks(previousBlocks);
-      openUnblockFailModal({ onClose: closeUnblockFailModal })
+      openUnblockFailModal({ onClose: closeUnblockFailModal });
     } else {
-      openUnblockSuccessModal({ onClose: closeUnblockSuccessModal, name: name })
+      openUnblockSuccessModal({
+        onClose: closeUnblockSuccessModal,
+        name: name,
+      });
     }
   };
 
@@ -82,7 +92,7 @@ export default function BlocksList() {
             onUnblockBtnPressed: () =>
               onUnblockBtnPressed(item.id, item.dst_name),
             unblockBtnEnabled: unblockBtnEnabled,
-            name: item.dst_name
+            name: item.dst_name,
           })
         }
       >
@@ -93,7 +103,7 @@ export default function BlocksList() {
   );
 
   return (
-    <>
+    <SafeAreaView style={BGStyle.BG}>
       <DefaultHeader title="차단 목록" />
       <View style={styles.container}>
         <FlatList
@@ -104,7 +114,7 @@ export default function BlocksList() {
           showsVerticalScrollIndicator={false}
         />
       </View>
-    </>
+    </SafeAreaView>
   );
 }
 

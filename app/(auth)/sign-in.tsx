@@ -10,13 +10,14 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 
 import { useAuthActions } from "@/hooks/useAuthActions";
+import { BGStyle } from "@/components/style/commonStyle";
 
 export default function SignIn() {
   const router = useRouter();
   const { loginWithGoogle, loginWithApple } = useAuthActions();
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={BGStyle.BG}>
       <View
         style={{
           alignItems: "center",

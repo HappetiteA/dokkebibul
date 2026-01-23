@@ -4,7 +4,7 @@ import { ChatRoom, Message } from "@/types/model.types";
 import { supabase } from "@/lib/supabase";
 import { ChatRoomDatas } from "@/components/interfaces";
 import { BackIcon, SendIcon, SettingsIcon } from "@/components/style/Icons";
-import headerStyle from "@/components/style/headerStyle";
+import headerStyle, { BGStyle } from "@/components/style/commonStyle";
 import ShadowWrap from "@/components/style/Shadow";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
@@ -27,6 +27,7 @@ import {
 } from "react-native";
 import { NeumorphicSwitch } from "@/components/style/Switch";
 import { getChatRooms } from "@/services/supabase";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 type Chat = Omit<Message, "conversation_id">;
 type ChatRoomData = Omit<ChatRoom, "id">;
@@ -78,11 +79,11 @@ export default function ChatScreen() {
       }
 
       const ChatRoomDataFromStorage = new Map<string, ChatRoomData>(
-        Object.entries(JSON.parse(storageData))
+        Object.entries(JSON.parse(storageData)),
       );
       ChatRoomDataFromStorage.set(conversation_id, value);
       const jsonStr = JSON.stringify(
-        Object.fromEntries(ChatRoomDataFromStorage)
+        Object.fromEntries(ChatRoomDataFromStorage),
       );
       await AsyncStorage.setItem("ChatRoomData", jsonStr);
       setChatRoomData(value);
@@ -198,7 +199,7 @@ export default function ChatScreen() {
             is_human: payload.new.is_human,
           };
           setChat((c) => [...c, new_chat]);
-        }
+        },
       )
       .subscribe();
 
@@ -236,7 +237,7 @@ export default function ChatScreen() {
       // can use asyncstorage data
       try {
         const ChatRoomDataFromStorage = new Map<string, ChatRoomData>(
-          Object.entries(JSON.parse(storageData))
+          Object.entries(JSON.parse(storageData)),
         );
         const data = ChatRoomDataFromStorage.get(conversation_id);
 
@@ -259,7 +260,7 @@ export default function ChatScreen() {
   }, [conversation_id]);
 
   return (
-    <>
+    <SafeAreaView style={BGStyle.BG}>
       {profile && conversation_id && chatRoomData ? (
         <>
           <ChatScreenHeader
@@ -272,7 +273,7 @@ export default function ChatScreen() {
             updateSetting={updateSetting}
           ></ChatScreenHeader>
           <KeyboardAvoidingView
-            style={{ flex: 1, marginBottom: 40 }}
+            style={{ flex: 1 }}
             behavior={Platform.OS == "ios" ? "padding" : undefined}
           >
             <View style={{ flex: 1, backgroundColor: "#F8F8FA" }}>
@@ -308,7 +309,7 @@ export default function ChatScreen() {
           <Text>ERROR</Text>
         </>
       )}
-    </>
+    </SafeAreaView>
   );
 }
 

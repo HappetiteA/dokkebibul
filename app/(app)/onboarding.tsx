@@ -18,7 +18,10 @@ import { useRouter } from "expo-router";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
 import ChatBubbleText from "@/components/style/ChatBubbleText";
-import headerStyle, { headerHeight } from "@/components/style/headerStyle";
+import headerStyle, {
+  BGStyle,
+  headerHeight,
+} from "@/components/style/commonStyle";
 import { BackIcon, SendIcon } from "@/components/style/Icons";
 import ShadowWrap from "@/components/style/Shadow";
 import Animated, {
@@ -373,7 +376,7 @@ const Onboarding = () => {
   const currentQuestion = questions[currentIndex];
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={BGStyle.BG}>
       {currentIndex > 0 ? (
         <View style={headerStyle.container}>
           <View style={headerStyle.content}>
@@ -424,10 +427,6 @@ const Onboarding = () => {
 export default Onboarding;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#F8F8FA",
-  },
   questionContainer: {
     ...StyleSheet.absoluteFillObject,
     alignItems: "center",

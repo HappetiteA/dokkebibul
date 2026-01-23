@@ -12,7 +12,7 @@ import {
 import { Link, useRouter } from "expo-router";
 import NearbyUserViewer, { startTracking } from "@/components/NearbyUserViewer";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import headerStyle from "@/components/style/headerStyle";
+import headerStyle, { BGStyle } from "@/components/style/commonStyle";
 import ChatRoomList from "@/components/ChatRoomList";
 import useModal from "@/hooks/useModal";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -35,13 +35,17 @@ import {
   ReportFailModal,
 } from "@/components/modals/ReportModals";
 import { DetailsModal } from "@/components/modals/DetailsModal";
-import { LeaveChatModal, LeaveChatSuccessModal, LeaveChatFailModal } from "@/components/modals/LeaveChatModals";
+import {
+  LeaveChatModal,
+  LeaveChatSuccessModal,
+  LeaveChatFailModal,
+} from "@/components/modals/LeaveChatModals";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
 import React from "react";
 import { SelectNearbyUsersResponse } from "@/types/orm.types";
 import { getNearbyUsers } from "@/services/supabase";
-
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function MainScreen() {
   const { profile } = useAuth();
@@ -132,8 +136,12 @@ export default function MainScreen() {
 
     const { error } = await supabase
       .from("conversations")
-      .update(is_user1 ? { user1_chat_enabled: false } : { user2_chat_enabled: false })
-      .eq('id', chat_id);
+      .update(
+        is_user1
+          ? { user1_chat_enabled: false }
+          : { user2_chat_enabled: false },
+      )
+      .eq("id", chat_id);
 
     closeLeaveChatModal();
     setLeaveChatBtnEnabled(true);
@@ -142,7 +150,7 @@ export default function MainScreen() {
       openLeaveChatFailModal({ onClose: closeLeaveChatFailModal });
     } else {
       openLeaveChatSuccessModal({
-        onClose: closeLeaveChatSuccessModal
+        onClose: closeLeaveChatSuccessModal,
       });
     }
   };
@@ -174,7 +182,11 @@ export default function MainScreen() {
     }
   };
 
-  const onReportBtnPressed = async (other_name: string, other_id: string, joinedReasons: string) => {
+  const onReportBtnPressed = async (
+    other_name: string,
+    other_id: string,
+    joinedReasons: string,
+  ) => {
     setReportBtnEnabled(false);
 
     if (!profile) {
@@ -222,10 +234,13 @@ export default function MainScreen() {
   };
 
   return (
-    <>
+    <SafeAreaView style={BGStyle.BG}>
       <MainScreenHeader />
       <GestureHandlerRootView style={styles.container}>
-        <NearbyUserViewer nearbyUsersLocations={nearbyUsersLocations} myLocation={myLocation}/>
+        <NearbyUserViewer
+          nearbyUsersLocations={nearbyUsersLocations}
+          myLocation={myLocation}
+        />
 
         <BottomSheet
           ref={bottomSheetRef}
@@ -308,7 +323,7 @@ export default function MainScreen() {
           </TouchableOpacity>
         </ShadowWrap>
       </View>
-    </>
+    </SafeAreaView>
   );
 }
 
