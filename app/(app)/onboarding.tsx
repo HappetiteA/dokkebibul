@@ -187,7 +187,7 @@ const ColorPicker = ({
 
   useEffect(() => {
     scrollRef.current?.scrollToOffset({ offset: value * W });
-  }, [scrollRef]);
+  }, [value, W]);
 
   const renderItem: ListRenderItem<number> = ({ item }) => {
     return (
