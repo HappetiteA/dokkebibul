@@ -274,7 +274,7 @@ export default function ChatScreen() {
           ></ChatScreenHeader>
           <KeyboardAvoidingView
             style={{ flex: 1 }}
-            behavior={Platform.OS == "ios" ? "padding" : undefined}
+            behavior={Platform.OS == "ios" ? "padding" : "height"}
           >
             <View style={{ flex: 1, backgroundColor: "#F8F8FA" }}>
               <ChatHistory
