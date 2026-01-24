@@ -3,7 +3,12 @@ import { useAuth } from "@/contexts/AuthContext";
 import { ChatRoom, Message } from "@/types/model.types";
 import { supabase } from "@/lib/supabase";
 import { ChatRoomDatas } from "@/components/interfaces";
-import { BackIcon, SendIcon, SettingsIcon } from "@/components/style/Icons";
+import {
+  BackIcon,
+  LockIcon,
+  SendIcon,
+  SettingsIcon,
+} from "@/components/style/Icons";
 import headerStyle, { BGStyle } from "@/components/style/commonStyle";
 import ShadowWrap from "@/components/style/Shadow";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -296,7 +301,7 @@ export default function ChatScreen() {
                     style={{ flex: 5, fontSize: 20 }}
                   />
                   <TouchableOpacity onPress={onSubmit} disabled={AIenabled}>
-                    <SendIcon />
+                    {AIenabled ? <LockIcon /> : <SendIcon />}
                   </TouchableOpacity>
                 </View>
               </ShadowWrap>
