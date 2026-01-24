@@ -14,10 +14,18 @@ import useModal from "@/hooks/useModal";
 import { useAuth } from "@/contexts/AuthContext";
 import { Profile } from "@/types/model.types";
 import { Ionicons } from "@expo/vector-icons";
-import { BlockModal, BlockSuccessModal, BlockFailModal } from "@/components/modals/BlockModals";
-import { ReportModal, ReportSuccessModal, ReportFailModal } from "@/components/modals/ReportModals"
+import {
+  BlockModal,
+  BlockSuccessModal,
+  BlockFailModal,
+} from "@/components/modals/BlockModals";
+import {
+  ReportModal,
+  ReportSuccessModal,
+  ReportFailModal,
+} from "@/components/modals/ReportModals";
 import { getAvatarSource } from "@/utils/avatarColor";
-
+import headerStyle from "@/components/style/commonStyle";
 
 export default function OtherProfileScreen() {
   const router = useRouter();
@@ -192,7 +200,9 @@ export default function OtherProfileScreen() {
 
         {/* Status Message Box - With Shadow */}
         <View style={[styles.commonShadow, styles.statusBox]}>
-          <Text style={styles.statusText}>{userInfo?.status_message ?? ""}</Text>
+          <Text style={styles.statusText}>
+            {userInfo?.status_message ?? ""}
+          </Text>
         </View>
 
         {/* Action Buttons Container - Fixed Width */}
@@ -274,10 +284,18 @@ export default function OtherProfileScreen() {
 function OtherProfileScreenHeader() {
   const router = useRouter();
   return (
-    <View style={styles.headerContainer}>
-      <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-        <Ionicons name="chevron-back" size={28} color="#aaa" />
-      </TouchableOpacity>
+    <View style={headerStyle.container}>
+      <View style={headerStyle.content}>
+        <View style={headerStyle.left}>
+          <TouchableOpacity
+            onPress={() => router.back()}
+            style={styles.backButton}
+          >
+            <Ionicons name="chevron-back" size={28} color="#aaa" />
+          </TouchableOpacity>
+        </View>
+        <View style={headerStyle.right} />
+      </View>
     </View>
   );
 }
@@ -286,12 +304,6 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: "#F8F9FA",
-  },
-  headerContainer: {
-    height: 50,
-    paddingHorizontal: 16,
-    justifyContent: "center",
-    zIndex: 10,
   },
   backButton: {
     padding: 8,

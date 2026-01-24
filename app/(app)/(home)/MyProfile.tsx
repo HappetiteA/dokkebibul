@@ -13,6 +13,7 @@ import { getFollowers, getFollowings } from "@/services/supabase";
 import { Ionicons } from "@expo/vector-icons";
 import { getAvatarSource } from "@/utils/avatarColor";
 import React from "react";
+import headerStyle from "@/components/style/commonStyle";
 
 export default function MyProfileScreen() {
   const { profile } = useAuth();
@@ -77,9 +78,7 @@ export default function MyProfileScreen() {
 
         {/* 4. Status Message Box (Large + Shadow) */}
         <View style={[styles.statusBox, styles.commonShadow]}>
-          <Text style={styles.statusText}>
-            {profile?.status_message ?? ""}
-          </Text>
+          <Text style={styles.statusText}>{profile?.status_message ?? ""}</Text>
         </View>
 
         {/* 5. Bottom Location Info */}
@@ -100,24 +99,25 @@ function MyProfileScreenHeader({ coins }: { coins: number }) {
   const router = useRouter();
 
   return (
-    <View style={styles.headerContainer}>
-      {/* Left: Back Button */}
-      <TouchableOpacity
-        style={styles.headerLeft}
-        onPress={() => router.canGoBack() && router.back()}
-      >
-        <Ionicons name="chevron-back" size={28} color="#aaa" />
-      </TouchableOpacity>
+    <View style={headerStyle.container}>
+      <View style={headerStyle.content}>
+        {/* Left: Back Button */}
+        <View style={headerStyle.left}>
+          <TouchableOpacity onPress={() => router.canGoBack() && router.back()}>
+            <Ionicons name="chevron-back" size={28} color="#aaa" />
+          </TouchableOpacity>
+        </View>
+        {/* Right: Cash Amount + Edit Button */}
+        <View style={[headerStyle.right, { alignItems: "center" }]}>
+          <Text style={styles.cashText}>${coins}</Text>
 
-      {/* Right: Cash Amount + Edit Button */}
-      <View style={styles.headerRight}>
-        <Text style={styles.cashText}>${coins}</Text>
-        <TouchableOpacity
-          style={[styles.editButtonCircle, styles.commonShadow]}
-          onPress={() => router.navigate("/(app)/(home)/EditProfile")}
-        >
-          <Ionicons name="pencil" size={16} color="#aaa" />
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.editButtonCircle, styles.commonShadow]}
+            onPress={() => router.navigate("/(app)/(home)/EditProfile")}
+          >
+            <Ionicons name="pencil" size={16} color="#aaa" />
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
@@ -236,20 +236,6 @@ const styles = StyleSheet.create({
   },
 
   // -- Header Styles --
-  headerContainer: {
-    height: 60,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 20,
-  },
-  headerLeft: {
-    padding: 5,
-  },
-  headerRight: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
   cashText: {
     fontSize: 18,
     fontWeight: "bold",

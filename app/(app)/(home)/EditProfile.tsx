@@ -17,6 +17,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
 import { getAvatarSource } from "@/utils/avatarColor";
+import headerStyle from "@/components/style/commonStyle";
 
 export default function ProfileEditScreen() {
   const router = useRouter();
@@ -33,7 +34,7 @@ export default function ProfileEditScreen() {
     if (!name) return;
     const { error } = await supabase
       .from("profiles")
-      .update({ "name": name, "status_message": statusMessage })
+      .update({ name: name, status_message: statusMessage })
       .eq("user_id", profile?.user_id);
     if (error) {
       console.error(error);
@@ -46,13 +47,18 @@ export default function ProfileEditScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       {/* Header */}
-      <View style={styles.headerContainer}>
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={styles.backButton}
-        >
-          <Ionicons name="chevron-back" size={28} color="#aaa" />
-        </TouchableOpacity>
+      <View style={headerStyle.container}>
+        <View style={headerStyle.content}>
+          <View style={headerStyle.left}>
+            <TouchableOpacity
+              onPress={() => router.back()}
+              style={styles.backButton}
+            >
+              <Ionicons name="chevron-back" size={28} color="#aaa" />
+            </TouchableOpacity>
+          </View>
+          <View style={headerStyle.right} />
+        </View>
       </View>
 
       {/* Keyboard Handling Wrapper */}
@@ -153,12 +159,6 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: "#F8F9FA",
-  },
-  headerContainer: {
-    height: 50,
-    paddingHorizontal: 16,
-    justifyContent: "center",
-    zIndex: 10,
   },
   backButton: {
     padding: 8,
