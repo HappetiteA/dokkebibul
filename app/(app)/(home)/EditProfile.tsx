@@ -50,10 +50,7 @@ export default function ProfileEditScreen() {
       <View style={headerStyle.container}>
         <View style={headerStyle.content}>
           <View style={headerStyle.left}>
-            <TouchableOpacity
-              onPress={() => router.back()}
-              style={styles.backButton}
-            >
+            <TouchableOpacity onPress={() => router.back()}>
               <Ionicons name="chevron-back" size={28} color="#aaa" />
             </TouchableOpacity>
           </View>
@@ -159,9 +156,6 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: "#F8F9FA",
-  },
-  backButton: {
-    padding: 8,
   },
   scrollContent: {
     alignItems: "center",
