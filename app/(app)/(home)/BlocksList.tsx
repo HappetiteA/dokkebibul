@@ -21,6 +21,8 @@ import {
 import useModal from "@/hooks/useModal";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { BGStyle } from "@/components/style/commonStyle";
+import { getAvatarSource } from "@/utils/avatarColor";
+import React from "react";
 
 export default function BlocksList() {
   const { profile } = useAuth();
@@ -76,7 +78,7 @@ export default function BlocksList() {
     <View style={styles.cardContainer}>
       <View style={styles.profileSection}>
         <Image
-          source={require("@/assets/from_figma/icon-wisp-list.png")}
+          source={getAvatarSource(item?.dst_color_code)}
           style={styles.avatar}
           resizeMode="contain"
         />

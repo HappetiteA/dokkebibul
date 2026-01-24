@@ -197,6 +197,7 @@ export default function Settings() {
                 onPress={async () => {
                   try {
                     await logout();
+                    await AsyncStorage.clear();
                   } catch (err: any) {
                     Alert.alert("Logout Error", err.message);
                   }

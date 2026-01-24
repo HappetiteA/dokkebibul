@@ -15,3 +15,8 @@ export type SelectBlocksRequest =
   Database["public"]["Functions"]["select_blocks"]["Args"];
 export type SelectBlocksResponse =
   Database["public"]["Functions"]["select_blocks"]["Returns"];
+
+export type SelectMyLocationRequest =
+  Database["public"]["Functions"]["select_my_location"]["Args"];
+export type SelectMyLocationResponse =
+  Database["public"]["Functions"]["select_my_location"]["Returns"];

@@ -1,5 +1,10 @@
 import { supabase } from "@/lib/supabase";
-import { SelectNearbyUsersResponse, SelectFollowingsResponse, SelectFollowersResponse, SelectBlocksResponse } from "@/types/orm.types";
+import { SelectNearbyUsersResponse, SelectFollowingsResponse, SelectFollowersResponse, SelectBlocksResponse, SelectMyLocationResponse } from "@/types/orm.types";
+
+type Coords = {
+  lat: number;
+  lon: number;
+};
 
 export async function getNearbyUsers(
   lat: number | undefined,
@@ -21,6 +26,12 @@ export async function getNearbyUsers(
     return [];
   }
   return data;
+}
+
+export async function getMyLocation() {
+  const { data, error } = await supabase.rpc("select_my_location");
+  if (error || !data) return null;
+  return data[0]
 }
 
 export async function getFollowings(): Promise<SelectFollowingsResponse> {

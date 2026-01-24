@@ -46,6 +46,11 @@ import React from "react";
 import { SelectNearbyUsersResponse } from "@/types/orm.types";
 import { getNearbyUsers } from "@/services/supabase";
 import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  fetchAddressFromCoords,
+  getOriginalAddress,
+  updateAddressCache,
+} from "@/services/geocode";
 
 export default function MainScreen() {
   const { profile } = useAuth();
@@ -215,23 +220,45 @@ export default function MainScreen() {
     }
   };
 
-  const onPlaceBtnPressed = async () => {
-    setPlaceBtnEnabled(false);
-    if (!myLocation || !profile) {
-      console.error("Failed to fetch current location");
+  const onPlaceIconPressed = async () => {
+    if (!myLocation || !profile) return;
+
+    const origAddrString = await getOriginalAddress();
+    
+    const newAddrString = await fetchAddressFromCoords(
+      myLocation.lat,
+      myLocation.lon,
+    );
+
+    const onPlaceBtnPressed = async () => {
+      setPlaceBtnEnabled(false);
+      if (!myLocation || !profile) {
+        console.error("Failed to fetch current location");
+        setPlaceBtnEnabled(true);
+        return;
+      }
+      const { error } = await supabase.from("locations").upsert({
+        user_id: profile.user_id,
+        location: `POINT(${myLocation.lon} ${myLocation.lat})`,
+      });
+      if (error) {
+        console.error(error);
+        setPlaceBtnEnabled(true);
+        return;
+      }
+      await updateAddressCache(newAddrString);
+      closePlaceModal();
       setPlaceBtnEnabled(true);
-      return;
-    }
-    const { error } = await supabase.from("locations").upsert({
-      user_id: profile.user_id,
-      location: `POINT(${myLocation.lon} ${myLocation.lat})`,
+    };
+
+    openPlaceModal({
+      onClose: closePlaceModal,
+      origAddr: origAddrString,
+      newAddr: newAddrString,
+      onPlaceBtnPressed: onPlaceBtnPressed,
+      placeBtnEnabled: placeBtnEnabled,
     });
-    if (error) {
-      console.error(error);
-    }
-    closePlaceModal();
-    setPlaceBtnEnabled(true);
-  };
+  }
 
   return (
     <SafeAreaView style={BGStyle.BG}>
@@ -309,15 +336,7 @@ export default function MainScreen() {
       >
         <ShadowWrap>
           <TouchableOpacity
-            onPress={() =>
-              openPlaceModal({
-                onClose: closePlaceModal,
-                origAddr: profile?.user_id,
-                newAddr: `POINT(${myLocation?.lon}, ${myLocation?.lat})`,
-                onPlaceBtnPressed: onPlaceBtnPressed,
-                placeBtnEnabled: placeBtnEnabled,
-              })
-            }
+            onPress={onPlaceIconPressed}
           >
             <PlaceIcon />
           </TouchableOpacity>
