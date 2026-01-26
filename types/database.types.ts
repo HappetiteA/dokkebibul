@@ -405,9 +405,14 @@ export type Database = {
           user_id: string
         }[]
       }
+      subtract_coin: { Args: { target_user_id: string }; Returns: undefined }
       update_conversations_chat_enabled: {
         Args: { new_chat_enabled: boolean; u1id: string; u2id: string }
         Returns: boolean
+      }
+      update_user_profile_and_location: {
+        Args: { p_is_public: boolean; p_name: string; p_status_message: string }
+        Returns: undefined
       }
     }
     Enums: {

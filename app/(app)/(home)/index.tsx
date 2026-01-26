@@ -47,10 +47,11 @@ import { SelectNearbyUsersResponse } from "@/types/orm.types";
 import { getNearbyUsers } from "@/services/supabase";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
-  fetchAddressFromCoords,
   getOriginalAddress,
   updateAddressCache,
 } from "@/services/geocode";
+import { reverseGeocode } from "@/services/supabase";
+import { GPSErrorModal } from "@/components/modals/GPSErrorModal";
 
 export default function MainScreen() {
   const { profile } = useAuth();
@@ -85,6 +86,9 @@ export default function MainScreen() {
 
   const { open: openPlaceModal, close: closePlaceModal } = useModal(PlaceModal);
   const [placeBtnEnabled, setPlaceBtnEnabled] = useState(true);
+
+  const { open: openGPSErrorModal, close: closeGPSErrorModal } =
+    useModal(GPSErrorModal);
 
   const [myLocation, setMyLocation] = useState<{
     lat: number;
@@ -221,11 +225,16 @@ export default function MainScreen() {
   };
 
   const onPlaceIconPressed = async () => {
-    if (!myLocation || !profile) return;
+    if (!myLocation || !profile) {
+      openGPSErrorModal({
+        onClose: closeGPSErrorModal,
+      });
+      return;
+    }
 
     const origAddrString = await getOriginalAddress();
     
-    const newAddrString = await fetchAddressFromCoords(
+    const newAddrString = await reverseGeocode(
       myLocation.lat,
       myLocation.lon,
     );
@@ -234,6 +243,10 @@ export default function MainScreen() {
       setPlaceBtnEnabled(false);
       if (!myLocation || !profile) {
         console.error("Failed to fetch current location");
+        closePlaceModal();
+        openGPSErrorModal({
+          onClose: closeGPSErrorModal,
+        });
         setPlaceBtnEnabled(true);
         return;
       }

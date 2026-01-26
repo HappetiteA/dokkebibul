@@ -31,6 +31,7 @@ export default function ProfileEditScreen() {
   );
   const [isPublic, setIsPublic] = useState(false);
   const [address, setAddress] = useState("위치 정보 불러오는 중...");
+  const [canToggleLocation, setCanToggleLocation] = useState(false);
 
   // Load initial location
   useEffect(() => {
@@ -39,6 +40,7 @@ export default function ProfileEditScreen() {
       if (data) {
         setAddress(data.addr);
         setIsPublic(data.is_public);
+        setCanToggleLocation(true);
       } else {
         setAddress("위치 정보 없음");
         setIsPublic(false);
@@ -49,17 +51,25 @@ export default function ProfileEditScreen() {
   const onSavePressed = async () => {
     if (!profile || !name) return;
 
-    const { error } = await supabase
+    const { error: locationError } = await supabase
       .from("locations")
       .update({ is_public: isPublic })
       .eq("user_id", profile.user_id);
 
-    const { error: error2 } = await supabase
+    if (locationError) {
+      console.error(locationError);
+      return;
+    }
+
+    const { error: profileError } = await supabase
       .from("profiles")
       .update({ name: name, status_message: statusMessage })
       .eq("user_id", profile.user_id);
 
-    if (error || error2) return;
+    if (profileError) {
+      console.error(profileError);
+      return;
+    }
 
     await refreshProfile();
     router.back();
@@ -159,16 +169,22 @@ export default function ProfileEditScreen() {
                 padding={3}
                 value={isPublic}
                 onValueChange={() => setIsPublic((prev) => !prev)}
-                onColor="#87CEFA"
+                onColor="#99D8EE"
                 offColor="#D7D7E2"
+                disabled={!canToggleLocation}
               />
             </View>
 
             {/* Save Button */}
             <View style={styles.footerContainer}>
               <TouchableOpacity
-                style={[styles.commonShadow, styles.saveButton]}
+                style={
+                  name
+                    ? [styles.commonShadow, styles.saveButton]
+                    : [styles.commonShadow, styles.saveButton, styles.saveButtonDisabled]
+                }
                 onPress={onSavePressed}
+                disabled={!name}
               >
                 <Text style={styles.saveButtonText}>저장</Text>
               </TouchableOpacity>
@@ -295,9 +311,12 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 50,
     borderRadius: 30,
-    backgroundColor: "#E4E4EA",
+    backgroundColor: "#99D8EE",
     borderWidth: 3,
     borderColor: "#FFFFFF",
+  },
+  saveButtonDisabled: {
+    backgroundColor: "#E4E4EA"
   },
   saveButtonText: {
     fontSize: 16,

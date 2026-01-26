@@ -30,8 +30,8 @@ export async function getNearbyUsers(
 
 export async function getMyLocation() {
   const { data, error } = await supabase.rpc("select_my_location");
-  if (error || !data) return null;
-  return data[0]
+  if (error || !data || data.length === 0) return null;
+  return data[0];
 }
 
 export async function getFollowings(): Promise<SelectFollowingsResponse> {
@@ -102,5 +102,19 @@ export const getProfileById = async (user_id: string) => {
     return null;
   } else {
     return data[0];
+  }
+};
+
+export const reverseGeocode = async (lat: number, lon: number) => {
+  try {
+    const { data, error } = await supabase.functions.invoke("reverse-geocode", {
+      body: { lat: lat, lon: lon },
+    });
+
+    if (error) throw error;
+
+    return data.address;
+  } catch (err) {
+    throw err;
   }
 };

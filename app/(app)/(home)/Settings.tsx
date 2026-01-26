@@ -1,4 +1,4 @@
-import { useRouter } from "expo-router";
+import { useRouter, useFocusEffect } from "expo-router";
 import DefaultHeader from "@/components/DefaultHeader";
 import { IGlobalSetting } from "@/components/interfaces";
 import { useAuthActions } from "@/hooks/useAuthActions";
@@ -71,7 +71,7 @@ export default function Settings() {
     }
   };
 
-  useEffect(() => {
+  useFocusEffect(() => {
     (async () => {
       const blockData = await getBlocks();
       setBlockNum(blockData?.length ?? 0);
@@ -121,7 +121,7 @@ export default function Settings() {
         console.error("Asyncstorage error", err.message);
       }
     })();
-  }, [profile]);
+  });
 
   return (
     <SafeAreaView style={BGStyle.BG}>
@@ -197,9 +197,14 @@ export default function Settings() {
                 onPress={async () => {
                   try {
                     await logout();
-                    await AsyncStorage.clear();
                   } catch (err: any) {
                     Alert.alert("Logout Error", err.message);
+                    return;
+                  }
+                  try {
+                    await AsyncStorage.clear();
+                  } catch (err: any) {
+                    console.warn("AsyncStorage clear failed", err.message);
                   }
                 }}
               >
