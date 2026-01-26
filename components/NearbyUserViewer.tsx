@@ -138,7 +138,7 @@ export default function NearbyUserViewer({
             >
               <Image
                 // Using random placeholder avatars based on ID to make them look different
-                source={getAvatarSource(user?.color_code)}
+                source={getAvatarSource(user?.user_color_code)}
                 style={styles.nearbyAvatarImage}
               />
               {/* Optional: Add name label below avatar if needed */}

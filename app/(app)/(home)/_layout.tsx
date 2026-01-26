@@ -10,6 +10,7 @@ export default function HomeLayout() {
         name="index"
         options={{
           title: "home",
+          gestureEnabled: false,
         }}
       />
       <Stack.Screen

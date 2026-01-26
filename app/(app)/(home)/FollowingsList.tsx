@@ -15,6 +15,8 @@ import { SelectFollowingsResponse } from "@/types/orm.types";
 import { useAuth } from "@/contexts/AuthContext";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { BGStyle } from "@/components/style/commonStyle";
+import { getAvatarSource } from "@/utils/avatarColor";
+import React from "react";
 
 export default function FollowingsList() {
   const router = useRouter();
@@ -56,7 +58,7 @@ export default function FollowingsList() {
         onPress={() => MoveToOtherProfile(item.dst_id)}
       >
         <Image
-          source={require("@/assets/from_figma/icon-wisp-list.png")}
+          source={getAvatarSource(item?.dst_color_code)}
           style={styles.avatar}
         />
         <Text style={styles.nameText}>{item.dst_name}</Text>

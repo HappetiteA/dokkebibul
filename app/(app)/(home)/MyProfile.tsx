@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Text,
   TouchableOpacity,
@@ -7,21 +7,34 @@ import {
   Image,
   SafeAreaView,
 } from "react-native";
-import { useRouter } from "expo-router";
+import { useRouter, useFocusEffect } from "expo-router";
 import { useAuth } from "@/contexts/AuthContext";
 import { getFollowers, getFollowings } from "@/services/supabase";
 import { Ionicons } from "@expo/vector-icons";
 import { getAvatarSource } from "@/utils/avatarColor";
+import { getAddressPublicity } from "@/services/geocode"; // Adjust path as needed
 import React from "react";
+
+// Define the type here if not imported
+type LocationInfo = {
+  addr: string;
+  is_public: boolean;
+};
 
 export default function MyProfileScreen() {
   const { profile } = useAuth();
   const router = useRouter();
+
+  // Stats State
   const [followingNumber, setFollowingNumber] = useState<number>(0);
   const [followerNumber, setFollowerNumber] = useState<number>(0);
 
-  useEffect(() => {
+  // Location State
+  const [locationInfo, setLocationInfo] = useState<LocationInfo | null>(null);
+
+  useFocusEffect(() => {
     async function start() {
+      // 1. Fetch Follow Stats
       (async () => {
         const followingData = await getFollowings();
         setFollowingNumber(followingData?.length ?? 0);
@@ -30,25 +43,58 @@ export default function MyProfileScreen() {
         const followerData = await getFollowers();
         setFollowerNumber(followerData?.length ?? 0);
       })();
+
+      // 2. Fetch Location Info
+      (async () => {
+        const data = await getAddressPublicity();
+        setLocationInfo(data);
+      })();
     }
     start();
-  }, []);
+  });
+
+  // --- Helper to determine Location UI Status ---
+  const getLocationUI = () => {
+    if (!locationInfo) {
+      return {
+        title: "도깨비불 공개",
+        dotColor: "#D7D7E2",
+        address: "위치 정보 없음",
+      };
+    }
+
+    if (locationInfo.is_public) {
+      return {
+        title: "도깨비불 공개",
+        dotColor: "#87CEFA",
+        address: locationInfo.addr,
+      };
+    } else {
+      return {
+        title: "도깨비불 공개",
+        dotColor: "#D7D7E2",
+        address: "비공개",
+      };
+    }
+  };
+
+  const { title, dotColor, address } = getLocationUI();
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <MyProfileScreenHeader coins={profile ? profile.coins : 0} />
 
       <View style={styles.scrollContent}>
-        {/* 1. Avatar Image (Transparent, No Border) */}
+        {/* 1. Avatar Image */}
         <View style={styles.avatarContainer}>
           <Image
-            source={getAvatarSource(profile?.color_code)} // Placeholder
+            source={getAvatarSource(profile?.color_code)}
             style={styles.avatarImage}
             resizeMode="contain"
           />
         </View>
 
-        {/* 2. Name Tag (Pill shape + Shadow) */}
+        {/* 2. Name Tag */}
         <View style={[styles.nameTag, styles.commonShadow]}>
           <Text style={styles.nameText}>{profile?.name ?? ""}</Text>
         </View>
@@ -63,7 +109,6 @@ export default function MyProfileScreen() {
             <Text style={styles.statLabel}>팔로잉</Text>
           </TouchableOpacity>
 
-          {/* Spacer between stats */}
           <View style={styles.statSpacer} />
 
           <TouchableOpacity
@@ -75,33 +120,31 @@ export default function MyProfileScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* 4. Status Message Box (Large + Shadow) */}
+        {/* 4. Status Message Box */}
         <View style={[styles.statusBox, styles.commonShadow]}>
-          <Text style={styles.statusText}>
-            {profile?.status_message ?? ""}
-          </Text>
+          <Text style={styles.statusText}>{profile?.status_message ?? ""}</Text>
         </View>
 
-        {/* 5. Bottom Location Info */}
+        {/* 5. Bottom Location Info (UPDATED) */}
         <View style={styles.locationContainer}>
           <View style={styles.locationTitleRow}>
-            <Text style={styles.locationTitle}>도깨비불 공개</Text>
-            <View style={styles.activeDot} />
+            <Text style={styles.locationTitle}>{title}</Text>
+            <View style={[styles.activeDot, { backgroundColor: dotColor }]} />
           </View>
-          <Text style={styles.addressText}>강남구 봉은사로 81길</Text>
+          <Text style={styles.addressText}>{address}</Text>
         </View>
       </View>
     </SafeAreaView>
   );
 }
 
-// --- Header Component ---
+// ... (Rest of Header Component and Styles remain unchanged) ...
+
 function MyProfileScreenHeader({ coins }: { coins: number }) {
   const router = useRouter();
 
   return (
     <View style={styles.headerContainer}>
-      {/* Left: Back Button */}
       <TouchableOpacity
         style={styles.headerLeft}
         onPress={() => router.canGoBack() && router.back()}
@@ -109,7 +152,6 @@ function MyProfileScreenHeader({ coins }: { coins: number }) {
         <Ionicons name="chevron-back" size={28} color="#aaa" />
       </TouchableOpacity>
 
-      {/* Right: Cash Amount + Edit Button */}
       <View style={styles.headerRight}>
         <Text style={styles.cashText}>${coins}</Text>
         <TouchableOpacity
@@ -123,39 +165,31 @@ function MyProfileScreenHeader({ coins }: { coins: number }) {
   );
 }
 
-// --- Styles ---
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#F8F9FA", // Light off-white background
+    backgroundColor: "#F8F9FA",
   },
   scrollContent: {
     alignItems: "center",
     paddingTop: 40,
     paddingBottom: 40,
   },
-
-  // -- Shared Shadow Style --
   commonShadow: {
     backgroundColor: "#ffffff",
     shadowColor: "#000",
-    shadowOffset: { width: 7, height: 7 }, // Offset to bottom-right
+    shadowOffset: { width: 7, height: 7 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
   },
-
-  // -- Avatar --
   avatarContainer: {
     marginBottom: 20,
-    // No background or border for the avatar container itself
   },
   avatarImage: {
     width: 120,
     height: 120,
   },
-
-  // -- Name Tag --
   nameTag: {
     paddingVertical: 10,
     paddingHorizontal: 30,
@@ -167,8 +201,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#333",
   },
-
-  // -- Stats (Following/Follower) --
   statsContainer: {
     flexDirection: "row",
     justifyContent: "center",
@@ -191,10 +223,8 @@ const styles = StyleSheet.create({
     color: "#888",
   },
   statSpacer: {
-    width: 40, // Space between the two stats
+    width: 40,
   },
-
-  // -- Status Box --
   statusBox: {
     width: "85%",
     borderRadius: 30,
@@ -208,8 +238,6 @@ const styles = StyleSheet.create({
     color: "#888",
     fontSize: 16,
   },
-
-  // -- Bottom Location Info --
   locationContainer: {
     alignItems: "center",
   },
@@ -221,21 +249,19 @@ const styles = StyleSheet.create({
   locationTitle: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#999", // Greyish title
+    color: "#999",
     marginRight: 6,
   },
   activeDot: {
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: "#87CEFA", // Light Blue Dot
+    // Background color is now handled dynamically in JSX
   },
   addressText: {
     fontSize: 16,
     color: "#aaa",
   },
-
-  // -- Header Styles --
   headerContainer: {
     height: 60,
     flexDirection: "row",
@@ -253,7 +279,7 @@ const styles = StyleSheet.create({
   cashText: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#C0C0C0", // Light grey for money
+    color: "#C0C0C0",
     marginRight: 12,
   },
   editButtonCircle: {
@@ -262,6 +288,5 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     alignItems: "center",
     justifyContent: "center",
-    // Common shadow applies here for the pencil button
   },
 });
