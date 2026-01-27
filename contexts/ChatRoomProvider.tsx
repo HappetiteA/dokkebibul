@@ -27,43 +27,48 @@ export function ChatRoomProvider({
 
   useEffect(() => {
     (async () => {
-      const storageData = await AsyncStorage.getItem(
-        `ChatRoomData:${conversation_id}`,
-      );
-      if (storageData == null) {
-        // load data from server and save at local storage
-        const chatRoomList = (await getChatRooms()) ?? [];
-        let chatRoom: ChatRoom | undefined = undefined;
-        for (let i = 0; i < chatRoomList.length; i++) {
-          if (chatRoomList[i].id == conversation_id) {
-            chatRoom = chatRoomList[i];
+      try {
+        const storageData = await AsyncStorage.getItem(
+          `ChatRoomData:${conversation_id}`,
+        );
+        if (storageData == null) {
+          // load data from server and save at local storage
+          const chatRoomList = (await getChatRooms()) ?? [];
+          let chatRoom: ChatRoom | undefined = undefined;
+          for (let i = 0; i < chatRoomList.length; i++) {
+            if (chatRoomList[i].id == conversation_id) {
+              chatRoom = chatRoomList[i];
+            }
           }
+
+          if (!chatRoom) {
+            console.log("this chat room does not exists");
+            return;
+          }
+
+          try {
+            await AsyncStorage.setItem(
+              `ChatRoomData:${conversation_id}`,
+              JSON.stringify(chatRoom),
+            );
+            setChatRoomData(toChatRoomVM(chatRoom, profile?.user_id));
+            initRef.current = true;
+          } catch (err: any) {
+            Alert.alert("Asyncstorage Error", err.message);
+          }
+          return;
         }
 
-        if (!chatRoom) {
-          console.log("this chat room does not exists");
-        }
-
+        // can use asyncstorage data
         try {
-          await AsyncStorage.setItem(
-            `ChatRoomData:${conversation_id}`,
-            JSON.stringify(chatRoom),
-          );
+          let chatRoom = JSON.parse(storageData) as ChatRoom;
           setChatRoomData(toChatRoomVM(chatRoom, profile?.user_id));
           initRef.current = true;
         } catch (err: any) {
-          Alert.alert("Asyncstorage Error", err.message);
+          Alert.alert("ChatRoomData parsing error", err.message);
         }
-        return;
-      }
-
-      // can use asyncstorage data
-      try {
-        let chatRoom = JSON.parse(storageData) as ChatRoom;
-        setChatRoomData(toChatRoomVM(chatRoom, profile?.user_id));
-        initRef.current = true;
-      } catch (err: any) {
-        Alert.alert("ChatRoomData parsing error", err.message);
+      } catch (e: any) {
+        Alert.alert("ChatRoom init error", e.message ?? String(e));
       }
     })();
   }, [conversation_id]);
@@ -82,7 +87,7 @@ export function ChatRoomProvider({
         console.error("AsyncStorage Error : cannot save chat room data");
       }
     })();
-  }, [chatRoomData]);
+  }, [chatRoomData, conversation_id]);
 
   const setAIenabled = (value: boolean) => {
     if (!chatRoomData) {
