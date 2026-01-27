@@ -9,7 +9,11 @@ import {
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { getProfileById, getFollowings } from "@/services/supabase";
+import {
+  getProfileById,
+  getFollowings,
+  getConversationIdbyUserId,
+} from "@/services/supabase";
 import useModal from "@/hooks/useModal";
 import { useAuth } from "@/contexts/AuthContext";
 import { Profile } from "@/types/model.types";
@@ -173,9 +177,14 @@ export default function OtherProfileScreen() {
       u2id: user_id,
       new_chat_enabled: true,
     });
+
+    const conversation_id = await getConversationIdbyUserId(
+      profile.user_id,
+      user_id,
+    );
+    if (!conversation_id) return;
     router.navigate({
-      pathname: "/chat/ChatScreen",
-      params: { user1_id: profile.user_id, user2_id: user_id },
+      pathname: `/(app)/(home)/chat/${conversation_id}/ChatScreen`,
     });
   };
 

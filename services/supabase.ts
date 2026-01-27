@@ -102,17 +102,15 @@ export const getProfileById = async (user_id: string) => {
 export const getConversationIdbyUserId = async (id1: string, id2: string) => {
   const user1_id = id1 < id2 ? id1 : id2;
   const user2_id = id1 > id2 ? id1 : id2;
-  (async () => {
-    const { data, error } = await supabase
-      .from("conversations")
-      .select("id")
-      .eq("user1_id", user1_id)
-      .eq("user2_id", user2_id)
-      .single();
-    if (error || !data) {
-      console.log("no conversation id found");
-      return undefined;
-    }
-    return data.id;
-  })();
+  const { data, error } = await supabase
+    .from("conversations")
+    .select("id")
+    .eq("user1_id", user1_id)
+    .eq("user2_id", user2_id)
+    .single();
+  if (error || !data) {
+    console.log("no conversation id found");
+    return undefined;
+  }
+  return data.id;
 };
