@@ -129,6 +129,20 @@ export function ChatRoomProvider({
   };
 
   const setNotiEnabled = (value: boolean) => {
+    if (!chatRoomData) {
+      console.error(`ChatRoomData for id ${conversation_id} does not exists`);
+      return;
+    }
+    snapshotRef.current = chatRoomData;
+
+    const toServer = {
+      ...chatRoomData,
+      me: {
+        ...chatRoomData.me,
+        noti_enabled: value,
+      },
+    };
+
     setChatRoomData((c) => {
       if (!c) return c;
 
@@ -140,9 +154,39 @@ export function ChatRoomProvider({
         },
       };
     });
+
+    try {
+      patchChatRoomOnServer(toServer);
+    } catch (e: any) {
+      const status = e?.status;
+      if (typeof status === "number" && status >= 400 && status < 500) {
+        const snap = snapshotRef.current;
+        if (snap) setChatRoomData(snap);
+      } else {
+        // 네트워크/5xx는 롤백 안 하고 두는 쪽이 일반적
+        // (원하면 여기서 Alert 정도만)
+        console.warn(
+          "Warning : network error occured when patching conversation setting",
+        );
+      }
+    }
   };
 
   const setChatEnabled = (value: boolean) => {
+    if (!chatRoomData) {
+      console.error(`ChatRoomData for id ${conversation_id} does not exists`);
+      return;
+    }
+    snapshotRef.current = chatRoomData;
+
+    const toServer = {
+      ...chatRoomData,
+      me: {
+        ...chatRoomData.me,
+        chat_enabled: value,
+      },
+    };
+
     setChatRoomData((c) => {
       if (!c) return c;
 
@@ -154,6 +198,22 @@ export function ChatRoomProvider({
         },
       };
     });
+
+    try {
+      patchChatRoomOnServer(toServer);
+    } catch (e: any) {
+      const status = e?.status;
+      if (typeof status === "number" && status >= 400 && status < 500) {
+        const snap = snapshotRef.current;
+        if (snap) setChatRoomData(snap);
+      } else {
+        // 네트워크/5xx는 롤백 안 하고 두는 쪽이 일반적
+        // (원하면 여기서 Alert 정도만)
+        console.warn(
+          "Warning : network error occured when patching conversation setting",
+        );
+      }
+    }
   };
 
   const patchChatRoomOnServer = async (newChatRoomData: ChatRoomVM) => {
