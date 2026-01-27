@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -18,28 +18,60 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
 import { getAvatarSource } from "@/utils/avatarColor";
 import headerStyle from "@/components/style/commonStyle";
+import { getAddressPublicity } from "@/services/geocode";
+import { NeumorphicSwitch } from "@/components/style/Switch";
 
 export default function ProfileEditScreen() {
   const router = useRouter();
   const { profile, refreshProfile } = useAuth();
 
-  // State for inputs
+  // State
   const [name, setName] = useState(profile?.name ?? "");
   const [statusMessage, setStatusMessage] = useState(
     profile?.status_message ?? "",
   );
+  const [isPublic, setIsPublic] = useState(false);
+  const [address, setAddress] = useState("위치 정보 불러오는 중...");
+  const [canToggleLocation, setCanToggleLocation] = useState(false);
+
+  // Load initial location
+  useEffect(() => {
+    (async () => {
+      const data = await getAddressPublicity();
+      if (data) {
+        setAddress(data.addr);
+        setIsPublic(data.is_public);
+        setCanToggleLocation(true);
+      } else {
+        setAddress("위치 정보 없음");
+        setIsPublic(false);
+      }
+    })();
+  }, []);
 
   const onSavePressed = async () => {
-    if (!profile) return;
-    if (!name) return;
-    const { error } = await supabase
+    if (!profile || !name) return;
+
+    const { error: locationError } = await supabase
+      .from("locations")
+      .update({ is_public: isPublic })
+      .eq("user_id", profile.user_id);
+
+    if (locationError) {
+      console.error(locationError);
+      return;
+    }
+
+    const { error: profileError } = await supabase
       .from("profiles")
       .update({ name: name, status_message: statusMessage })
-      .eq("user_id", profile?.user_id);
-    if (error) {
-      console.error(error);
+      .eq("user_id", profile.user_id);
+
+    if (profileError) {
+      console.error(profileError);
+      return;
     }
-    console.log("Saved:", name, statusMessage);
+
     await refreshProfile();
     router.back();
   };
@@ -58,14 +90,13 @@ export default function ProfileEditScreen() {
         </View>
       </View>
 
-      {/* Keyboard Handling Wrapper */}
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
       >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View style={styles.scrollContent}>
-            {/* Avatar Section */}
+            {/* Avatar */}
             <View style={styles.avatarContainer}>
               <Image
                 source={getAvatarSource(profile?.color_code)}
@@ -74,14 +105,11 @@ export default function ProfileEditScreen() {
               />
             </View>
 
-            {/* --- NAME INPUT ROW --- */}
+            {/* Name Input */}
             <View style={styles.inputRow}>
-              {/* Label */}
               <View style={[styles.labelContainer, styles.commonShadow]}>
                 <Text style={styles.labelText}>이름</Text>
               </View>
-
-              {/* Input Field */}
               <View style={[styles.inputContainer, styles.commonShadow]}>
                 <TextInput
                   style={styles.textInput}
@@ -92,21 +120,17 @@ export default function ProfileEditScreen() {
                 />
                 {name.length > 0 && (
                   <TouchableOpacity onPress={() => setName("")}>
-                    {/* CHANGED: Simple gray cross icon */}
                     <Ionicons name="close" size={18} color="#aaa" />
                   </TouchableOpacity>
                 )}
               </View>
             </View>
 
-            {/* --- BIO INPUT ROW (Multiline) --- */}
+            {/* Bio Input */}
             <View style={styles.inputRow}>
-              {/* Label */}
               <View style={[styles.labelContainer, styles.commonShadow]}>
                 <Text style={styles.labelText}>소개</Text>
               </View>
-
-              {/* Input Field */}
               <View
                 style={[
                   styles.inputContainer,
@@ -121,26 +145,54 @@ export default function ProfileEditScreen() {
                   placeholder="자기소개를 입력하세요"
                   placeholderTextColor="#ccc"
                   multiline
-                  textAlignVertical="top" // Android fix for multiline
+                  textAlignVertical="top"
                 />
                 {statusMessage.length > 0 && (
                   <TouchableOpacity
                     onPress={() => setStatusMessage("")}
                     style={{ marginTop: 4 }}
                   >
-                    {/* CHANGED: Simple gray cross icon */}
                     <Ionicons name="close" size={18} color="#aaa" />
                   </TouchableOpacity>
                 )}
               </View>
             </View>
 
-            {/* --- SAVE BUTTON --- */}
+            {/* --- LOCATION TOGGLE ROW (FIXED) --- */}
+            <View style={styles.locationRow}>
+              {/* Text Container: Uses flex: 1 to push against the switch but wrap text */}
+              <View style={styles.locationTextContainer}>
+                <Text style={styles.locationTitle}>도깨비불 공개</Text>
+                <Text style={styles.locationAddress}>{address}</Text>
+              </View>
+
+              {/* Switch: Remains fixed size on the right */}
+              <NeumorphicSwitch
+                width={54}
+                height={30}
+                padding={3}
+                value={isPublic}
+                onValueChange={() => setIsPublic((prev) => !prev)}
+                onColor="#99D8EE"
+                offColor="#D7D7E2"
+                disabled={!canToggleLocation}
+              />
+            </View>
+
+            {/* Save Button */}
             <View style={styles.footerContainer}>
               <TouchableOpacity
-                // CHANGED: Removed commonShadow, applied specific styles
-                style={[styles.commonShadow, styles.saveButton]}
+                style={
+                  name
+                    ? [styles.commonShadow, styles.saveButton]
+                    : [
+                        styles.commonShadow,
+                        styles.saveButton,
+                        styles.saveButtonDisabled,
+                      ]
+                }
                 onPress={onSavePressed}
+                disabled={!name}
               >
                 <Text style={styles.saveButtonText}>저장</Text>
               </TouchableOpacity>
@@ -162,8 +214,6 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     paddingBottom: 40,
   },
-
-  // --- REUSABLE SHADOW (For Inputs only now) ---
   commonShadow: {
     backgroundColor: "#ffffff",
     shadowColor: "#000",
@@ -172,8 +222,6 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 3,
   },
-
-  // Avatar
   avatarContainer: {
     marginBottom: 40,
     marginTop: 20,
@@ -182,16 +230,12 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
   },
-
-  // Input Rows
   inputRow: {
     flexDirection: "row",
     width: "85%",
     marginBottom: 20,
     alignItems: "flex-start",
   },
-
-  // Label Styling (Left side)
   labelContainer: {
     paddingVertical: 14,
     paddingHorizontal: 16,
@@ -206,8 +250,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#333",
   },
-
-  // Input Box Styling (Right side)
   inputContainer: {
     flex: 1,
     flexDirection: "row",
@@ -221,10 +263,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#333",
     marginRight: 8,
-    paddingVertical: 0, // Fix alignment issues on Android
+    paddingVertical: 0,
   },
-
-  // Specific styles for Bio (Multiline)
   bioInputContainer: {
     height: 100,
     alignItems: "flex-start",
@@ -235,10 +275,34 @@ const styles = StyleSheet.create({
     textAlignVertical: "top",
   },
 
-  // Footer / Save Button
+  // --- UPDATED LOCATION STYLES ---
+  locationRow: {
+    width: "85%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center", // Keeps switch vertically centered with the text block
+    marginTop: 20,
+    marginBottom: 10,
+    paddingHorizontal: 4,
+  },
+  locationTextContainer: {
+    flex: 1, // Takes all width except what the Switch needs
+    marginRight: 20, // Adds gap so text doesn't touch the switch
+  },
+  locationTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#999",
+    marginBottom: 4,
+  },
+  locationAddress: {
+    fontSize: 14,
+    color: "#aaa",
+    // No explicit width needed here; 'flex: 1' on parent handles the wrapping
+  },
+
   footerContainer: {
-    // CHANGED: Increased margin to push it further down
-    marginTop: 120,
+    marginTop: 80,
     width: "100%",
     alignItems: "center",
   },
@@ -246,14 +310,16 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 50,
     borderRadius: 30,
-    // CHANGED: Gray background with thick white border
-    backgroundColor: "#E4E4EA",
+    backgroundColor: "#99D8EE",
     borderWidth: 3,
     borderColor: "#FFFFFF",
+  },
+  saveButtonDisabled: {
+    backgroundColor: "#E4E4EA",
   },
   saveButtonText: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#555", // Slightly darker gray text
+    color: "#555",
   },
 });

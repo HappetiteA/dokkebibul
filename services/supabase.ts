@@ -4,7 +4,13 @@ import {
   SelectFollowingsResponse,
   SelectFollowersResponse,
   SelectBlocksResponse,
+  SelectMyLocationResponse,
 } from "@/types/orm.types";
+
+type Coords = {
+  lat: number;
+  lon: number;
+};
 
 export async function getNearbyUsers(
   lat: number | undefined,
@@ -26,6 +32,12 @@ export async function getNearbyUsers(
     return [];
   }
   return data;
+}
+
+export async function getMyLocation() {
+  const { data, error } = await supabase.rpc("select_my_location");
+  if (error || !data || data.length === 0) return null;
+  return data[0];
 }
 
 export async function getFollowings(): Promise<SelectFollowingsResponse> {
@@ -113,4 +125,18 @@ export const getConversationIdbyUserId = async (id1: string, id2: string) => {
     return undefined;
   }
   return data.id;
+};
+
+export const reverseGeocode = async (lat: number, lon: number) => {
+  try {
+    const { data, error } = await supabase.functions.invoke("reverse-geocode", {
+      body: { lat: lat, lon: lon },
+    });
+
+    if (error) throw error;
+
+    return data.address;
+  } catch (err) {
+    throw err;
+  }
 };

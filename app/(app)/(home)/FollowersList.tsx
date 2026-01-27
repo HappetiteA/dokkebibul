@@ -1,7 +1,7 @@
 import DefaultHeader from "@/components/DefaultHeader";
 import { getConversationIdbyUserId, getFollowers } from "@/services/supabase";
-import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useRouter, useFocusEffect } from "expo-router";
+import { useCallback, useState } from "react";
 import {
   Text,
   TouchableOpacity,
@@ -16,28 +16,39 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { BGStyle } from "@/components/style/commonStyle";
+import { getAvatarSource } from "@/utils/avatarColor";
+import React from "react";
 
 export default function FollowersList() {
   const router = useRouter();
   const { profile } = useAuth(); // To get current user's ID
   const [followers, setFollowers] = useState<SelectFollowersResponse>([]);
 
-  useEffect(() => {
-    (async () => {
-      const followData = await getFollowers();
-      if (!followData) return;
+  useFocusEffect(
+    useCallback(() => {
+      let isActive = true; // Flag to prevent setting state if screen unmounts during fetch
 
-      // SORTING LOGIC:
-      // Put "is_two_way: false" (Not followed back) at the top
-      // 0 means no change, -1 means 'a' comes first, 1 means 'b' comes first
-      const sortedData = [...followData].sort((a, b) => {
-        if (a.is_two_way === b.is_two_way) return 0;
-        return a.is_two_way ? 1 : -1; // false comes before true
-      });
+      const fetchFollowers = async () => {
+        const followData = await getFollowers();
+        if (!followData || !isActive) return;
 
-      setFollowers(sortedData);
-    })();
-  }, []);
+        // SORTING LOGIC
+        const sortedData = [...followData].sort((a, b) => {
+          if (a.is_two_way === b.is_two_way) return 0;
+          return a.is_two_way ? 1 : -1;
+        });
+
+        setFollowers(sortedData);
+      };
+
+      fetchFollowers();
+
+      // Cleanup function
+      return () => {
+        isActive = false;
+      };
+    }, []), // Dependency array is empty so callback is stable
+  );
 
   const MoveToOtherProfile = (user_id: string) => {
     router.navigate({
@@ -103,7 +114,7 @@ export default function FollowersList() {
         onPress={() => MoveToOtherProfile(item.src_id)}
       >
         <Image
-          source={require("@/assets/from_figma/icon-wisp-list.png")}
+          source={getAvatarSource(item?.src_color_code)}
           style={styles.avatar}
           resizeMode="contain"
         />

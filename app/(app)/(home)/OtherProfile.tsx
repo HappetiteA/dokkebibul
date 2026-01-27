@@ -6,7 +6,8 @@ import {
   Image,
   SafeAreaView,
 } from "react-native";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter, useNavigation } from "expo-router";
+import { CommonActions } from "@react-navigation/native";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import {
@@ -33,6 +34,7 @@ import headerStyle from "@/components/style/commonStyle";
 
 export default function OtherProfileScreen() {
   const router = useRouter();
+  const navigation = useNavigation();
   const { profile } = useAuth();
   const params = useLocalSearchParams();
   const user_id = params.user_id as string;
@@ -131,7 +133,17 @@ export default function OtherProfileScreen() {
     } else {
       openBlockSuccessModal({
         onClose: () => {
-          router.replace("/(app)/(home)");
+          navigation.dispatch(
+            CommonActions.reset({
+              index: 0,
+              routes: [
+                {
+                  name: "index",
+                  params: { refreshTimeStamp: Date.now() },
+                },
+              ],
+            }),
+          );
           closeBlockSuccessModal();
         },
         name: userInfo?.name,
