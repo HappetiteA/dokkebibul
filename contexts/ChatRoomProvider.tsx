@@ -111,9 +111,7 @@ export function ChatRoomProvider({
       };
     });
 
-    try {
-      patchChatRoomOnServer(toServer);
-    } catch (e: any) {
+    patchChatRoomOnServer(toServer).catch((e: any) => {
       const status = e?.status;
       if (typeof status === "number" && status >= 400 && status < 500) {
         const snap = snapshotRef.current;
@@ -125,7 +123,7 @@ export function ChatRoomProvider({
           "Warning : network error occured when patching conversation setting",
         );
       }
-    }
+    });
   };
 
   const setNotiEnabled = (value: boolean) => {
@@ -155,9 +153,7 @@ export function ChatRoomProvider({
       };
     });
 
-    try {
-      patchChatRoomOnServer(toServer);
-    } catch (e: any) {
+    patchChatRoomOnServer(toServer).catch((e: any) => {
       const status = e?.status;
       if (typeof status === "number" && status >= 400 && status < 500) {
         const snap = snapshotRef.current;
@@ -169,7 +165,7 @@ export function ChatRoomProvider({
           "Warning : network error occured when patching conversation setting",
         );
       }
-    }
+    });
   };
 
   const setChatEnabled = (value: boolean) => {
@@ -199,9 +195,7 @@ export function ChatRoomProvider({
       };
     });
 
-    try {
-      patchChatRoomOnServer(toServer);
-    } catch (e: any) {
+    patchChatRoomOnServer(toServer).catch((e: any) => {
       const status = e?.status;
       if (typeof status === "number" && status >= 400 && status < 500) {
         const snap = snapshotRef.current;
@@ -213,7 +207,7 @@ export function ChatRoomProvider({
           "Warning : network error occured when patching conversation setting",
         );
       }
-    }
+    });
   };
 
   const patchChatRoomOnServer = async (newChatRoomData: ChatRoomVM) => {

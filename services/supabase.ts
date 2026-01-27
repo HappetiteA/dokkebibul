@@ -119,8 +119,12 @@ export const getConversationIdbyUserId = async (id1: string, id2: string) => {
     .select("id")
     .eq("user1_id", user1_id)
     .eq("user2_id", user2_id)
-    .single();
-  if (error || !data) {
+    .maybeSingle();
+  if (error) {
+    console.error("Failed to fetch conversation id:", error);
+    return undefined;
+  }
+  if (!data) {
     console.log("no conversation id found");
     return undefined;
   }
