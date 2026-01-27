@@ -1,5 +1,5 @@
 import DefaultHeader from "@/components/DefaultHeader";
-import { getFollowings } from "@/services/supabase";
+import { getConversationIdbyUserId, getFollowings } from "@/services/supabase";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
@@ -37,11 +37,15 @@ export default function FollowingsList() {
     });
   };
 
-  const handleChat = (user_id: string) => {
+  const handleChat = async (user_id: string) => {
     if (profile) {
+      const conversation_id = await getConversationIdbyUserId(
+        profile.user_id,
+        user_id,
+      );
+      if (!conversation_id) return;
       router.navigate({
-        pathname: "/(app)/(home)/chat/ChatScreen",
-        params: { user1_id: profile?.user_id, user2_id: user_id },
+        pathname: `/(app)/(home)/chat/${conversation_id}/ChatScreen`,
       });
     } else {
       console.error("Cannot move to chat screen: User not authenticated");

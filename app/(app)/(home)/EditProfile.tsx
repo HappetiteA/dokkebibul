@@ -17,6 +17,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
 import { getAvatarSource } from "@/utils/avatarColor";
+import headerStyle from "@/components/style/commonStyle";
 import { getAddressPublicity } from "@/services/geocode";
 import { NeumorphicSwitch } from "@/components/style/Switch";
 
@@ -77,13 +78,16 @@ export default function ProfileEditScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.headerContainer}>
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={styles.backButton}
-        >
-          <Ionicons name="chevron-back" size={28} color="#aaa" />
-        </TouchableOpacity>
+      {/* Header */}
+      <View style={headerStyle.container}>
+        <View style={headerStyle.content}>
+          <View style={headerStyle.left}>
+            <TouchableOpacity onPress={() => router.back()}>
+              <Ionicons name="chevron-back" size={28} color="#aaa" />
+            </TouchableOpacity>
+          </View>
+          <View style={headerStyle.right} />
+        </View>
       </View>
 
       <KeyboardAvoidingView
@@ -181,7 +185,11 @@ export default function ProfileEditScreen() {
                 style={
                   name
                     ? [styles.commonShadow, styles.saveButton]
-                    : [styles.commonShadow, styles.saveButton, styles.saveButtonDisabled]
+                    : [
+                        styles.commonShadow,
+                        styles.saveButton,
+                        styles.saveButtonDisabled,
+                      ]
                 }
                 onPress={onSavePressed}
                 disabled={!name}
@@ -200,15 +208,6 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: "#F8F9FA",
-  },
-  headerContainer: {
-    height: 50,
-    paddingHorizontal: 16,
-    justifyContent: "center",
-    zIndex: 10,
-  },
-  backButton: {
-    padding: 8,
   },
   scrollContent: {
     alignItems: "center",
@@ -316,7 +315,7 @@ const styles = StyleSheet.create({
     borderColor: "#FFFFFF",
   },
   saveButtonDisabled: {
-    backgroundColor: "#E4E4EA"
+    backgroundColor: "#E4E4EA",
   },
   saveButtonText: {
     fontSize: 16,

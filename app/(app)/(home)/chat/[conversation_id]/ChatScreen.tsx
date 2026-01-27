@@ -2,11 +2,15 @@ import ChatHistory from "@/components/ChatHistory";
 import { useAuth } from "@/contexts/AuthContext";
 import { ChatRoom, Message } from "@/types/model.types";
 import { supabase } from "@/lib/supabase";
-import { ChatRoomDatas } from "@/components/interfaces";
-import { BackIcon, SendIcon, SettingsIcon } from "@/components/style/Icons";
+import { ChatRoomVM, toChatRoomVM } from "@/components/interfaces";
+import {
+  BackIcon,
+  LockIcon,
+  SendIcon,
+  SettingsIcon,
+} from "@/components/style/Icons";
 import headerStyle, { BGStyle } from "@/components/style/commonStyle";
 import ShadowWrap from "@/components/style/Shadow";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   Link,
   useLocalSearchParams,
@@ -26,73 +30,21 @@ import {
   View,
 } from "react-native";
 import { NeumorphicSwitch } from "@/components/style/Switch";
-import { getChatRooms } from "@/services/supabase";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useChatRoom } from "@/contexts/ChatRoomContext";
 
 type Chat = Omit<Message, "conversation_id">;
-type ChatRoomData = Omit<ChatRoom, "id">;
+
 export default function ChatScreen() {
   const navigation = useNavigation();
 
   const params = useLocalSearchParams();
+  const conversation_id = params.conversation_id as string;
 
   const { profile } = useAuth();
-  const [conversation_id, setConversationId] = useState<string>();
+  const { chatRoomData, setAIenabled } = useChatRoom();
   const [chat, setChat] = useState<Array<Chat>>([]);
   const [text, setText] = useState<string>("");
-  const [AIenabled, setAIenabled] = useState<boolean>(false);
-  const [chatRoomData, setChatRoomData] = useState<ChatRoomData>();
-
-  const updateSetting = async (value: ChatRoomData) => {
-    if (profile == null || profile.user_id == null) {
-      console.warn("Cannot update AI setting: user not authenticated");
-      return true;
-    }
-
-    if (conversation_id == null) {
-      console.warn("Cannot update AI setting: conversation doesn't exist");
-      return true;
-    }
-
-    const { last_msg, last_msg_created_at, user1_name, user2_name, ...rest } =
-      value;
-    const newData = {
-      id: conversation_id,
-      ...rest,
-    };
-
-    const { error } = await supabase
-      .from("conversations")
-      .update(newData)
-      .eq("id", conversation_id);
-
-    if (error) {
-      console.log(error);
-      return true;
-    }
-
-    try {
-      const storageData = await AsyncStorage.getItem("ChatRoomData");
-      if (storageData == null) {
-        console.warn("ChatRoomData not found, cannot update setting");
-        return true;
-      }
-
-      const ChatRoomDataFromStorage = new Map<string, ChatRoomData>(
-        Object.entries(JSON.parse(storageData)),
-      );
-      ChatRoomDataFromStorage.set(conversation_id, value);
-      const jsonStr = JSON.stringify(
-        Object.fromEntries(ChatRoomDataFromStorage),
-      );
-      await AsyncStorage.setItem("ChatRoomData", jsonStr);
-      setChatRoomData(value);
-      return false;
-    } catch (err: any) {
-      Alert.alert("Error while updating setting", err.message);
-      return true;
-    }
-  };
 
   const onChangeText = (inputText: string) => {
     setText(inputText);
@@ -126,31 +78,8 @@ export default function ChatScreen() {
   };
 
   useEffect(() => {
-    if (params.id) {
-      setConversationId(params.id as string);
-    } else {
-      let id1 = params.user1_id as string;
-      let id2 = params.user2_id as string;
-      const user1_id = id1 < id2 ? id1 : id2;
-      const user2_id = id1 > id2 ? id1 : id2;
-      (async () => {
-        const { data, error } = await supabase
-          .from("conversations")
-          .select("id")
-          .eq("user1_id", user1_id)
-          .eq("user2_id", user2_id)
-          .single();
-        if (error || !data) {
-          console.log("no conversation id found");
-          return;
-        }
-        setConversationId(data.id);
-      })();
-    }
-  }, [profile?.user_id]);
-
-  useEffect(() => {
     if (!conversation_id) return;
+    if (!profile?.user_id) return;
 
     // get messages
     (async () => {
@@ -203,61 +132,12 @@ export default function ChatScreen() {
       )
       .subscribe();
 
-    //get ChatRoomData from asyncstorage
-    (async () => {
-      const storageData = await AsyncStorage.getItem("ChatRoomData");
-      if (storageData == null) {
-        // load data from server and save at local storage
-        const chatRoomData = (await getChatRooms()) ?? [];
-        const map: ChatRoomDatas = new Map();
-        chatRoomData.forEach((value) => {
-          const { id, ...rest } = value;
-          map.set(id, rest);
-        });
-
-        try {
-          const jsonStr = JSON.stringify(Object.fromEntries(map));
-          await AsyncStorage.setItem("ChatRoomData", jsonStr);
-
-          const data = map.get(conversation_id);
-          setChatRoomData(data);
-          if (profile?.user_id == data?.user1_id) {
-            setAIenabled(data?.user1_ai_enabled ?? false);
-          } else if (profile?.user_id == data?.user2_id) {
-            setAIenabled(data?.user2_ai_enabled ?? false);
-          } else {
-            setAIenabled(false);
-          }
-        } catch (err: any) {
-          Alert.alert("Asyncstorage Error", err.message);
-        }
-        return;
-      }
-
-      // can use asyncstorage data
-      try {
-        const ChatRoomDataFromStorage = new Map<string, ChatRoomData>(
-          Object.entries(JSON.parse(storageData)),
-        );
-        const data = ChatRoomDataFromStorage.get(conversation_id);
-
-        setChatRoomData(data);
-        if (profile?.user_id == data?.user1_id) {
-          setAIenabled(data?.user1_ai_enabled ?? false);
-        } else if (profile?.user_id == data?.user2_id) {
-          setAIenabled(data?.user2_ai_enabled ?? false);
-        } else {
-          setAIenabled(false);
-        }
-      } catch (err: any) {
-        Alert.alert("ChatRoomData parsing error", err.message);
-      }
-    })();
-
     return () => {
       channel.unsubscribe();
     };
-  }, [conversation_id]);
+  }, [profile?.user_id, conversation_id]);
+
+  // Change Asyncstorage & Server DB when chatRoomData modified
 
   return (
     <SafeAreaView style={BGStyle.BG}>
@@ -265,38 +145,41 @@ export default function ChatScreen() {
         <>
           <ChatScreenHeader
             conversation_id={conversation_id}
-            user_id={profile.user_id}
+            other_name={chatRoomData.other.name}
+            AIenabled={chatRoomData.me.ai_enabled}
             setText={setText}
-            AIenabled={AIenabled}
             setAIenabled={setAIenabled}
-            chatRoomData={chatRoomData}
-            updateSetting={updateSetting}
           ></ChatScreenHeader>
           <KeyboardAvoidingView
             style={{ flex: 1 }}
-            behavior={Platform.OS == "ios" ? "padding" : undefined}
+            behavior={Platform.OS == "ios" ? "padding" : "height"}
           >
             <View style={{ flex: 1, backgroundColor: "#F8F8FA" }}>
               <ChatHistory
                 chat={chat}
-                user1_id={chatRoomData.user1_id}
-                user1_name={chatRoomData.user1_name}
-                user2_id={chatRoomData.user2_id}
-                user2_name={chatRoomData.user2_name}
+                user1_id={chatRoomData.me.user_id}
+                user1_name={chatRoomData.me.name}
+                user2_id={chatRoomData.other.user_id}
+                user2_name={chatRoomData.other.name}
               />
               <ShadowWrap>
                 <View style={styles.textInputView}>
                   <TextInput
-                    editable={!AIenabled}
+                    editable={!chatRoomData.me.ai_enabled}
                     value={text}
                     onChangeText={onChangeText}
                     placeholder={
-                      AIenabled ? "AI가 대신 채팅중" : "Say Something..."
+                      chatRoomData.me.ai_enabled
+                        ? "AI가 대신 채팅중"
+                        : "Say Something..."
                     }
                     style={{ flex: 5, fontSize: 20 }}
                   />
-                  <TouchableOpacity onPress={onSubmit} disabled={AIenabled}>
-                    <SendIcon />
+                  <TouchableOpacity
+                    onPress={onSubmit}
+                    disabled={chatRoomData.me.ai_enabled}
+                  >
+                    {chatRoomData.me.ai_enabled ? <LockIcon /> : <SendIcon />}
                   </TouchableOpacity>
                 </View>
               </ShadowWrap>
@@ -315,22 +198,18 @@ export default function ChatScreen() {
 
 interface ChatScreenHeaderProp {
   conversation_id: string;
-  user_id: string;
-  setText: React.Dispatch<React.SetStateAction<string>>;
+  other_name: string;
   AIenabled: boolean;
-  setAIenabled: React.Dispatch<React.SetStateAction<boolean>>;
-  chatRoomData: ChatRoomData;
-  updateSetting: (value: ChatRoomData) => Promise<boolean>;
+  setText: React.Dispatch<React.SetStateAction<string>>;
+  setAIenabled: (value: boolean) => void;
 }
 
 function ChatScreenHeader({
   conversation_id,
-  user_id,
-  setText,
+  other_name,
   AIenabled,
+  setText,
   setAIenabled,
-  chatRoomData,
-  updateSetting,
 }: ChatScreenHeaderProp) {
   const router = useRouter();
 
@@ -340,30 +219,8 @@ function ChatScreenHeader({
     }
   };
 
-  const getOtherName = () => {
-    if (user_id == chatRoomData.user1_id) {
-      return chatRoomData.user2_name;
-    } else if (user_id == chatRoomData.user2_id) {
-      return chatRoomData.user1_name;
-    }
-    return "Unknown";
-  };
-
   const onSwitchChange = async () => {
-    const newData = { ...chatRoomData };
-    if (user_id == newData.user1_id) {
-      newData.user1_ai_enabled = !AIenabled;
-    } else if (user_id == newData.user2_id) {
-      newData.user2_ai_enabled = !AIenabled;
-    }
-
-    setAIenabled((c) => !c);
-    const failed = await updateSetting(newData);
-    if (failed) {
-      setAIenabled((c) => !c);
-      return;
-    }
-
+    setAIenabled(!AIenabled);
     setText("");
   };
 
@@ -374,7 +231,7 @@ function ChatScreenHeader({
           <TouchableOpacity onPress={onPressBackBtn}>
             <BackIcon />
           </TouchableOpacity>
-          <Text style={headerStyle.title}>{getOtherName()}</Text>
+          <Text style={headerStyle.title}>{other_name}</Text>
         </View>
         <View style={headerStyle.right}>
           <View style={{ justifyContent: "center" }}>
@@ -405,8 +262,7 @@ function ChatScreenHeader({
           <ShadowWrap>
             <Link
               href={{
-                pathname: "/chat/ChatSettings",
-                params: { id: conversation_id },
+                pathname: `/(app)/(home)/chat/${conversation_id}/ChatSettings`,
               }}
               asChild
             >

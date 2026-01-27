@@ -18,11 +18,15 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 2, height: 4 },
     shadowOpacity: 0.15,
     shadowRadius: 3,
+
+    elevation: 7,
   },
   inner_view_shadow: {
     shadowColor: "#FFFFFF",
     shadowOffset: { width: -2, height: -3 },
     shadowOpacity: 0.6,
     shadowRadius: 3,
+
+    elevation: 2,
   },
 });

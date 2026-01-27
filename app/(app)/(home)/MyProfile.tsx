@@ -14,6 +14,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { getAvatarSource } from "@/utils/avatarColor";
 import { getAddressPublicity } from "@/services/geocode"; // Adjust path as needed
 import React from "react";
+import headerStyle from "@/components/style/commonStyle";
 
 // Define the type here if not imported
 type LocationInfo = {
@@ -144,22 +145,25 @@ function MyProfileScreenHeader({ coins }: { coins: number }) {
   const router = useRouter();
 
   return (
-    <View style={styles.headerContainer}>
-      <TouchableOpacity
-        style={styles.headerLeft}
-        onPress={() => router.canGoBack() && router.back()}
-      >
-        <Ionicons name="chevron-back" size={28} color="#aaa" />
-      </TouchableOpacity>
+    <View style={headerStyle.container}>
+      <View style={headerStyle.content}>
+        {/* Left: Back Button */}
+        <View style={headerStyle.left}>
+          <TouchableOpacity onPress={() => router.canGoBack() && router.back()}>
+            <Ionicons name="chevron-back" size={28} color="#aaa" />
+          </TouchableOpacity>
+        </View>
+        {/* Right: Cash Amount + Edit Button */}
+        <View style={[headerStyle.right, { alignItems: "center" }]}>
+          <Text style={styles.cashText}>${coins}</Text>
 
-      <View style={styles.headerRight}>
-        <Text style={styles.cashText}>${coins}</Text>
-        <TouchableOpacity
-          style={[styles.editButtonCircle, styles.commonShadow]}
-          onPress={() => router.navigate("/(app)/(home)/EditProfile")}
-        >
-          <Ionicons name="pencil" size={16} color="#aaa" />
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.editButtonCircle, styles.commonShadow]}
+            onPress={() => router.navigate("/(app)/(home)/EditProfile")}
+          >
+            <Ionicons name="pencil" size={16} color="#aaa" />
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
@@ -262,20 +266,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#aaa",
   },
-  headerContainer: {
-    height: 60,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 20,
-  },
-  headerLeft: {
-    padding: 5,
-  },
-  headerRight: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
+
+  // -- Header Styles --
   cashText: {
     fontSize: 18,
     fontWeight: "bold",
