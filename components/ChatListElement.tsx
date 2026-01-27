@@ -4,8 +4,6 @@ import ShadowWrap from "./style/Shadow";
 
 interface IChatListElementProp {
   conversation_id: string;
-  user_ids: string;
-  user_names: string;
   other_name: string;
   last_msg: string;
   time_string: string;
@@ -14,8 +12,6 @@ interface IChatListElementProp {
 
 export default function ChatListElement({
   conversation_id,
-  user_ids,
-  user_names,
   other_name,
   last_msg,
   time_string,
@@ -25,10 +21,7 @@ export default function ChatListElement({
     <ShadowWrap>
       <Link
         href={{
-          pathname: "/(app)/(home)/chat/ChatScreen",
-          params: {
-            id: conversation_id,
-          },
+          pathname: `/(app)/(home)/chat/${conversation_id}/ChatScreen`,
         }}
         asChild
       >

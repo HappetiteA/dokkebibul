@@ -1,10 +1,15 @@
 import { supabase } from "@/lib/supabase";
-import { SelectNearbyUsersResponse, SelectFollowingsResponse, SelectFollowersResponse, SelectBlocksResponse } from "@/types/orm.types";
+import {
+  SelectNearbyUsersResponse,
+  SelectFollowingsResponse,
+  SelectFollowersResponse,
+  SelectBlocksResponse,
+} from "@/types/orm.types";
 
 export async function getNearbyUsers(
   lat: number | undefined,
   lon: number | undefined,
-  maxDistance: number
+  maxDistance: number,
 ): Promise<SelectNearbyUsersResponse> {
   if (lat == null || lon == null) {
     console.error("Error fetching current location");
@@ -35,7 +40,7 @@ export async function getFollowings(): Promise<SelectFollowingsResponse> {
     console.error("Unexpected error:", err);
     return [];
   }
-};
+}
 
 export async function getFollowers(): Promise<SelectFollowersResponse> {
   try {
@@ -49,7 +54,7 @@ export async function getFollowers(): Promise<SelectFollowersResponse> {
     console.error("Unexpected error:", err);
     return [];
   }
-};
+}
 
 export async function getBlocks(): Promise<SelectBlocksResponse> {
   try {
@@ -63,7 +68,7 @@ export async function getBlocks(): Promise<SelectBlocksResponse> {
     console.error("Unexpected error:", err);
     return [];
   }
-};
+}
 
 export const getChatRooms = async () => {
   try {
@@ -92,4 +97,22 @@ export const getProfileById = async (user_id: string) => {
   } else {
     return data[0];
   }
+};
+
+export const getConversationIdbyUserId = async (id1: string, id2: string) => {
+  const user1_id = id1 < id2 ? id1 : id2;
+  const user2_id = id1 > id2 ? id1 : id2;
+  (async () => {
+    const { data, error } = await supabase
+      .from("conversations")
+      .select("id")
+      .eq("user1_id", user1_id)
+      .eq("user2_id", user2_id)
+      .single();
+    if (error || !data) {
+      console.log("no conversation id found");
+      return undefined;
+    }
+    return data.id;
+  })();
 };
