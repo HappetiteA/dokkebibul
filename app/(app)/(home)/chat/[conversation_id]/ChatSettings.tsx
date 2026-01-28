@@ -1,15 +1,121 @@
 import DefaultHeader from "@/components/DefaultHeader";
+import {
+  BlockFailModal,
+  BlockModal,
+  BlockSuccessModal,
+} from "@/components/modals/BlockModals";
+import {
+  ReportFailModal,
+  ReportModal,
+  ReportSuccessModal,
+} from "@/components/modals/ReportModals";
 import { BGStyle } from "@/components/style/commonStyle";
 import ShadowWrap from "@/components/style/Shadow";
 import { NeumorphicSwitch } from "@/components/style/Switch";
+import { useAuth } from "@/contexts/AuthContext";
 import { useChatRoom } from "@/contexts/ChatRoomContext";
-import { useLocalSearchParams } from "expo-router";
+import useModal from "@/hooks/useModal";
+import { supabase } from "@/lib/supabase";
+import { CommonActions } from "@react-navigation/native";
+import { useLocalSearchParams, useNavigation } from "expo-router";
+import { useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ChatSettings() {
-  const params = useLocalSearchParams();
+  const navigation = useNavigation();
   const { chatRoomData, setNotiEnabled } = useChatRoom();
+  const { profile } = useAuth();
+
+  const [blockBtnEnabled, setBlockBtnEnabled] = useState(true);
+  const { open: openBlockModal, close: closeBlockModal } = useModal(BlockModal);
+  const { open: openBlockSuccessModal, close: closeBlockSuccessModal } =
+    useModal(BlockSuccessModal);
+  const { open: openBlockFailModal, close: closeBlockFailModal } =
+    useModal(BlockFailModal);
+
+  const [reportBtnEnabled, setReportBtnEnabled] = useState(true);
+  const { open: openReportModal, close: closeReportModal } =
+    useModal(ReportModal);
+  const { open: openReportSuccessModal, close: closeReportSuccessModal } =
+    useModal(ReportSuccessModal);
+  const { open: openReportFailModal, close: closeReportFailModal } =
+    useModal(ReportFailModal);
+
+  const onBlockBtnPressed = async () => {
+    setBlockBtnEnabled(false);
+
+    if (!profile) {
+      setBlockBtnEnabled(true);
+      return;
+    }
+
+    if (!chatRoomData) {
+      return;
+    }
+
+    const { error } = await supabase
+      .from("blocks")
+      .insert({ src_id: profile.user_id, dst_id: chatRoomData?.other.user_id });
+
+    closeBlockModal();
+    setBlockBtnEnabled(true);
+    if (error) {
+      console.error(error);
+      openBlockFailModal({ onClose: closeBlockFailModal });
+    } else {
+      openBlockSuccessModal({
+        onClose: () => {
+          navigation.dispatch(
+            CommonActions.reset({
+              index: 0,
+              routes: [
+                {
+                  name: "index",
+                  params: { refreshTimeStamp: Date.now() },
+                },
+              ],
+            }),
+          );
+          closeBlockSuccessModal();
+        },
+        name: chatRoomData?.other.name,
+      });
+    }
+  };
+
+  const onReportBtnPressed = async (joinedReasons: string) => {
+    setReportBtnEnabled(false);
+
+    if (!profile) {
+      setReportBtnEnabled(true);
+      return;
+    }
+
+    if (!chatRoomData) {
+      return;
+    }
+
+    const { error } = await supabase.from("reports").insert({
+      src_id: profile.user_id,
+      dst_id: chatRoomData?.other.user_id,
+      reason: joinedReasons,
+    });
+
+    closeReportModal();
+    setReportBtnEnabled(true);
+    if (error) {
+      console.error(error);
+      openReportFailModal({ onClose: closeReportFailModal });
+    } else {
+      openReportSuccessModal({
+        onClose: () => {
+          closeReportSuccessModal();
+        },
+        name: chatRoomData?.other.name,
+      });
+    }
+  };
 
   return (
     <SafeAreaView style={BGStyle.BG}>
@@ -36,14 +142,32 @@ export default function ChatSettings() {
 
             <View>
               <ShadowWrap>
-                <TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() =>
+                    openReportModal({
+                      onClose: closeReportModal,
+                      name: chatRoomData?.other.name,
+                      onReportBtnPressed: onReportBtnPressed,
+                      reportBtnEnabled: reportBtnEnabled,
+                    })
+                  }
+                >
                   <View style={styles.button}>
                     <Text style={styles.innerButtonText}>신고하기</Text>
                   </View>
                 </TouchableOpacity>
               </ShadowWrap>
               <ShadowWrap>
-                <TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() =>
+                    openBlockModal({
+                      onClose: closeBlockModal,
+                      name: chatRoomData?.other.name,
+                      onBlockBtnPressed: onBlockBtnPressed,
+                      blockBtnEnabled: blockBtnEnabled,
+                    })
+                  }
+                >
                   <View style={styles.button}>
                     <Text style={styles.innerButtonText}>차단하기</Text>
                   </View>
