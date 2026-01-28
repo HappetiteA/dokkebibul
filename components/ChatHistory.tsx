@@ -58,7 +58,7 @@ export default function ChatHistory({
     chat: Chat[],
     value: Chat,
     index: number,
-    isMe: boolean
+    isMe: boolean,
   ) => {
     if (isMe) {
       //Right Aligned
@@ -165,6 +165,7 @@ export default function ChatHistory({
       ref={scrollRef}
       style={{ flex: 1, marginBottom: 10 }}
       inverted
+      maintainVisibleContentPosition={{ minIndexForVisible: 0 }}
       contentContainerStyle={{ flexDirection: "column-reverse" }}
     ></FlatList>
   );
