@@ -32,6 +32,7 @@ import {
 import { NeumorphicSwitch } from "@/components/style/Switch";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useChatRoom } from "@/contexts/ChatRoomContext";
+import { useGlobalSetting } from "@/contexts/GlobalSettingContext";
 
 type Chat = Omit<Message, "conversation_id">;
 
@@ -206,6 +207,7 @@ function ChatScreenHeader({
   setAIenabled,
 }: ChatScreenHeaderProp) {
   const router = useRouter();
+  const { globalSetting } = useGlobalSetting();
 
   const onPressBackBtn = () => {
     if (router.canGoBack()) {
@@ -251,6 +253,7 @@ function ChatScreenHeader({
                   }}
                 />
               )}
+              disabled={!globalSetting?.ai_enabled}
             ></NeumorphicSwitch>
           </View>
           <ShadowWrap>

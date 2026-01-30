@@ -9,7 +9,7 @@ import {
   View,
 } from "react-native";
 import { Message } from "@/types/model.types";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   convertTimestampToDate,
@@ -29,21 +29,26 @@ export default function ChatHistory({ chat, chatRoomData }: ChatHistoryProp) {
 
   const showName = (chat: Chat[], value: Chat, index: number) => {
     //if (isMe(value.sender_id)) return false;
-    if (index == 0) return true;
-    return value.sender_id != chat[index - 1].sender_id;
-  };
-
-  const hasRightBottomTail = (chat: Chat[], value: Chat, index: number) => {
     if (index == chat.length - 1) return true;
     return value.sender_id != chat[index + 1].sender_id;
   };
 
+  const hasRightBottomTail = (chat: Chat[], value: Chat, index: number) => {
+    if (index == 0) return true;
+
+    const differentSender = value.sender_id != chat[index - 1].sender_id;
+    const differentDay =
+      convertTimestampToDate(value.created_at) !=
+      convertTimestampToDate(chat[index - 1].created_at);
+    return differentSender || differentDay;
+  };
+
   const showDate = (chat: Chat[], value: Chat, index: number) => {
     //if (isMe(value.sender_id)) return false;
-    if (index == 0) return true;
+    if (index == chat.length - 1) return true;
     return (
       convertTimestampToDate(value.created_at) !=
-      convertTimestampToDate(chat[index - 1].created_at)
+      convertTimestampToDate(chat[index + 1].created_at)
     );
   };
 
@@ -70,9 +75,7 @@ export default function ChatHistory({ chat, chatRoomData }: ChatHistoryProp) {
   const TextElement = (chat: Chat[], value: Chat, index: number) => {
     if (value.sender_id == chatRoomData.me.user_id) {
       //Right Aligned
-      const ShowDate = showDate(chat, value, index);
-      const HasRightBottomTail =
-        hasRightBottomTail(chat, value, index) || ShowDate;
+      const HasRightBottomTail = hasRightBottomTail(chat, value, index);
       const BGcolor =
         chatRoomData.me.ai_enabled && !value.is_human ? "#C5EDD2" : "#99D8EE";
 
@@ -149,7 +152,7 @@ export default function ChatHistory({ chat, chatRoomData }: ChatHistoryProp) {
   const renderItem = ({ item, index }: ListRenderItemInfo<Chat>) => {
     return (
       <View key={index}>
-        {showDate(chat, item, index) ? (
+        {showDate(reversedChat, item, index) ? (
           <View style={styles.timeText}>
             <Text style={{ color: "#96969D" }}>
               {convertTimestampToDate(item.created_at)}
@@ -159,23 +162,28 @@ export default function ChatHistory({ chat, chatRoomData }: ChatHistoryProp) {
           <></>
         )}
 
-        {TextElement(chat, item, index)}
+        {TextElement(reversedChat, item, index)}
       </View>
     );
   };
 
   const scrollRef = useRef<FlatList>(null);
+  const reversedChat = useMemo(() => {
+    return chat.slice().reverse();
+  }, [chat]);
 
   return (
     <FlatList
-      data={chat}
+      data={reversedChat}
       renderItem={renderItem}
       keyExtractor={(item) => item.id}
       ref={scrollRef}
       style={{ flex: 1, marginBottom: 10 }}
       inverted
-      maintainVisibleContentPosition={{ minIndexForVisible: 0 }}
-      contentContainerStyle={{ flexDirection: "column-reverse" }}
+      maintainVisibleContentPosition={{
+        minIndexForVisible: 0,
+        autoscrollToTopThreshold: 80,
+      }}
     ></FlatList>
   );
 }
