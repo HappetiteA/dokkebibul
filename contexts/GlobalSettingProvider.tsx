@@ -24,7 +24,9 @@ export function GlobalSettingProvider({
 
     (async () => {
       try {
-        const storageData = await AsyncStorage.getItem("GlobalSetting");
+        const storageData = await AsyncStorage.getItem(
+          `GlobalSetting:${profile.user_id}`,
+        );
         if (storageData == null) {
           const globalSetting: GlobalSetting = {
             ai_enabled: profile.is_ai_enabled,
@@ -33,7 +35,7 @@ export function GlobalSettingProvider({
 
           try {
             await AsyncStorage.setItem(
-              "GlobalSetting",
+              `GlobalSetting:${profile.user_id}`,
               JSON.stringify(globalSetting),
             );
             setGlobalSetting(globalSetting);
@@ -59,12 +61,13 @@ export function GlobalSettingProvider({
 
   useEffect(() => {
     if (!initRef.current) return;
+    if (!profile) return;
     if (!globalSetting) return;
 
     (async () => {
       try {
         await AsyncStorage.setItem(
-          "GlobalSetting",
+          `GlobalSetting:${profile.user_id}`,
           JSON.stringify(globalSetting),
         );
       } catch {

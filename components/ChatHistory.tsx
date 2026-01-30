@@ -70,7 +70,9 @@ export default function ChatHistory({ chat, chatRoomData }: ChatHistoryProp) {
   const TextElement = (chat: Chat[], value: Chat, index: number) => {
     if (value.sender_id == chatRoomData.me.user_id) {
       //Right Aligned
-      const HasRightBottomTail = hasRightBottomTail(chat, value, index);
+      const ShowDate = showDate(chat, value, index);
+      const HasRightBottomTail =
+        hasRightBottomTail(chat, value, index) || ShowDate;
       const BGcolor =
         chatRoomData.me.ai_enabled && !value.is_human ? "#C5EDD2" : "#99D8EE";
 

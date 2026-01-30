@@ -2,7 +2,7 @@ import { useRouter, useFocusEffect } from "expo-router";
 import DefaultHeader from "@/components/DefaultHeader";
 import { useAuthActions } from "@/hooks/useAuthActions";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Alert, Image, StyleSheet, Switch, Text, View } from "react-native";
 import { TouchableOpacity } from "react-native";
 import ShadowWrap from "@/components/style/Shadow";
@@ -19,10 +19,12 @@ export default function Settings() {
   const [blockNum, setBlockNum] = useState<number>();
 
   useFocusEffect(() => {
-    (async () => {
-      const blockData = await getBlocks();
-      setBlockNum(blockData?.length);
-    })();
+    useCallback(() => {
+      (async () => {
+        const blockData = await getBlocks();
+        setBlockNum(blockData?.length);
+      })();
+    }, []);
   });
 
   return (

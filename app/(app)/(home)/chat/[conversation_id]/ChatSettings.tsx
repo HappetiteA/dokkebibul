@@ -87,12 +87,8 @@ export default function ChatSettings() {
   const onReportBtnPressed = async (joinedReasons: string) => {
     setReportBtnEnabled(false);
 
-    if (!profile) {
+    if (!profile || !chatRoomData) {
       setReportBtnEnabled(true);
-      return;
-    }
-
-    if (!chatRoomData) {
       return;
     }
 
