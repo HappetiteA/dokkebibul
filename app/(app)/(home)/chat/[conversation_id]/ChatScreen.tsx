@@ -155,13 +155,7 @@ export default function ChatScreen() {
             behavior={Platform.OS == "ios" ? "padding" : "height"}
           >
             <View style={{ flex: 1, backgroundColor: "#F8F8FA" }}>
-              <ChatHistory
-                chat={chat}
-                user1_id={chatRoomData.me.user_id}
-                user1_name={chatRoomData.me.name}
-                user2_id={chatRoomData.other.user_id}
-                user2_name={chatRoomData.other.name}
-              />
+              <ChatHistory chat={chat} chatRoomData={chatRoomData} />
               <ShadowWrap>
                 <View style={styles.textInputView}>
                   <TextInput

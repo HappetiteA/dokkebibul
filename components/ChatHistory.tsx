@@ -1,5 +1,6 @@
 import {
   FlatList,
+  Image,
   InteractionManager,
   ListRenderItemInfo,
   ScrollView,
@@ -14,24 +15,16 @@ import {
   convertTimestampToDate,
   convertTimestampToTime,
 } from "@/utils/time_converter";
+import { getAvatarSource } from "@/utils/avatarColor";
+import { ChatRoomVM } from "./interfaces";
 
 type Chat = Omit<Message, "conversation_id">;
 
 interface ChatHistoryProp {
   chat?: Array<Chat>;
-  user1_id: string;
-  user2_id: string;
-  user1_name: string;
-  user2_name: string;
+  chatRoomData: ChatRoomVM;
 }
-export default function ChatHistory({
-  chat,
-  user1_id,
-  user2_id,
-  user1_name,
-  user2_name,
-}: ChatHistoryProp) {
-  const { profile } = useAuth();
+export default function ChatHistory({ chat, chatRoomData }: ChatHistoryProp) {
   chat = chat ?? [];
 
   const TextBox = (value: Chat, color: string) => {
@@ -54,13 +47,8 @@ export default function ChatHistory({
     );
   };
 
-  const TextElement = (
-    chat: Chat[],
-    value: Chat,
-    index: number,
-    isMe: boolean,
-  ) => {
-    if (isMe) {
+  const TextElement = (chat: Chat[], value: Chat, index: number) => {
+    if (value.sender_id == chatRoomData.me.user_id) {
       //Right Aligned
       return (
         <View key={index} style={{ flexDirection: "row" }}>
@@ -82,18 +70,23 @@ export default function ChatHistory({
               width: 40,
               height: 40,
               borderRadius: 20,
-              backgroundColor: showName(chat, value, index)
-                ? "red"
-                : "transparent",
               marginLeft: 5,
             }}
-          ></View>
+          >
+            {showName(chat, value, index) ? (
+              <Image
+                source={getAvatarSource(chatRoomData.other.color_code)}
+                style={{ width: 40, height: 40 }}
+                resizeMethod="resize"
+              />
+            ) : (
+              <></>
+            )}
+          </View>
           <View>
             {showName(chat, value, index) ? (
               <View>
-                <Text style={styles.otherName}>
-                  {convertUIDtoUserName(value.sender_id)}
-                </Text>
+                <Text style={styles.otherName}>{chatRoomData.other.name}</Text>
               </View>
             ) : (
               ""
@@ -126,18 +119,9 @@ export default function ChatHistory({
           ""
         )}
 
-        {TextElement(chat, item, index, isMe(item.sender_id))}
+        {TextElement(chat, item, index)}
       </View>
     );
-  };
-
-  const convertUIDtoUserName = (user_id: string) => {
-    var idx = [user1_id, user2_id].findIndex((value) => value == user_id);
-    return [user1_name, user2_name][idx];
-  };
-
-  const isMe = (id: string) => {
-    return id == profile?.user_id;
   };
 
   const showName = (chat: Chat[], value: Chat, index: number) => {
