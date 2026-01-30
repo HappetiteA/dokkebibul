@@ -164,10 +164,10 @@ export default function ChatScreen() {
                     onChangeText={onChangeText}
                     placeholder={
                       chatRoomData.me.ai_enabled
-                        ? "AI가 대신 채팅중"
+                        ? "도깨비불 모드 사용 중입니다."
                         : "Say Something..."
                     }
-                    style={{ flex: 5, fontSize: 20 }}
+                    style={{ flex: 5, fontSize: 16 }}
                   />
                   <TouchableOpacity
                     onPress={onSubmit}

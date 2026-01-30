@@ -27,6 +27,26 @@ interface ChatHistoryProp {
 export default function ChatHistory({ chat, chatRoomData }: ChatHistoryProp) {
   chat = chat ?? [];
 
+  const showName = (chat: Chat[], value: Chat, index: number) => {
+    //if (isMe(value.sender_id)) return false;
+    if (index == 0) return true;
+    return value.sender_id != chat[index - 1].sender_id;
+  };
+
+  const hasRightBottomTail = (chat: Chat[], value: Chat, index: number) => {
+    if (index == chat.length - 1) return true;
+    return value.sender_id != chat[index + 1].sender_id;
+  };
+
+  const showDate = (chat: Chat[], value: Chat, index: number) => {
+    //if (isMe(value.sender_id)) return false;
+    if (index == 0) return true;
+    return (
+      convertTimestampToDate(value.created_at) !=
+      convertTimestampToDate(chat[index - 1].created_at)
+    );
+  };
+
   const TextBox = (value: Chat, color: string) => {
     return (
       <View
@@ -50,19 +70,38 @@ export default function ChatHistory({ chat, chatRoomData }: ChatHistoryProp) {
   const TextElement = (chat: Chat[], value: Chat, index: number) => {
     if (value.sender_id == chatRoomData.me.user_id) {
       //Right Aligned
+      const HasRightBottomTail = hasRightBottomTail(chat, value, index);
+      const BGcolor =
+        chatRoomData.me.ai_enabled && !value.is_human ? "#C5EDD2" : "#99D8EE";
+
       return (
         <View key={index} style={{ flexDirection: "row" }}>
           <View style={{ flex: 1 }} />
           <View style={{ flexDirection: "row" }}>
+            {HasRightBottomTail ? (
+              <View
+                style={[
+                  styles.rightTail,
+                  {
+                    backgroundColor: BGcolor,
+                  },
+                ]}
+              ></View>
+            ) : (
+              <></>
+            )}
             <Text style={{ marginTop: "auto", color: "#909090" }}>
               {convertTimestampToTime(value.created_at)}
             </Text>
-            {TextBox(value, "#99D8EE")}
+            {TextBox(value, BGcolor)}
           </View>
         </View>
       );
     } else {
       // Left Aligned
+      const ShowDate = showDate(chat, value, index);
+      const ShowName = showName(chat, value, index) || ShowDate;
+      const HasLeftTopTail = ShowName;
       return (
         <View key={index} style={{ flexDirection: "row" }}>
           <View
@@ -73,7 +112,7 @@ export default function ChatHistory({ chat, chatRoomData }: ChatHistoryProp) {
               marginLeft: 5,
             }}
           >
-            {showName(chat, value, index) ? (
+            {ShowName ? (
               <Image
                 source={getAvatarSource(chatRoomData.other.color_code)}
                 style={{ width: 40, height: 40 }}
@@ -84,14 +123,13 @@ export default function ChatHistory({ chat, chatRoomData }: ChatHistoryProp) {
             )}
           </View>
           <View>
-            {showName(chat, value, index) ? (
-              <View>
-                <Text style={styles.otherName}>{chatRoomData.other.name}</Text>
-              </View>
+            {ShowName ? (
+              <Text style={styles.otherName}>{chatRoomData.other.name}</Text>
             ) : (
-              ""
+              <></>
             )}
             <View style={{ flexDirection: "row" }}>
+              {HasLeftTopTail ? <View style={styles.leftTail}></View> : <></>}
               <View style={{ flexDirection: "row" }}>
                 {TextBox(value, "#E4E4EA")}
                 <Text style={{ marginTop: "auto", color: "#909090" }}>
@@ -116,26 +154,11 @@ export default function ChatHistory({ chat, chatRoomData }: ChatHistoryProp) {
             </Text>
           </View>
         ) : (
-          ""
+          <></>
         )}
 
         {TextElement(chat, item, index)}
       </View>
-    );
-  };
-
-  const showName = (chat: Chat[], value: Chat, index: number) => {
-    //if (isMe(value.sender_id)) return false;
-    if (index == 0) return true;
-    return value.sender_id != chat[index - 1].sender_id;
-  };
-
-  const showDate = (chat: Chat[], value: Chat, index: number) => {
-    //if (isMe(value.sender_id)) return false;
-    if (index == 0) return true;
-    return (
-      convertTimestampToDate(value.created_at) !=
-      convertTimestampToDate(chat[index - 1].created_at)
     );
   };
 
@@ -179,5 +202,24 @@ const styles = StyleSheet.create({
   },
   rightAlign: {
     color: "black",
+  },
+
+  // Design Detail
+  leftTail: {
+    position: "absolute",
+    top: 5,
+    left: 5,
+    width: 15,
+    height: 15,
+    backgroundColor: "#E4E4EA",
+  },
+
+  rightTail: {
+    position: "absolute",
+    right: 5,
+    bottom: 5,
+    width: 15,
+    height: 15,
+    backgroundColor: "#E4E4EA",
   },
 });
