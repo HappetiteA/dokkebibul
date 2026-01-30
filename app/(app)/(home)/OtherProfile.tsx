@@ -31,6 +31,9 @@ import {
 } from "@/components/modals/ReportModals";
 import { getAvatarSource } from "@/utils/avatarColor";
 import headerStyle from "@/components/style/commonStyle";
+import { CloseModal, OpenModalOptions } from "@/types/modal";
+import { BackIcon, BlockIcon, ReportIcon } from "@/components/style/Icons";
+import ShadowWrap from "@/components/style/Shadow";
 
 export default function OtherProfileScreen() {
   const router = useRouter();
@@ -202,107 +205,141 @@ export default function OtherProfileScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <OtherProfileScreenHeader />
-
-      <View style={styles.scrollContent}>
-        {/* Avatar Section - Transparent, No Border, No Shadow */}
-        <View style={styles.avatarContainer}>
-          <Image
-            source={getAvatarSource(userInfo?.color_code)}
-            style={styles.avatarImage}
-            resizeMode="contain"
+      {userInfo ? (
+        <>
+          <OtherProfileScreenHeader
+            userInfo={userInfo}
+            openReportModal={openReportModal}
+            closeReportModal={closeReportModal}
+            onReportBtnPressed={onReportBtnPressed}
+            reportBtnEnabled={reportBtnEnabled}
+            openBlockModal={openBlockModal}
+            closeBlockModal={closeBlockModal}
+            onBlockBtnPressed={onBlockBtnPressed}
+            blockBtnEnabled={blockBtnEnabled}
           />
-        </View>
 
-        {/* Name Tag - With Shadow */}
-        <View style={[styles.commonShadow, styles.nameTag]}>
-          <Text style={styles.nameText}>{userInfo?.name ?? ""}</Text>
-        </View>
-
-        {/* Status Message Box - With Shadow */}
-        <View style={[styles.commonShadow, styles.statusBox]}>
-          <Text style={styles.statusText}>
-            {userInfo?.status_message ?? ""}
-          </Text>
-        </View>
-
-        {/* Action Buttons Container - Fixed Width */}
-        <View style={styles.actionButtonContainer}>
-          {!follow ? (
-            // State 1: Single Button
-            <TouchableOpacity
-              style={[
-                styles.buttonBase,
-                styles.commonShadow,
-                styles.followButtonWide,
-              ]}
-              onPress={onFollowBtnPressed}
-              disabled={!followBtnEnabled}
-            >
-              <Text style={styles.followButtonText}>팔로우</Text>
-            </TouchableOpacity>
-          ) : (
-            // State 2: Two Buttons
-            <View style={styles.doubleButtonRow}>
-              <TouchableOpacity
-                style={[
-                  styles.buttonBase,
-                  styles.commonShadow,
-                  styles.unfollowButton,
-                ]}
-                onPress={onFollowBtnPressed}
-                disabled={!followBtnEnabled}
-              >
-                <Text style={styles.unfollowButtonText}>팔로우 취소</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[
-                  styles.buttonBase,
-                  styles.commonShadow,
-                  styles.chatButton,
-                ]}
-                onPress={onChatBtnPressed}
-              >
-                <Text style={styles.chatButtonText}>대화하기</Text>
-              </TouchableOpacity>
+          <View style={styles.scrollContent}>
+            {/* Avatar Section - Transparent, No Border, No Shadow */}
+            <View style={styles.avatarContainer}>
+              <Image
+                source={getAvatarSource(userInfo?.color_code)}
+                style={styles.avatarImage}
+                resizeMode="contain"
+              />
             </View>
-          )}
-        </View>
 
-        <View style={styles.footerOptions}>
-          <TouchableOpacity
-            onPress={() =>
-              openReportModal({
-                onClose: closeReportModal,
-                name: userInfo?.name,
-                onReportBtnPressed: onReportBtnPressed,
-                reportBtnEnabled: reportBtnEnabled,
-              })
-            }
-          >
-            <Text style={styles.footerLinkText}>신고하기</Text>
-          </TouchableOpacity>
-          <Text style={styles.footerDivider}>|</Text>
-          <TouchableOpacity
-            onPress={() =>
-              openBlockModal({
-                onClose: closeBlockModal,
-                name: userInfo?.name,
-                onBlockBtnPressed: onBlockBtnPressed,
-                blockBtnEnabled: blockBtnEnabled,
-              })
-            }
-          >
-            <Text style={styles.footerLinkText}>차단하기</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+            {/* Name Tag - With Shadow */}
+            <View style={[styles.commonShadow, styles.nameTag]}>
+              <Text style={styles.nameText}>{userInfo?.name ?? ""}</Text>
+            </View>
+
+            {/* Status Message Box - With Shadow */}
+            <View style={[styles.commonShadow, styles.statusBox]}>
+              <Text style={styles.statusText}>
+                {userInfo?.status_message ?? ""}
+              </Text>
+            </View>
+
+            {/* Action Buttons Container - Fixed Width */}
+            <View style={styles.actionButtonContainer}>
+              {!follow ? (
+                // State 1: Single Button
+                <TouchableOpacity
+                  style={[
+                    styles.buttonBase,
+                    styles.commonShadow,
+                    styles.followButtonWide,
+                  ]}
+                  onPress={onFollowBtnPressed}
+                  disabled={!followBtnEnabled}
+                >
+                  <Text style={styles.followButtonText}>팔로우</Text>
+                </TouchableOpacity>
+              ) : (
+                // State 2: Two Buttons
+                <View style={styles.doubleButtonRow}>
+                  <TouchableOpacity
+                    style={[
+                      styles.buttonBase,
+                      styles.commonShadow,
+                      styles.unfollowButton,
+                    ]}
+                    onPress={onFollowBtnPressed}
+                    disabled={!followBtnEnabled}
+                  >
+                    <Text style={styles.unfollowButtonText}>팔로우 취소</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={[
+                      styles.buttonBase,
+                      styles.commonShadow,
+                      styles.chatButton,
+                    ]}
+                    onPress={onChatBtnPressed}
+                  >
+                    <Text style={styles.chatButtonText}>대화하기</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+            </View>
+          </View>
+        </>
+      ) : (
+        <ErrorOtherProfileScreenHeader />
+      )}
     </SafeAreaView>
   );
 }
 
-function OtherProfileScreenHeader() {
+interface OtherProfileScreenHeaderProp {
+  userInfo: Profile;
+  openReportModal: (
+    props: Omit<
+      {
+        isOpen: boolean;
+        onClose: () => void;
+        name: string | undefined;
+        onReportBtnPressed: (joinedReasons: string) => Promise<void>;
+        reportBtnEnabled: boolean;
+      },
+      "isOpen"
+    >,
+    options?: OpenModalOptions,
+  ) => void;
+  closeReportModal: CloseModal;
+  onReportBtnPressed: (joinedReasons: string) => Promise<void>;
+  reportBtnEnabled: boolean;
+  openBlockModal: (
+    props: Omit<
+      {
+        isOpen: boolean;
+        onClose: () => void;
+        name: string | undefined;
+        onBlockBtnPressed: () => Promise<void>;
+        blockBtnEnabled: boolean;
+      },
+      "isOpen"
+    >,
+    options?: OpenModalOptions,
+  ) => void;
+  closeBlockModal: CloseModal;
+  onBlockBtnPressed: () => Promise<void>;
+  blockBtnEnabled: boolean;
+}
+
+function OtherProfileScreenHeader({
+  userInfo,
+  openReportModal,
+  closeReportModal,
+  onReportBtnPressed,
+  reportBtnEnabled,
+  openBlockModal,
+  closeBlockModal,
+  onBlockBtnPressed,
+  blockBtnEnabled,
+}: OtherProfileScreenHeaderProp) {
   const router = useRouter();
   return (
     <View style={headerStyle.container}>
@@ -312,7 +349,61 @@ function OtherProfileScreenHeader() {
             <Ionicons name="chevron-back" size={28} color="#aaa" />
           </TouchableOpacity>
         </View>
-        <View style={headerStyle.right} />
+        <View style={[headerStyle.right, { justifyContent: "center" }]}>
+          <ShadowWrap>
+            <TouchableOpacity
+              style={headerStyle.button}
+              onPress={() =>
+                openReportModal({
+                  onClose: closeReportModal,
+                  name: userInfo?.name,
+                  onReportBtnPressed: onReportBtnPressed,
+                  reportBtnEnabled: reportBtnEnabled,
+                })
+              }
+            >
+              <ReportIcon />
+            </TouchableOpacity>
+          </ShadowWrap>
+          <ShadowWrap>
+            <TouchableOpacity
+              style={headerStyle.button}
+              onPress={() =>
+                openBlockModal({
+                  onClose: closeBlockModal,
+                  name: userInfo?.name,
+                  onBlockBtnPressed: onBlockBtnPressed,
+                  blockBtnEnabled: blockBtnEnabled,
+                })
+              }
+            >
+              <BlockIcon />
+            </TouchableOpacity>
+          </ShadowWrap>
+        </View>
+      </View>
+    </View>
+  );
+}
+
+function ErrorOtherProfileScreenHeader() {
+  const router = useRouter();
+
+  const onPressBackBtn = () => {
+    if (router.canGoBack()) {
+      router.back();
+    }
+  };
+
+  return (
+    <View style={headerStyle.container}>
+      <View style={headerStyle.content}>
+        <View style={headerStyle.left}>
+          <TouchableOpacity onPress={onPressBackBtn}>
+            <BackIcon />
+          </TouchableOpacity>
+        </View>
+        <View style={headerStyle.right}></View>
       </View>
     </View>
   );

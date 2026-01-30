@@ -23,6 +23,28 @@ export function ProfilesIcon() {
   );
 }
 
+export function BlockIcon() {
+  return (
+    <View style={styles.inner_shadow}>
+      <Image
+        style={{ width: 36, height: 36 }}
+        source={require("@/assets/from_figma/block.png")}
+      />
+    </View>
+  );
+}
+
+export function ReportIcon() {
+  return (
+    <View style={styles.inner_shadow}>
+      <Image
+        style={{ width: 36, height: 36 }}
+        source={require("@/assets/from_figma/report.png")}
+      />
+    </View>
+  );
+}
+
 export function BackIcon() {
   return (
     <View>

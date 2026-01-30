@@ -53,6 +53,7 @@ export default function ChatRoomList({ openModal }: IChatRoomListProp) {
         key={vm.id}
         conversation_id={vm.id}
         other_name={vm.other.name}
+        other_color_code={vm.other.color_code}
         last_msg={vm.last_msg}
         time_string={time_string}
         onLongPress={() => {

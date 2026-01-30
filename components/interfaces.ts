@@ -105,7 +105,7 @@ export const toChatRoom = (vm: ChatRoomVM): ChatRoom => {
   };
 };
 
-export interface IGlobalSetting {
-  AIenabled: boolean;
-  last_fetched: number;
+export interface GlobalSetting {
+  ai_enabled: boolean;
+  noti_enabled: boolean;
 }

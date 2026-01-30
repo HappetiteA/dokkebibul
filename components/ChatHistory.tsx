@@ -1,5 +1,6 @@
 import {
   FlatList,
+  Image,
   InteractionManager,
   ListRenderItemInfo,
   ScrollView,
@@ -14,25 +15,37 @@ import {
   convertTimestampToDate,
   convertTimestampToTime,
 } from "@/utils/time_converter";
+import { getAvatarSource } from "@/utils/avatarColor";
+import { ChatRoomVM } from "./interfaces";
 
 type Chat = Omit<Message, "conversation_id">;
 
 interface ChatHistoryProp {
   chat?: Array<Chat>;
-  user1_id: string;
-  user2_id: string;
-  user1_name: string;
-  user2_name: string;
+  chatRoomData: ChatRoomVM;
 }
-export default function ChatHistory({
-  chat,
-  user1_id,
-  user2_id,
-  user1_name,
-  user2_name,
-}: ChatHistoryProp) {
-  const { profile } = useAuth();
+export default function ChatHistory({ chat, chatRoomData }: ChatHistoryProp) {
   chat = chat ?? [];
+
+  const showName = (chat: Chat[], value: Chat, index: number) => {
+    //if (isMe(value.sender_id)) return false;
+    if (index == 0) return true;
+    return value.sender_id != chat[index - 1].sender_id;
+  };
+
+  const hasRightBottomTail = (chat: Chat[], value: Chat, index: number) => {
+    if (index == chat.length - 1) return true;
+    return value.sender_id != chat[index + 1].sender_id;
+  };
+
+  const showDate = (chat: Chat[], value: Chat, index: number) => {
+    //if (isMe(value.sender_id)) return false;
+    if (index == 0) return true;
+    return (
+      convertTimestampToDate(value.created_at) !=
+      convertTimestampToDate(chat[index - 1].created_at)
+    );
+  };
 
   const TextBox = (value: Chat, color: string) => {
     return (
@@ -54,27 +67,43 @@ export default function ChatHistory({
     );
   };
 
-  const TextElement = (
-    chat: Chat[],
-    value: Chat,
-    index: number,
-    isMe: boolean
-  ) => {
-    if (isMe) {
+  const TextElement = (chat: Chat[], value: Chat, index: number) => {
+    if (value.sender_id == chatRoomData.me.user_id) {
       //Right Aligned
+      const ShowDate = showDate(chat, value, index);
+      const HasRightBottomTail =
+        hasRightBottomTail(chat, value, index) || ShowDate;
+      const BGcolor =
+        chatRoomData.me.ai_enabled && !value.is_human ? "#C5EDD2" : "#99D8EE";
+
       return (
         <View key={index} style={{ flexDirection: "row" }}>
           <View style={{ flex: 1 }} />
           <View style={{ flexDirection: "row" }}>
+            {HasRightBottomTail ? (
+              <View
+                style={[
+                  styles.rightTail,
+                  {
+                    backgroundColor: BGcolor,
+                  },
+                ]}
+              ></View>
+            ) : (
+              <></>
+            )}
             <Text style={{ marginTop: "auto", color: "#909090" }}>
               {convertTimestampToTime(value.created_at)}
             </Text>
-            {TextBox(value, "#99D8EE")}
+            {TextBox(value, BGcolor)}
           </View>
         </View>
       );
     } else {
       // Left Aligned
+      const ShowDate = showDate(chat, value, index);
+      const ShowName = showName(chat, value, index) || ShowDate;
+      const HasLeftTopTail = ShowName;
       return (
         <View key={index} style={{ flexDirection: "row" }}>
           <View
@@ -82,23 +111,27 @@ export default function ChatHistory({
               width: 40,
               height: 40,
               borderRadius: 20,
-              backgroundColor: showName(chat, value, index)
-                ? "red"
-                : "transparent",
               marginLeft: 5,
             }}
-          ></View>
-          <View>
-            {showName(chat, value, index) ? (
-              <View>
-                <Text style={styles.otherName}>
-                  {convertUIDtoUserName(value.sender_id)}
-                </Text>
-              </View>
+          >
+            {ShowName ? (
+              <Image
+                source={getAvatarSource(chatRoomData.other.color_code)}
+                style={{ width: 40, height: 40 }}
+                resizeMethod="resize"
+              />
             ) : (
-              ""
+              <></>
+            )}
+          </View>
+          <View>
+            {ShowName ? (
+              <Text style={styles.otherName}>{chatRoomData.other.name}</Text>
+            ) : (
+              <></>
             )}
             <View style={{ flexDirection: "row" }}>
+              {HasLeftTopTail ? <View style={styles.leftTail}></View> : <></>}
               <View style={{ flexDirection: "row" }}>
                 {TextBox(value, "#E4E4EA")}
                 <Text style={{ marginTop: "auto", color: "#909090" }}>
@@ -123,35 +156,11 @@ export default function ChatHistory({
             </Text>
           </View>
         ) : (
-          ""
+          <></>
         )}
 
-        {TextElement(chat, item, index, isMe(item.sender_id))}
+        {TextElement(chat, item, index)}
       </View>
-    );
-  };
-
-  const convertUIDtoUserName = (user_id: string) => {
-    var idx = [user1_id, user2_id].findIndex((value) => value == user_id);
-    return [user1_name, user2_name][idx];
-  };
-
-  const isMe = (id: string) => {
-    return id == profile?.user_id;
-  };
-
-  const showName = (chat: Chat[], value: Chat, index: number) => {
-    //if (isMe(value.sender_id)) return false;
-    if (index == 0) return true;
-    return value.sender_id != chat[index - 1].sender_id;
-  };
-
-  const showDate = (chat: Chat[], value: Chat, index: number) => {
-    //if (isMe(value.sender_id)) return false;
-    if (index == 0) return true;
-    return (
-      convertTimestampToDate(value.created_at) !=
-      convertTimestampToDate(chat[index - 1].created_at)
     );
   };
 
@@ -165,6 +174,7 @@ export default function ChatHistory({
       ref={scrollRef}
       style={{ flex: 1, marginBottom: 10 }}
       inverted
+      maintainVisibleContentPosition={{ minIndexForVisible: 0 }}
       contentContainerStyle={{ flexDirection: "column-reverse" }}
     ></FlatList>
   );
@@ -194,5 +204,24 @@ const styles = StyleSheet.create({
   },
   rightAlign: {
     color: "black",
+  },
+
+  // Design Detail
+  leftTail: {
+    position: "absolute",
+    top: 5,
+    left: 5,
+    width: 15,
+    height: 15,
+    backgroundColor: "#E4E4EA",
+  },
+
+  rightTail: {
+    position: "absolute",
+    right: 5,
+    bottom: 5,
+    width: 15,
+    height: 15,
+    backgroundColor: "#E4E4EA",
   },
 });
