@@ -1,10 +1,12 @@
 import { Link } from "expo-router";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import ShadowWrap from "./style/Shadow";
+import { getAvatarSource } from "@/utils/avatarColor";
 
 interface IChatListElementProp {
   conversation_id: string;
   other_name: string;
+  other_color_code: number;
   last_msg: string;
   time_string: string;
   onLongPress: () => void;
@@ -13,6 +15,7 @@ interface IChatListElementProp {
 export default function ChatListElement({
   conversation_id,
   other_name,
+  other_color_code,
   last_msg,
   time_string,
   onLongPress,
@@ -30,7 +33,13 @@ export default function ChatListElement({
           onLongPress={onLongPress}
         >
           <View style={{ flexDirection: "row" }}>
-            <View style={styles.icon}></View>
+            <View style={styles.icon}>
+              <Image
+                source={getAvatarSource(other_color_code)}
+                style={styles.icon}
+                resizeMethod="resize"
+              />
+            </View>
             <View style={styles.contents}>
               <View style={styles.horizontal}>
                 <Text style={styles.name}>{other_name}</Text>
@@ -69,7 +78,6 @@ const styles = StyleSheet.create({
   icon: {
     width: height - padding * 2,
     height: height - padding * 2,
-    backgroundColor: "red",
     borderRadius: height / 2 - padding,
   },
   contents: {
