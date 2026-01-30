@@ -53,7 +53,7 @@ export function GlobalSettingProvider({
           setGlobalSetting(globalSettingFromStorage);
           initRef.current = true;
         } catch (err: any) {
-          Alert.alert("ChatRoomData parsing error", err.message);
+          Alert.alert("GlobalSetting parsing error", err.message);
         }
       } catch (err: any) {}
     })();

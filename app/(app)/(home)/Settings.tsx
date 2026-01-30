@@ -18,14 +18,14 @@ export default function Settings() {
   const { globalSetting, setAIenabled, setNotiEnabled } = useGlobalSetting();
   const [blockNum, setBlockNum] = useState<number>();
 
-  useFocusEffect(() => {
+  useFocusEffect(
     useCallback(() => {
       (async () => {
         const blockData = await getBlocks();
         setBlockNum(blockData?.length);
       })();
-    }, []);
-  });
+    }, []),
+  );
 
   return (
     <SafeAreaView style={BGStyle.BG}>
