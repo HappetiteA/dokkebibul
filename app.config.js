@@ -10,11 +10,6 @@ export default {
     scheme: "dokkebibul",
     userInterfaceStyle: "automatic",
     newArchEnabled: true,
-    splash: {
-      image: "./assets/images/splash-icon.png",
-      resizeMode: "contain",
-      backgroundColor: "#ffffff",
-    },
     ios: {
       supportsTablet: true,
       usesAppleSignIn: true,

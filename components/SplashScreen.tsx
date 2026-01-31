@@ -23,6 +23,8 @@ export function AnimatedSplashScreen({ isAppReady, children }: any) {
   const containerOpacity = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
+    let timeoutId: number;
+
     const runAnimation = async () => {
       // Hide Native Splash immediately
       // (If native splash is blank, screen stays blank here)
@@ -46,7 +48,7 @@ export function AnimatedSplashScreen({ isAppReady, children }: any) {
             useNativeDriver: true,
           }),
           Animated.timing(shadowTranslate, {
-            toValue: { x: 4, y: 4 }, // Move shadow down-right by 10px
+            toValue: { x: 4, y: 4 },
             duration: 600,
             useNativeDriver: true,
           }),
@@ -54,12 +56,16 @@ export function AnimatedSplashScreen({ isAppReady, children }: any) {
       ]).start();
 
       // Ensure minimal view time
-      setTimeout(() => {
+      timeoutId = setTimeout(() => {
         setAnimationComplete(true);
       }, 2000);
     };
 
     runAnimation();
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+    };
   }, []);
 
   // Exit Logic: Fade out container when App is Ready AND Animation is Done
