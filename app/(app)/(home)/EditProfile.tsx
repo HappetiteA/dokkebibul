@@ -15,11 +15,11 @@ import {
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/lib/supabase";
 import { getAvatarSource } from "@/utils/avatarColor";
 import headerStyle from "@/components/style/commonStyle";
 import { getAddressPublicity } from "@/services/geocode";
 import { NeumorphicSwitch } from "@/components/style/Switch";
+import { updateMyProfile } from "@/services/supabase";
 
 export default function ProfileEditScreen() {
   const router = useRouter();
@@ -51,25 +51,14 @@ export default function ProfileEditScreen() {
 
   const onSavePressed = async () => {
     if (!profile || !name) return;
-
-    const { error: locationError } = await supabase
-      .from("locations")
-      .update({ is_public: isPublic })
-      .eq("user_id", profile.user_id);
-
-    if (locationError) {
-      console.error(locationError);
-      return;
-    }
-
-    const { error: profileError } = await supabase
-      .from("profiles")
-      .update({ name: name, status_message: statusMessage })
-      .eq("user_id", profile.user_id);
-
-    if (profileError) {
-      console.error(profileError);
-      return;
+    try {
+      await updateMyProfile({
+        p_is_public: isPublic,
+        p_name: name,
+        p_status_message: statusMessage,
+      });
+    } catch (err) {
+      console.error(err); return;
     }
 
     await refreshProfile();

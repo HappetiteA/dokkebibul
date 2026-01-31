@@ -4,7 +4,7 @@ import {
   SelectFollowingsResponse,
   SelectFollowersResponse,
   SelectBlocksResponse,
-  SelectMyLocationResponse,
+  UpdateMyProfileRequest
 } from "@/types/orm.types";
 
 type Coords = {
@@ -144,3 +144,15 @@ export const reverseGeocode = async (lat: number, lon: number) => {
     throw err;
   }
 };
+
+export async function updateMyProfile(req: UpdateMyProfileRequest) {
+  try {
+    const { data, error } = await supabase.rpc(
+      "update_user_profile_and_location",
+      req
+    );
+    if (error) throw error;
+  } catch (err) {
+    throw err;
+  }
+}
