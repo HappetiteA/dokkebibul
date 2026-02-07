@@ -5,7 +5,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useCallback, useEffect, useState } from "react";
 import { Alert, Image, StyleSheet, Switch, Text, View } from "react-native";
 import { TouchableOpacity } from "react-native";
-import ShadowWrap from "@/components/style/Shadow";
+import { ShadowStyle } from "@/components/style/Shadow";
 import { NeumorphicSwitch } from "@/components/style/Switch";
 import { getBlocks } from "@/services/supabase";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -96,26 +96,24 @@ export default function Settings() {
                 </TouchableOpacity>
               </View>
               <View style={{ marginTop: 40 }}>
-                <ShadowWrap>
-                  <TouchableOpacity
-                    style={styles.button}
-                    onPress={async () => {
-                      try {
-                        await logout();
-                      } catch (err: any) {
-                        Alert.alert("Logout Error", err.message);
-                        return;
-                      }
-                      try {
-                        await AsyncStorage.clear();
-                      } catch (err: any) {
-                        console.warn("AsyncStorage clear failed", err.message);
-                      }
-                    }}
-                  >
-                    <Text style={styles.innerButtonText}>로그아웃</Text>
-                  </TouchableOpacity>
-                </ShadowWrap>
+                <TouchableOpacity
+                  style={[styles.button, ShadowStyle.default]}
+                  onPress={async () => {
+                    try {
+                      await logout();
+                    } catch (err: any) {
+                      Alert.alert("Logout Error", err.message);
+                      return;
+                    }
+                    try {
+                      await AsyncStorage.clear();
+                    } catch (err: any) {
+                      console.warn("AsyncStorage clear failed", err.message);
+                    }
+                  }}
+                >
+                  <Text style={styles.innerButtonText}>로그아웃</Text>
+                </TouchableOpacity>
               </View>
 
               <View

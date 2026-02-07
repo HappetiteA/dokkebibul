@@ -5,7 +5,6 @@ import {
   TouchableOpacity,
   View,
   Image,
-  SafeAreaView,
   TextInput,
   Keyboard,
   TouchableWithoutFeedback,
@@ -20,6 +19,8 @@ import { getAvatarSource } from "@/utils/avatarColor";
 import headerStyle from "@/components/style/commonStyle";
 import { getAddressPublicity } from "@/services/geocode";
 import { NeumorphicSwitch } from "@/components/style/Switch";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { ShadowStyle } from "@/components/style/Shadow";
 
 export default function ProfileEditScreen() {
   const router = useRouter();
@@ -107,10 +108,10 @@ export default function ProfileEditScreen() {
 
             {/* Name Input */}
             <View style={styles.inputRow}>
-              <View style={[styles.labelContainer, styles.commonShadow]}>
+              <View style={[styles.labelContainer, ShadowStyle.default]}>
                 <Text style={styles.labelText}>이름</Text>
               </View>
-              <View style={[styles.inputContainer, styles.commonShadow]}>
+              <View style={[styles.inputContainer, ShadowStyle.default]}>
                 <TextInput
                   style={styles.textInput}
                   value={name}
@@ -128,14 +129,14 @@ export default function ProfileEditScreen() {
 
             {/* Bio Input */}
             <View style={styles.inputRow}>
-              <View style={[styles.labelContainer, styles.commonShadow]}>
+              <View style={[styles.labelContainer, ShadowStyle.default]}>
                 <Text style={styles.labelText}>소개</Text>
               </View>
               <View
                 style={[
                   styles.inputContainer,
                   styles.bioInputContainer,
-                  styles.commonShadow,
+                  ShadowStyle.default,
                 ]}
               >
                 <TextInput
@@ -184,9 +185,9 @@ export default function ProfileEditScreen() {
               <TouchableOpacity
                 style={
                   name
-                    ? [styles.commonShadow, styles.saveButton]
+                    ? [ShadowStyle.default, styles.saveButton]
                     : [
-                        styles.commonShadow,
+                        ShadowStyle.default,
                         styles.saveButton,
                         styles.saveButtonDisabled,
                       ]
@@ -213,14 +214,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingTop: 20,
     paddingBottom: 40,
-  },
-  commonShadow: {
-    backgroundColor: "#ffffff",
-    shadowColor: "#000",
-    shadowOffset: { width: 5, height: 5 },
-    shadowOpacity: 0.08,
-    shadowRadius: 5,
-    elevation: 3,
   },
   avatarContainer: {
     marginBottom: 40,

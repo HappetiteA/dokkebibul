@@ -1,6 +1,13 @@
 import { Link } from "expo-router";
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import ShadowWrap from "./style/Shadow";
+import {
+  Dimensions,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { ShadowStyle } from "./style/Shadow";
 import { getAvatarSource } from "@/utils/avatarColor";
 
 interface IChatListElementProp {
@@ -20,18 +27,17 @@ export default function ChatListElement({
   time_string,
   onLongPress,
 }: IChatListElementProp) {
+  const { width: W } = Dimensions.get("window");
+
   return (
-    <ShadowWrap>
+    <View style={[styles.container, ShadowStyle.default]}>
       <Link
         href={{
           pathname: `/(app)/(home)/chat/${conversation_id}/ChatScreen`,
         }}
         asChild
       >
-        <TouchableOpacity
-          style={{ ...styles.container }}
-          onLongPress={onLongPress}
-        >
+        <TouchableOpacity onLongPress={onLongPress}>
           <View style={{ flexDirection: "row" }}>
             <View style={styles.icon}>
               <Image
@@ -41,7 +47,7 @@ export default function ChatListElement({
               />
             </View>
             <View style={styles.contents}>
-              <View style={styles.horizontal}>
+              <View style={[styles.horizontal, { width: W - height - 40 }]}>
                 <Text style={styles.name}>{other_name}</Text>
                 <Text style={styles.time}>{time_string}</Text>
               </View>
@@ -50,12 +56,13 @@ export default function ChatListElement({
           </View>
         </TouchableOpacity>
       </Link>
-    </ShadowWrap>
+    </View>
   );
 }
 
-const height = 55;
-const padding = 5;
+const height = 60;
+const padding = 10;
+const iconSize = 40;
 
 const styles = StyleSheet.create({
   container: {
@@ -65,20 +72,20 @@ const styles = StyleSheet.create({
     marginVertical: 5,
     paddingHorizontal: padding,
     justifyContent: "center",
-    borderRadius: 30,
+    borderRadius: 35,
   },
   vertical: {
     flexDirection: "column",
   },
   horizontal: {
     flexDirection: "row",
-    width: 350 - height,
     justifyContent: "space-between",
   },
   icon: {
-    width: height - padding * 2,
-    height: height - padding * 2,
-    borderRadius: height / 2 - padding,
+    width: iconSize,
+    height: iconSize,
+    borderRadius: iconSize / 2,
+    backgroundColor: "#f8f8fa",
   },
   contents: {
     flexDirection: "column",
@@ -86,5 +93,5 @@ const styles = StyleSheet.create({
   },
   name: { fontSize: 16 },
   chat: { color: "#909090", fontSize: 14 },
-  time: { color: "#909090", fontSize: 12 },
+  time: { color: "#909090", fontSize: 12, textAlign: "right" },
 });

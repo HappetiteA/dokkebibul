@@ -10,7 +10,7 @@ import {
   SettingsIcon,
 } from "@/components/style/Icons";
 import headerStyle, { BGStyle } from "@/components/style/commonStyle";
-import ShadowWrap from "@/components/style/Shadow";
+import { ShadowStyle } from "@/components/style/Shadow";
 import {
   Link,
   useLocalSearchParams,
@@ -109,29 +109,28 @@ export default function ChatScreen() {
     })();
 
     //set realtime chatting
-    const channel = supabase
-      .channel(`chatroom:${conversation_id}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "messages",
-          filter: `conversation_id=eq.${conversation_id}`,
-        },
-        (payload) => {
-          const new_chat: Chat = {
-            id: payload.new.id,
-            sender_id: payload.new.sender_id,
-            content: payload.new.content,
-            created_at: payload.new.created_at,
-            is_read: payload.new.is_read,
-            is_human: payload.new.is_human,
-          };
-          setChat((c) => [...c, new_chat]);
-        },
-      )
-      .subscribe();
+    const channel = supabase.channel(`chatroom:${conversation_id}`).on(
+      "postgres_changes",
+      {
+        event: "INSERT",
+        schema: "public",
+        table: "messages",
+        filter: `conversation_id=eq.${conversation_id}`,
+      },
+      (payload) => {
+        const new_chat: Chat = {
+          id: payload.new.id,
+          sender_id: payload.new.sender_id,
+          content: payload.new.content,
+          created_at: payload.new.created_at,
+          is_read: payload.new.is_read,
+          is_human: payload.new.is_human,
+        };
+        setChat((c) => [...c, new_chat]);
+      },
+    );
+
+    channel.subscribe();
 
     return () => {
       channel.unsubscribe();
@@ -157,27 +156,25 @@ export default function ChatScreen() {
           >
             <View style={{ flex: 1, backgroundColor: "#F8F8FA" }}>
               <ChatHistory chat={chat} chatRoomData={chatRoomData} />
-              <ShadowWrap>
-                <View style={styles.textInputView}>
-                  <TextInput
-                    editable={!chatRoomData.me.ai_enabled}
-                    value={text}
-                    onChangeText={onChangeText}
-                    placeholder={
-                      chatRoomData.me.ai_enabled
-                        ? "도깨비불 모드 사용 중입니다."
-                        : "Say Something..."
-                    }
-                    style={{ flex: 5, fontSize: 16 }}
-                  />
-                  <TouchableOpacity
-                    onPress={onSubmit}
-                    disabled={chatRoomData.me.ai_enabled}
-                  >
-                    {chatRoomData.me.ai_enabled ? <LockIcon /> : <SendIcon />}
-                  </TouchableOpacity>
-                </View>
-              </ShadowWrap>
+              <View style={[styles.textInputView, ShadowStyle.default]}>
+                <TextInput
+                  editable={!chatRoomData.me.ai_enabled}
+                  value={text}
+                  onChangeText={onChangeText}
+                  placeholder={
+                    chatRoomData.me.ai_enabled
+                      ? "도깨비불 모드 사용 중입니다."
+                      : "Say Something..."
+                  }
+                  style={{ flex: 5, fontSize: 16 }}
+                />
+                <TouchableOpacity
+                  onPress={onSubmit}
+                  disabled={chatRoomData.me.ai_enabled}
+                >
+                  {chatRoomData.me.ai_enabled ? <LockIcon /> : <SendIcon />}
+                </TouchableOpacity>
+              </View>
             </View>
           </KeyboardAvoidingView>
         </>
@@ -256,18 +253,17 @@ function ChatScreenHeader({
               disabled={!globalSetting?.ai_enabled}
             ></NeumorphicSwitch>
           </View>
-          <ShadowWrap>
-            <Link
-              href={{
-                pathname: `/(app)/(home)/chat/${conversation_id}/ChatSettings`,
+          <View style={[headerStyle.button, ShadowStyle.default]}>
+            <TouchableOpacity
+              onPress={() => {
+                router.navigate(
+                  `/(app)/(home)/chat/${conversation_id}/ChatSettings`,
+                );
               }}
-              asChild
             >
-              <TouchableOpacity style={headerStyle.button}>
-                <SettingsIcon />
-              </TouchableOpacity>
-            </Link>
-          </ShadowWrap>
+              <SettingsIcon />
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     </View>

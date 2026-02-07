@@ -29,12 +29,12 @@ const headerStyle = StyleSheet.create({
     marginLeft: 15,
   },
   button: {
-    width: 48,
-    height: 48,
+    width: 40,
+    height: 40,
     borderRadius: 25,
+    marginHorizontal: 5,
     justifyContent: "center",
     alignItems: "center",
-    marginHorizontal: 2,
   },
   title: {
     marginLeft: 10,

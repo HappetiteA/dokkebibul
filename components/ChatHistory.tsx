@@ -120,7 +120,7 @@ export default function ChatHistory({ chat, chatRoomData }: ChatHistoryProp) {
             {ShowName ? (
               <Image
                 source={getAvatarSource(chatRoomData.other.color_code)}
-                style={{ width: 40, height: 40 }}
+                style={{ width: 40, height: 40, backgroundColor: "#f8f8fa" }}
                 resizeMethod="resize"
               />
             ) : (
