@@ -5,7 +5,7 @@ export function SettingsIcon() {
   return (
     <View style={styles.inner_shadow}>
       <Image
-        style={{ width: 36, height: 36 }}
+        style={{ width: 40, height: 40 }}
         source={require("@/assets/from_figma/settings.png")}
       />
     </View>
@@ -16,7 +16,7 @@ export function ProfilesIcon() {
   return (
     <View style={styles.inner_shadow}>
       <Image
-        style={{ width: 36, height: 36 }}
+        style={{ width: 40, height: 40 }}
         source={require("@/assets/from_figma/profiles.png")}
       />
     </View>
@@ -87,28 +87,14 @@ export function PlaceIcon() {
 
 const styles = StyleSheet.create({
   inner_shadow: {
-    backgroundColor: "transparent",
+    backgroundColor: "#c9c9c9",
     borderRadius: 30,
-    borderWidth: 0.01,
-    borderColor: "transparent",
     overflow: "hidden",
-    shadowOffset: { width: 2, height: 2 },
-    shadowColor: "#000000",
-    shadowRadius: 3,
-    shadowOpacity: 0.3,
-    elevation: 1,
   },
 
   large_inner_shadow: {
-    backgroundColor: "transparent",
+    backgroundColor: "#c9c9c9",
     borderRadius: 30,
-    borderWidth: 0.01,
-    borderColor: "transparent",
     overflow: "hidden",
-    shadowOffset: { width: 2, height: 2 },
-    shadowColor: "#000000",
-    shadowRadius: 6,
-    shadowOpacity: 0.3,
-    elevation: 1,
   },
 });

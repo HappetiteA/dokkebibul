@@ -9,7 +9,7 @@ import {
   View,
   ViewStyle,
 } from "react-native";
-import ShadowWrap from "@/components/style/Shadow";
+import { ShadowStyle } from "@/components/style/Shadow";
 
 type NeumorphicSwitchProps = {
   value: boolean;
@@ -96,7 +96,7 @@ export function NeumorphicSwitch({
             shadowRadius: 10,
           }),
     }),
-    [thumbSize, thumbColor]
+    [thumbSize, thumbColor],
   );
 
   return (
@@ -107,48 +107,47 @@ export function NeumorphicSwitch({
       style={[{ opacity: disabled ? 0.55 : 1 }, style]}
       hitSlop={10}
     >
-      <ShadowWrap>
-        {/* white border */}
+      {/* white border */}
+      <View
+        style={[
+          ShadowStyle.default,
+          styles.outerRing,
+          {
+            width,
+            height,
+            borderRadius: height / 2,
+            padding: border,
+          },
+        ]}
+      >
+        {/* track */}
         <View
-          style={[
-            styles.outerRing,
-            {
-              width,
-              height,
-              borderRadius: height / 2,
-              padding: border,
-            },
-          ]}
+          style={{
+            width: innerWidth,
+            height: innerHeight,
+            borderRadius: radius,
+            backgroundColor: trackBg,
+          }}
         >
-          {/* track */}
-          <View
-            style={{
-              width: innerWidth,
-              height: innerHeight,
-              borderRadius: radius,
-              backgroundColor: trackBg,
-            }}
+          {/* thumb */}
+          <Animated.View
+            style={[
+              styles.thumbWrapper,
+              {
+                left: padding,
+                top: padding,
+                transform: [{ translateX: thumbTranslateX }],
+              },
+            ]}
           >
-            {/* thumb */}
-            <Animated.View
-              style={[
-                styles.thumbWrapper,
-                {
-                  left: padding,
-                  top: padding,
-                  transform: [{ translateX: thumbTranslateX }],
-                },
-              ]}
-            >
-              <View style={thumbStyle}>
-                {renderThumbContent
-                  ? renderThumbContent({ value, size: thumbSize })
-                  : null}
-              </View>
-            </Animated.View>
-          </View>
+            <View style={thumbStyle}>
+              {renderThumbContent
+                ? renderThumbContent({ value, size: thumbSize })
+                : null}
+            </View>
+          </Animated.View>
         </View>
-      </ShadowWrap>
+      </View>
     </Pressable>
   );
 }
