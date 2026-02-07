@@ -10,11 +10,6 @@ export default {
     scheme: "dokkebibul",
     userInterfaceStyle: "automatic",
     newArchEnabled: true,
-    splash: {
-      image: "./assets/images/splash-icon.png",
-      resizeMode: "contain",
-      backgroundColor: "#ffffff",
-    },
     ios: {
       supportsTablet: true,
       usesAppleSignIn: true,
@@ -57,13 +52,13 @@ export default {
       [
         "expo-splash-screen",
         {
-          backgroundColor: "#232323",
+          backgroundColor: "#ffffff",
           image: "./assets/images/splash-icon.png",
-          dark: {
-            image: "./assets/images/splash-icon-dark.png",
-            backgroundColor: "#000000",
-          },
-          imageWidth: 200,
+          resizeMode: "contain",
+          // dark: {
+          //   image: "./assets/images/splash-icon-dark.png",
+          //   backgroundColor: "#000000",
+          // },
         },
       ],
       [

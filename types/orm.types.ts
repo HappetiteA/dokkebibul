@@ -20,3 +20,5 @@ export type SelectMyLocationRequest =
   Database["public"]["Functions"]["select_my_location"]["Args"];
 export type SelectMyLocationResponse =
   Database["public"]["Functions"]["select_my_location"]["Returns"];
+
+export type UpdateMyProfileRequest = Database["public"]["Functions"]["update_user_profile_and_location"]["Args"];
