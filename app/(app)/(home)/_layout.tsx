@@ -62,6 +62,20 @@ export default function HomeLayout() {
             headerShown: false,
           }}
         />
+        <Stack.Screen
+          name="chat"
+          options={{
+            title: "chat",
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="PISetting"
+          options={{
+            title: "PISetting",
+            headerShown: false,
+          }}
+        />
       </Stack>
     </GlobalSettingProvider>
   );

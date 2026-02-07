@@ -89,6 +89,24 @@ export default function Settings() {
                   </View>
                 </TouchableOpacity>
               </View>
+
+              <View style={[styles.settingListElement, { marginTop: 10 }]}>
+                <Text style={styles.h1}>개인 정보 설정</Text>
+                <TouchableOpacity
+                  onPress={() => {
+                    router.navigate("/PISetting/PISetting");
+                  }}
+                >
+                  <View style={{ flexDirection: "row" }}>
+                    <Image
+                      style={{ width: 16, height: 25 }}
+                      resizeMode="contain"
+                      source={require("../../../assets/from_figma/right_arrow.png")}
+                    />
+                  </View>
+                </TouchableOpacity>
+              </View>
+
               <View style={styles.settingListElement}>
                 <Text style={styles.h1}>계정 관리</Text>
                 <TouchableOpacity>
