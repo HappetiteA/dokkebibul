@@ -63,17 +63,15 @@ export default function HomeLayout() {
           }}
         />
         <Stack.Screen
-          name="chat"
-          options={{
-            title: "chat",
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
           name="PISetting"
           options={{
             title: "PISetting",
-            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="EditPISetting"
+          options={{
+            title: "EditPISetting",
           }}
         />
       </Stack>

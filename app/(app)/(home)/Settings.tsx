@@ -94,7 +94,7 @@ export default function Settings() {
                 <Text style={styles.h1}>개인 정보 설정</Text>
                 <TouchableOpacity
                   onPress={() => {
-                    router.navigate("/PISetting/PISetting");
+                    router.navigate("/PISetting");
                   }}
                 >
                   <View style={{ flexDirection: "row" }}>
