@@ -7,7 +7,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { getAvatarSource } from "@/utils/avatarColor";
 import { getAddressPublicity } from "@/services/geocode"; // Adjust path as needed
 import React from "react";
-import headerStyle from "@/components/style/commonStyle";
+import headerStyle, { BGStyle } from "@/components/style/commonStyle";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ShadowStyle } from "@/components/style/Shadow";
 
@@ -77,7 +77,7 @@ export default function MyProfileScreen() {
   const { title, dotColor, address } = getLocationUI();
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={BGStyle.BG}>
       <MyProfileScreenHeader coins={profile ? profile.coins : 0} />
 
       <View style={styles.scrollContent}>
@@ -149,8 +149,24 @@ function MyProfileScreenHeader({ coins }: { coins: number }) {
           </TouchableOpacity>
         </View>
         {/* Right: Cash Amount + Edit Button */}
-        <View style={[headerStyle.right, { alignItems: "center" }]}>
-          <Text style={styles.cashText}>${coins}</Text>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            marginRight: 12,
+          }}
+        >
+          <Image
+            source={require("@/assets/icons/cash.png")}
+            style={{
+              width: 20,
+              height: 20,
+              marginRight: 4,
+              tintColor: "#C0C0C0",
+            }}
+            resizeMode="contain"
+          />
+          <Text style={styles.cashText}>{coins}</Text>
 
           <TouchableOpacity
             style={[styles.editButtonCircle, ShadowStyle.default]}
@@ -218,8 +234,8 @@ const styles = StyleSheet.create({
     width: 40,
   },
   statusBox: {
-    width: "85%",
-    borderRadius: 30,
+    width: "80%",
+    borderRadius: 50,
     paddingVertical: 40,
     paddingHorizontal: 20,
     alignItems: "center",
@@ -236,7 +252,7 @@ const styles = StyleSheet.create({
   locationTitleRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 8,
+    marginBottom: 12,
   },
   locationTitle: {
     fontSize: 18,
