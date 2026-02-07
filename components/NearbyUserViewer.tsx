@@ -27,7 +27,9 @@ const AVATAR_SIZE = 50;
 const CENTER_AVATAR_SIZE = 70;
 const MAX_RADIUS_METERS = 2000; // 2km limit
 
-export async function startTracking(onUpdate: (lat: number, lon: number) => void) {
+export async function startTracking(
+  onUpdate: (lat: number, lon: number) => void,
+) {
   const { status } = await Location.requestForegroundPermissionsAsync();
   if (status !== "granted") throw new Error("Location permission denied");
 
@@ -39,7 +41,7 @@ export async function startTracking(onUpdate: (lat: number, lon: number) => void
     (loc) => {
       const { latitude, longitude } = loc.coords;
       onUpdate(latitude, longitude);
-    }
+    },
   );
 }
 

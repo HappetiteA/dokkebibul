@@ -18,6 +18,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { BGStyle } from "@/components/style/commonStyle";
 import { getAvatarSource } from "@/utils/avatarColor";
 import React from "react";
+import { ShadowStyle } from "@/components/style/Shadow";
 
 export default function FollowersList() {
   const router = useRouter();
@@ -107,7 +108,7 @@ export default function FollowersList() {
     item,
     index,
   }) => (
-    <View style={styles.cardContainer}>
+    <View style={[styles.cardContainer, ShadowStyle.default]}>
       {/* Left Section: Profile Click */}
       <TouchableOpacity
         style={styles.profileSection}
@@ -175,13 +176,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: 30,
     marginBottom: 12,
-
-    // --- SHADOW EFFECT ---
-    shadowColor: "#000",
-    shadowOffset: { width: 7, height: 7 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
   },
   profileSection: {
     flexDirection: "row",

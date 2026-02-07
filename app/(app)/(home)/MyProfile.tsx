@@ -1,12 +1,5 @@
 import { useState } from "react";
-import {
-  Text,
-  TouchableOpacity,
-  View,
-  StyleSheet,
-  Image,
-  SafeAreaView,
-} from "react-native";
+import { Text, TouchableOpacity, View, StyleSheet, Image } from "react-native";
 import { useRouter, useFocusEffect } from "expo-router";
 import { useAuth } from "@/contexts/AuthContext";
 import { getFollowers, getFollowings } from "@/services/supabase";
@@ -15,6 +8,8 @@ import { getAvatarSource } from "@/utils/avatarColor";
 import { getAddressPublicity } from "@/services/geocode"; // Adjust path as needed
 import React from "react";
 import headerStyle from "@/components/style/commonStyle";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { ShadowStyle } from "@/components/style/Shadow";
 
 // Define the type here if not imported
 type LocationInfo = {
@@ -96,7 +91,7 @@ export default function MyProfileScreen() {
         </View>
 
         {/* 2. Name Tag */}
-        <View style={[styles.nameTag, styles.commonShadow]}>
+        <View style={[styles.nameTag, ShadowStyle.default]}>
           <Text style={styles.nameText}>{profile?.name ?? ""}</Text>
         </View>
 
@@ -122,7 +117,7 @@ export default function MyProfileScreen() {
         </View>
 
         {/* 4. Status Message Box */}
-        <View style={[styles.statusBox, styles.commonShadow]}>
+        <View style={[styles.statusBox, ShadowStyle.default]}>
           <Text style={styles.statusText}>{profile?.status_message ?? ""}</Text>
         </View>
 
@@ -158,7 +153,7 @@ function MyProfileScreenHeader({ coins }: { coins: number }) {
           <Text style={styles.cashText}>${coins}</Text>
 
           <TouchableOpacity
-            style={[styles.editButtonCircle, styles.commonShadow]}
+            style={[styles.editButtonCircle, ShadowStyle.default]}
             onPress={() => router.navigate("/(app)/(home)/EditProfile")}
           >
             <Ionicons name="pencil" size={16} color="#aaa" />
@@ -179,20 +174,13 @@ const styles = StyleSheet.create({
     paddingTop: 40,
     paddingBottom: 40,
   },
-  commonShadow: {
-    backgroundColor: "#ffffff",
-    shadowColor: "#000",
-    shadowOffset: { width: 7, height: 7 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
   avatarContainer: {
     marginBottom: 20,
   },
   avatarImage: {
     width: 120,
     height: 120,
+    backgroundColor: "#f8f8fa",
   },
   nameTag: {
     paddingVertical: 10,

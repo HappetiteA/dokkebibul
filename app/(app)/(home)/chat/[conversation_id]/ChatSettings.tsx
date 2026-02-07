@@ -10,7 +10,7 @@ import {
   ReportSuccessModal,
 } from "@/components/modals/ReportModals";
 import { BGStyle } from "@/components/style/commonStyle";
-import ShadowWrap from "@/components/style/Shadow";
+import { ShadowStyle } from "@/components/style/Shadow";
 import { NeumorphicSwitch } from "@/components/style/Switch";
 import { useAuth } from "@/contexts/AuthContext";
 import { useChatRoom } from "@/contexts/ChatRoomContext";
@@ -137,45 +137,39 @@ export default function ChatSettings() {
             </View>
 
             <View>
-              <ShadowWrap>
-                <TouchableOpacity
-                  onPress={() =>
-                    openReportModal({
-                      onClose: closeReportModal,
-                      name: chatRoomData?.other.name,
-                      onReportBtnPressed: onReportBtnPressed,
-                      reportBtnEnabled: reportBtnEnabled,
-                    })
-                  }
-                >
-                  <View style={styles.button}>
-                    <Text style={styles.innerButtonText}>신고하기</Text>
-                  </View>
-                </TouchableOpacity>
-              </ShadowWrap>
-              <ShadowWrap>
-                <TouchableOpacity
-                  onPress={() =>
-                    openBlockModal({
-                      onClose: closeBlockModal,
-                      name: chatRoomData?.other.name,
-                      onBlockBtnPressed: onBlockBtnPressed,
-                      blockBtnEnabled: blockBtnEnabled,
-                    })
-                  }
-                >
-                  <View style={styles.button}>
-                    <Text style={styles.innerButtonText}>차단하기</Text>
-                  </View>
-                </TouchableOpacity>
-              </ShadowWrap>
-              <ShadowWrap>
-                <TouchableOpacity>
-                  <View style={styles.button}>
-                    <Text style={styles.innerButtonText}>채팅방 나가기</Text>
-                  </View>
-                </TouchableOpacity>
-              </ShadowWrap>
+              <TouchableOpacity
+                onPress={() =>
+                  openReportModal({
+                    onClose: closeReportModal,
+                    name: chatRoomData?.other.name,
+                    onReportBtnPressed: onReportBtnPressed,
+                    reportBtnEnabled: reportBtnEnabled,
+                  })
+                }
+              >
+                <View style={[styles.button, ShadowStyle.default]}>
+                  <Text style={styles.innerButtonText}>신고하기</Text>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() =>
+                  openBlockModal({
+                    onClose: closeBlockModal,
+                    name: chatRoomData?.other.name,
+                    onBlockBtnPressed: onBlockBtnPressed,
+                    blockBtnEnabled: blockBtnEnabled,
+                  })
+                }
+              >
+                <View style={[styles.button, ShadowStyle.default]}>
+                  <Text style={styles.innerButtonText}>차단하기</Text>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity>
+                <View style={[styles.button, ShadowStyle.default]}>
+                  <Text style={styles.innerButtonText}>채팅방 나가기</Text>
+                </View>
+              </TouchableOpacity>
             </View>
           </>
         ) : (

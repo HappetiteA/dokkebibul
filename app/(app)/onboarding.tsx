@@ -23,7 +23,7 @@ import headerStyle, {
   headerHeight,
 } from "@/components/style/commonStyle";
 import { BackIcon, SendIcon } from "@/components/style/Icons";
-import ShadowWrap from "@/components/style/Shadow";
+import { ShadowStyle } from "@/components/style/Shadow";
 import Animated, {
   cancelAnimation,
   useAnimatedStyle,
@@ -156,19 +156,17 @@ const Question = ({
         behavior={Platform.OS == "ios" ? "padding" : undefined}
       >
         <View>
-          <ShadowWrap>
-            <View style={styles.textInputView}>
-              <TextInput
-                value={value}
-                onChangeText={onChangeText}
-                placeholder="Type your answer..."
-                style={{ flex: 5, fontSize: 20 }}
-              />
-              <TouchableOpacity onPress={onNext} disabled={!value.trim()}>
-                <SendIcon />
-              </TouchableOpacity>
-            </View>
-          </ShadowWrap>
+          <View style={[styles.textInputView, ShadowStyle.default]}>
+            <TextInput
+              value={value}
+              onChangeText={onChangeText}
+              placeholder="Type your answer..."
+              style={{ flex: 5, fontSize: 20 }}
+            />
+            <TouchableOpacity onPress={onNext} disabled={!value.trim()}>
+              <SendIcon />
+            </TouchableOpacity>
+          </View>
         </View>
       </KeyboardAvoidingView>
     </>
@@ -271,7 +269,7 @@ const ColorPicker = ({
 
       <View style={{ position: "absolute", bottom: "30%" }}>
         <TouchableOpacity
-          style={[styles.commonShadow, styles.saveButton]}
+          style={[ShadowStyle.default, styles.saveButton]}
           onPress={onNext}
         >
           <Text style={styles.saveButtonText}>저장</Text>
@@ -500,14 +498,6 @@ const styles = StyleSheet.create({
   },
 
   // Button Design
-  commonShadow: {
-    backgroundColor: "#ffffff",
-    shadowColor: "#000",
-    shadowOffset: { width: 5, height: 5 },
-    shadowOpacity: 0.08,
-    shadowRadius: 5,
-    elevation: 3,
-  },
   saveButton: {
     paddingVertical: 12,
     paddingHorizontal: 50,

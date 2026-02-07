@@ -1,11 +1,4 @@
-import {
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-  Image,
-  SafeAreaView,
-} from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View, Image } from "react-native";
 import { useLocalSearchParams, useRouter, useNavigation } from "expo-router";
 import { CommonActions } from "@react-navigation/native";
 import { useEffect, useState } from "react";
@@ -33,7 +26,8 @@ import { getAvatarSource } from "@/utils/avatarColor";
 import headerStyle from "@/components/style/commonStyle";
 import { CloseModal, OpenModalOptions } from "@/types/modal";
 import { BackIcon, BlockIcon, ReportIcon } from "@/components/style/Icons";
-import ShadowWrap from "@/components/style/Shadow";
+import { ShadowStyle } from "@/components/style/Shadow";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function OtherProfileScreen() {
   const router = useRouter();
@@ -230,12 +224,12 @@ export default function OtherProfileScreen() {
             </View>
 
             {/* Name Tag - With Shadow */}
-            <View style={[styles.commonShadow, styles.nameTag]}>
+            <View style={[ShadowStyle.default, styles.nameTag]}>
               <Text style={styles.nameText}>{userInfo?.name ?? ""}</Text>
             </View>
 
             {/* Status Message Box - With Shadow */}
-            <View style={[styles.commonShadow, styles.statusBox]}>
+            <View style={[ShadowStyle.default, styles.statusBox]}>
               <Text style={styles.statusText}>
                 {userInfo?.status_message ?? ""}
               </Text>
@@ -248,7 +242,8 @@ export default function OtherProfileScreen() {
                 <TouchableOpacity
                   style={[
                     styles.buttonBase,
-                    styles.commonShadow,
+
+                    ShadowStyle.default,
                     styles.followButtonWide,
                   ]}
                   onPress={onFollowBtnPressed}
@@ -262,7 +257,7 @@ export default function OtherProfileScreen() {
                   <TouchableOpacity
                     style={[
                       styles.buttonBase,
-                      styles.commonShadow,
+                      ShadowStyle.default,
                       styles.unfollowButton,
                     ]}
                     onPress={onFollowBtnPressed}
@@ -274,7 +269,7 @@ export default function OtherProfileScreen() {
                   <TouchableOpacity
                     style={[
                       styles.buttonBase,
-                      styles.commonShadow,
+                      ShadowStyle.default,
                       styles.chatButton,
                     ]}
                     onPress={onChatBtnPressed}
@@ -350,36 +345,32 @@ function OtherProfileScreenHeader({
           </TouchableOpacity>
         </View>
         <View style={[headerStyle.right, { justifyContent: "center" }]}>
-          <ShadowWrap>
-            <TouchableOpacity
-              style={headerStyle.button}
-              onPress={() =>
-                openReportModal({
-                  onClose: closeReportModal,
-                  name: userInfo?.name,
-                  onReportBtnPressed: onReportBtnPressed,
-                  reportBtnEnabled: reportBtnEnabled,
-                })
-              }
-            >
-              <ReportIcon />
-            </TouchableOpacity>
-          </ShadowWrap>
-          <ShadowWrap>
-            <TouchableOpacity
-              style={headerStyle.button}
-              onPress={() =>
-                openBlockModal({
-                  onClose: closeBlockModal,
-                  name: userInfo?.name,
-                  onBlockBtnPressed: onBlockBtnPressed,
-                  blockBtnEnabled: blockBtnEnabled,
-                })
-              }
-            >
-              <BlockIcon />
-            </TouchableOpacity>
-          </ShadowWrap>
+          <TouchableOpacity
+            style={[headerStyle.button, ShadowStyle.default]}
+            onPress={() =>
+              openReportModal({
+                onClose: closeReportModal,
+                name: userInfo?.name,
+                onReportBtnPressed: onReportBtnPressed,
+                reportBtnEnabled: reportBtnEnabled,
+              })
+            }
+          >
+            <ReportIcon />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[headerStyle.button, ShadowStyle.default]}
+            onPress={() =>
+              openBlockModal({
+                onClose: closeBlockModal,
+                name: userInfo?.name,
+                onBlockBtnPressed: onBlockBtnPressed,
+                blockBtnEnabled: blockBtnEnabled,
+              })
+            }
+          >
+            <BlockIcon />
+          </TouchableOpacity>
         </View>
       </View>
     </View>
@@ -420,16 +411,6 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
 
-  // --- REUSABLE SHADOW STYLE ---
-  commonShadow: {
-    backgroundColor: "#ffffff", // Needed for shadow to be visible
-    shadowColor: "#000",
-    shadowOffset: { width: 7, height: 7 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-
   // Avatar (Transparent, No Shadow)
   avatarContainer: {
     marginBottom: 20,
@@ -438,6 +419,8 @@ const styles = StyleSheet.create({
   avatarImage: {
     width: 100,
     height: 100,
+    backgroundColor: "#f8f8fa",
+
     // Removed borderRadius to ensure no clipping if the image is irregular
     // If you want a circle crop, keep borderRadius: 50
   },

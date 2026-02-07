@@ -17,6 +17,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { BGStyle } from "@/components/style/commonStyle";
 import { getAvatarSource } from "@/utils/avatarColor";
 import React from "react";
+import { ShadowStyle } from "@/components/style/Shadow";
 
 export default function FollowingsList() {
   const router = useRouter();
@@ -55,7 +56,7 @@ export default function FollowingsList() {
   const renderItem: ListRenderItem<SelectFollowingsResponse[0]> = ({
     item,
   }) => (
-    <View style={styles.cardContainer}>
+    <View style={[styles.cardContainer, ShadowStyle.default]}>
       {/* Left Section: Profile Click */}
       <TouchableOpacity
         style={styles.profileSection}
@@ -106,19 +107,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: "#ffffff", // White background
+    backgroundColor: "#f8f8fa", // White background
     paddingVertical: 14,
     paddingHorizontal: 16,
     borderRadius: 30, // Higher border radius for the fully rounded pill look
     marginBottom: 12,
-
-    // --- SHADOW EFFECT ---
-    boxShadow: "0px 0px 2px 2px #ffffff",
-    shadowColor: "#000",
-    shadowOffset: { width: 7, height: 7 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3, // Essential for Android shadow
   },
   profileSection: {
     flexDirection: "row",
@@ -128,7 +121,7 @@ const styles = StyleSheet.create({
   avatar: {
     width: 40,
     height: 40,
-    backgroundColor: "#ffffff",
+    backgroundColor: "#f8f8fa",
     marginRight: 12,
   },
   nameText: {

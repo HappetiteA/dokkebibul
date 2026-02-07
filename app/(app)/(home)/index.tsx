@@ -17,7 +17,7 @@ import ChatRoomList from "@/components/ChatRoomList";
 import useModal from "@/hooks/useModal";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import BottomSheet, { BottomSheetScrollView } from "@gorhom/bottom-sheet";
-import ShadowWrap from "@/components/style/Shadow";
+import { ShadowStyle } from "@/components/style/Shadow";
 import PlaceModal from "@/components/modals/PlaceModal";
 import {
   PlaceIcon,
@@ -46,10 +46,7 @@ import React from "react";
 import { SelectNearbyUsersResponse } from "@/types/orm.types";
 import { getNearbyUsers } from "@/services/supabase";
 import { SafeAreaView } from "react-native-safe-area-context";
-import {
-  getOriginalAddress,
-  updateAddressCache,
-} from "@/services/geocode";
+import { getOriginalAddress, updateAddressCache } from "@/services/geocode";
 import { reverseGeocode } from "@/services/supabase";
 import { GPSErrorModal } from "@/components/modals/GPSErrorModal";
 
@@ -233,11 +230,8 @@ export default function MainScreen() {
     }
 
     const origAddrString = await getOriginalAddress();
-    
-    const newAddrString = await reverseGeocode(
-      myLocation.lat,
-      myLocation.lon,
-    );
+
+    const newAddrString = await reverseGeocode(myLocation.lat, myLocation.lon);
 
     const onPlaceBtnPressed = async () => {
       setPlaceBtnEnabled(false);
@@ -271,7 +265,7 @@ export default function MainScreen() {
       onPlaceBtnPressed: onPlaceBtnPressed,
       placeBtnEnabled: placeBtnEnabled,
     });
-  }
+  };
 
   return (
     <SafeAreaView style={BGStyle.BG}>
@@ -347,13 +341,12 @@ export default function MainScreen() {
           left: 10,
         }}
       >
-        <ShadowWrap>
-          <TouchableOpacity
-            onPress={onPlaceIconPressed}
-          >
-            <PlaceIcon />
-          </TouchableOpacity>
-        </ShadowWrap>
+        <TouchableOpacity
+          style={[ShadowStyle.default, { borderRadius: 35 }]}
+          onPress={onPlaceIconPressed}
+        >
+          <PlaceIcon />
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
@@ -374,22 +367,18 @@ function MainScreenHeader() {
       <View style={headerStyle.content}>
         <View style={headerStyle.left}></View>
         <View style={headerStyle.right}>
-          <ShadowWrap>
-            <TouchableOpacity
-              style={headerStyle.button}
-              onPress={onSettingsClick}
-            >
-              <SettingsIcon />
-            </TouchableOpacity>
-          </ShadowWrap>
-          <ShadowWrap>
-            <TouchableOpacity
-              style={headerStyle.button}
-              onPress={onProfileClick}
-            >
-              <ProfilesIcon />
-            </TouchableOpacity>
-          </ShadowWrap>
+          <TouchableOpacity
+            style={[headerStyle.button, ShadowStyle.default]}
+            onPress={onSettingsClick}
+          >
+            <SettingsIcon />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[headerStyle.button, ShadowStyle.default]}
+            onPress={onProfileClick}
+          >
+            <ProfilesIcon />
+          </TouchableOpacity>
         </View>
       </View>
     </View>
