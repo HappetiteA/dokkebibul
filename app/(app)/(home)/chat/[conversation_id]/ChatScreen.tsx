@@ -33,6 +33,7 @@ import { NeumorphicSwitch } from "@/components/style/Switch";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useChatRoom } from "@/contexts/ChatRoomContext";
 import { useGlobalSetting } from "@/contexts/GlobalSettingContext";
+import SelfChatHistory from "@/components/SelfChatHistory";
 
 type Chat = Omit<Message, "conversation_id">;
 
@@ -147,6 +148,7 @@ export default function ChatScreen() {
             conversation_id={conversation_id}
             other_name={chatRoomData.other.name}
             AIenabled={chatRoomData.me.ai_enabled}
+            is_self_chat={chatRoomData.me.user_id == chatRoomData.other.user_id}
             setText={setText}
             setAIenabled={setAIenabled}
           ></ChatScreenHeader>
@@ -155,7 +157,11 @@ export default function ChatScreen() {
             behavior={Platform.OS == "ios" ? "padding" : "height"}
           >
             <View style={{ flex: 1, backgroundColor: "#F8F8FA" }}>
-              <ChatHistory chat={chat} chatRoomData={chatRoomData} />
+              {chatRoomData.me.user_id != chatRoomData.other.user_id ? (
+                <ChatHistory chat={chat} chatRoomData={chatRoomData} />
+              ) : (
+                <SelfChatHistory chat={chat} chatRoomData={chatRoomData} />
+              )}
               <View style={[styles.textInputView, ShadowStyle.default]}>
                 <TextInput
                   editable={!chatRoomData.me.ai_enabled}
@@ -191,6 +197,7 @@ export default function ChatScreen() {
 interface ChatScreenHeaderProp {
   conversation_id: string;
   other_name: string;
+  is_self_chat: boolean;
   AIenabled: boolean;
   setText: React.Dispatch<React.SetStateAction<string>>;
   setAIenabled: (value: boolean) => void;
@@ -199,6 +206,7 @@ interface ChatScreenHeaderProp {
 function ChatScreenHeader({
   conversation_id,
   other_name,
+  is_self_chat,
   AIenabled,
   setText,
   setAIenabled,
@@ -224,46 +232,54 @@ function ChatScreenHeader({
           <TouchableOpacity onPress={onPressBackBtn}>
             <BackIcon />
           </TouchableOpacity>
-          <Text style={headerStyle.title}>{other_name}</Text>
+          <Text style={headerStyle.title}>
+            {is_self_chat ? "도깨비불" : other_name}
+          </Text>
         </View>
         <View style={headerStyle.right}>
-          <View style={{ justifyContent: "center" }}>
-            <NeumorphicSwitch
-              width={54}
-              height={30}
-              padding={3}
-              value={AIenabled}
-              onValueChange={onSwitchChange}
-              onColor="#93D7EA"
-              offColor="#D7D7E2"
-              renderThumbContent={({ value, size }) => (
-                <Image
-                  source={
-                    value
-                      ? require("@/assets/from_figma/fire_on.png")
-                      : require("@/assets/from_figma/fire_off.png")
-                  }
-                  style={{
-                    width: size,
-                    height: size,
-                    resizeMode: "contain",
+          {!is_self_chat ? (
+            <>
+              <View style={{ justifyContent: "center" }}>
+                <NeumorphicSwitch
+                  width={54}
+                  height={30}
+                  padding={3}
+                  value={AIenabled}
+                  onValueChange={onSwitchChange}
+                  onColor="#93D7EA"
+                  offColor="#D7D7E2"
+                  renderThumbContent={({ value, size }) => (
+                    <Image
+                      source={
+                        value
+                          ? require("@/assets/from_figma/fire_on.png")
+                          : require("@/assets/from_figma/fire_off.png")
+                      }
+                      style={{
+                        width: size,
+                        height: size,
+                        resizeMode: "contain",
+                      }}
+                    />
+                  )}
+                  disabled={!globalSetting?.ai_enabled}
+                ></NeumorphicSwitch>
+              </View>
+              <View style={[headerStyle.button, ShadowStyle.default]}>
+                <TouchableOpacity
+                  onPress={() => {
+                    router.navigate(
+                      `/(app)/(home)/chat/${conversation_id}/ChatSettings`,
+                    );
                   }}
-                />
-              )}
-              disabled={!globalSetting?.ai_enabled}
-            ></NeumorphicSwitch>
-          </View>
-          <View style={[headerStyle.button, ShadowStyle.default]}>
-            <TouchableOpacity
-              onPress={() => {
-                router.navigate(
-                  `/(app)/(home)/chat/${conversation_id}/ChatSettings`,
-                );
-              }}
-            >
-              <SettingsIcon />
-            </TouchableOpacity>
-          </View>
+                >
+                  <SettingsIcon />
+                </TouchableOpacity>
+              </View>
+            </>
+          ) : (
+            ""
+          )}
         </View>
       </View>
     </View>
