@@ -29,7 +29,7 @@ export default function Settings() {
 
   return (
     <SafeAreaView style={BGStyle.BG}>
-      <DefaultHeader title="Settings" />
+      <DefaultHeader title="설정" />
       <View style={styles.container}>
         {globalSetting ? (
           <>

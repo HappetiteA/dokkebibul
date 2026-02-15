@@ -1,7 +1,7 @@
 import { SelectNearbyUsersResponse } from "@/types/orm.types";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "expo-router";
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Dimensions,
   StyleSheet,
@@ -21,11 +21,16 @@ import Animated, {
 import { getAvatarSource } from "@/utils/avatarColor";
 
 // --- CONFIGURATION ---
-const MAX_VISIBLE_USERS = 6; // Display top 6 closest people
-const CIRCLE_RADIUS_PERCENTAGE = 0.35; // Users placed at 35% of container width from center
-const AVATAR_SIZE = 50;
-const CENTER_AVATAR_SIZE = 70;
 const MAX_RADIUS_METERS = 2000; // 2km limit
+const AVATAR_SIZE = 40;
+const CENTER_AVATAR_SIZE = 60;
+const MAX_VISIBLE_USERS = 6; // Display top 6 closest people
+
+// Slot Configuration
+const INNER_RING_COUNT = 6;
+const OUTER_RING_COUNT = 12;
+const INNER_RADIUS_PCT = 0.28; // Distance from center (28% of view size)
+const OUTER_RADIUS_PCT = 0.42; // Distance from center (42% of view size)
 
 export async function startTracking(
   onUpdate: (lat: number, lon: number) => void,
@@ -45,28 +50,116 @@ export async function startTracking(
   );
 }
 
+// Fisher-Yates Shuffle
+function shuffleArray(array: number[]) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+
 export default function NearbyUserViewer({
   nearbyUsersLocations,
-  myLocation,
 }: {
   nearbyUsersLocations: SelectNearbyUsersResponse;
-  myLocation: {
-    lat: number;
-    lon: number;
-  } | null;
 }) {
   const { profile } = useAuth();
+  const router = useRouter();
 
   const { width, height } = Dimensions.get("window");
   const userViewerSize = Math.min(width, height) - 20;
-  const centerPoint = userViewerSize / 2;
-  const placementRadius = userViewerSize * CIRCLE_RADIUS_PERCENTAGE;
 
-  const router = useRouter();
+  // 1. ONE-TIME SETUP: Generate "Orbital Slots" with a random global rotation
+  // This ensures the map looks different every time you open the app,
+  // but stays consistent while you are using it.
+  const slots = useMemo(() => {
+    const seedRotation = Math.random() * 360; // Global random rotation (0-360 deg)
+    const _slots: { x: number; y: number; id: number }[] = [];
+    let slotIdCounter = 0;
 
-  const visibleUsers = nearbyUsersLocations
-    .filter((user) => user.distance <= MAX_RADIUS_METERS)
-    .slice(0, MAX_VISIBLE_USERS);
+    // Helper to add a ring of slots
+    const addRing = (count: number, radiusPct: number, offsetDeg: number) => {
+      const radius = userViewerSize * radiusPct;
+      for (let i = 0; i < count; i++) {
+        // Calculate angle: (360 / count * index) + random_seed + ring_offset
+        const angleDeg = (360 / count) * i + seedRotation + offsetDeg;
+        const angleRad = (angleDeg * Math.PI) / 180;
+
+        // Add slight randomness (jitter) to the slot itself so it's not a perfect circle
+        const jitterX = Math.random() * 10 - 5; // -5 to +5 px
+        const jitterY = Math.random() * 10 - 5;
+
+        _slots.push({
+          id: slotIdCounter++,
+          x: radius * Math.cos(angleRad) + jitterX,
+          y: radius * Math.sin(angleRad) + jitterY,
+        });
+      }
+    };
+
+    // Create Inner Ring
+    addRing(INNER_RING_COUNT, INNER_RADIUS_PCT, 0);
+    // Create Outer Ring (Offset by 15deg so they don't align perfectly with inner ring)
+    addRing(OUTER_RING_COUNT, OUTER_RADIUS_PCT, 15);
+
+    return _slots;
+  }, [userViewerSize]);
+
+  // 2. STATE: Map User IDs to Slot IDs
+  // Structure: { "user_uuid_123": 0, "user_uuid_456": 5 }
+  const [userSlotMap, setUserSlotMap] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    // Filter valid users first
+    const validUsers = nearbyUsersLocations
+      .filter((user) => user.distance <= MAX_RADIUS_METERS)
+      .slice(0, MAX_VISIBLE_USERS);
+
+    setUserSlotMap((prevMap) => {
+      const newMap = { ...prevMap };
+
+      // 1. Identify currently occupied slots (by users who are still here)
+      const occupiedSlotIndices = new Set<number>();
+
+      Object.keys(newMap).forEach((userId) => {
+        const stillHere = validUsers.find((u) => u.user_id === userId);
+        if (!stillHere) {
+          // User left? Free up their slot.
+          delete newMap[userId];
+        } else {
+          // User still here? Mark slot as taken.
+          occupiedSlotIndices.add(newMap[userId]);
+        }
+      });
+
+      // 2. Identify ALL available slots
+      const availableSlots: number[] = [];
+      for (let i = 0; i < slots.length; i++) {
+        if (!occupiedSlotIndices.has(i)) {
+          availableSlots.push(i);
+        }
+      }
+
+      // 3. Assign slots to new users randomly
+      // We shuffle the available slots array so we don't always pick index 0
+      shuffleArray(availableSlots);
+
+      validUsers.forEach((user) => {
+        // If user doesn't have a slot yet...
+        if (newMap[user.user_id] === undefined) {
+          if (availableSlots.length > 0) {
+            // Pop a random slot from the available pool
+            const randomSlot = availableSlots.pop();
+            if (randomSlot !== undefined) {
+              newMap[user.user_id] = randomSlot;
+            }
+          }
+        }
+      });
+
+      return newMap;
+    });
+  }, [nearbyUsersLocations, slots]);
 
   const onPressNearbyUser = (user_id?: string) => {
     if (!user_id) return;
@@ -90,18 +183,17 @@ export default function NearbyUserViewer({
           justifyContent: "center",
           alignItems: "center",
         }}
-        // Using your existing border asset
         source={require("@/assets/from_figma/MainScreenBorder.png")}
         resizeMode="contain"
       >
-        {/* --- 2. Center Avatar (Myself) --- */}
+        {/* --- Center Avatar (Myself) --- */}
         <TouchableOpacity
           activeOpacity={0.8}
           onPress={() => onPressNearbyUser(profile?.user_id)}
           style={styles.centerAvatarContainer}
         >
           <Image
-            source={getAvatarSource(profile?.color_code)} // Placeholder
+            source={getAvatarSource(profile?.color_code)}
             style={{
               width: CENTER_AVATAR_SIZE,
               height: CENTER_AVATAR_SIZE,
@@ -110,17 +202,13 @@ export default function NearbyUserViewer({
           />
         </TouchableOpacity>
 
-        {/* --- 3. Surrounding Avatars (Nearby Users) --- */}
-        {visibleUsers.map((user, index) => {
-          // Calculate Angle: Spread evenly (360 / count)
-          // -90 degrees offset to start from top
-          const angleDeg = (360 / visibleUsers.length) * index - 90;
-          const angleRad = (angleDeg * Math.PI) / 180;
+        {/* --- Nearby Users (Mapped via Slots) --- */}
+        {nearbyUsersLocations.map((user) => {
+          const slotId = userSlotMap[user.user_id];
+          // If user hasn't been assigned a slot yet (or map is full), don't render
+          if (slotId === undefined) return null;
 
-          // Convert Polar to Cartesian coordinates relative to center
-          // x = r * cos(theta), y = r * sin(theta)
-          const translateX = placementRadius * Math.cos(angleRad);
-          const translateY = placementRadius * Math.sin(angleRad);
+          const pos = slots[slotId];
 
           return (
             <TouchableOpacity
@@ -130,21 +218,15 @@ export default function NearbyUserViewer({
               style={[
                 styles.nearbyAvatarContainer,
                 {
-                  // Apply calculated position using transform to keep them centered relative to container center
-                  transform: [
-                    { translateX: translateX },
-                    { translateY: translateY },
-                  ],
+                  // Apply the fixed slot position
+                  transform: [{ translateX: pos.x }, { translateY: pos.y }],
                 },
               ]}
             >
               <Image
-                // Using random placeholder avatars based on ID to make them look different
                 source={getAvatarSource(user?.user_color_code)}
                 style={styles.nearbyAvatarImage}
               />
-              {/* Optional: Add name label below avatar if needed */}
-              {/* <Text style={styles.nameLabel}>{user.name}</Text> */}
             </TouchableOpacity>
           );
         })}
@@ -152,58 +234,6 @@ export default function NearbyUserViewer({
     </View>
   );
 }
-
-// function NearbyUser({
-//   screenWidth,
-//   myLocation,
-//   userLocation,
-//   mapRadiusMeters = 500,
-//   children,
-// }: {
-//   screenWidth: number;
-//   myLocation: { lat: number; lon: number };
-//   userLocation: { lat: number; lon: number };
-//   mapRadiusMeters?: number;
-//   children: React.ReactNode;
-// }) {
-//   if (!myLocation || !userLocation) return null;
-
-//   const METERS_PER_DEG_LAT = 111000;
-//   const center = screenWidth / 2;
-
-//   const dx_m =
-//     (userLocation.lon - myLocation.lon) *
-//     METERS_PER_DEG_LAT *
-//     Math.cos((myLocation.lat * Math.PI) / 180);
-//   const dy_m = (userLocation.lat - myLocation.lat) * METERS_PER_DEG_LAT;
-
-//   const pixelsPerMeter = screenWidth / (2 * mapRadiusMeters);
-//   const x_px = dx_m * pixelsPerMeter;
-//   const y_px = -dy_m * pixelsPerMeter;
-
-//   const top = center + y_px - 25;
-//   const left = center + x_px - 25;
-
-//   if (Math.abs(x_px) > center || Math.abs(y_px) > center) return null;
-
-//   return (
-//     <View
-//       style={{
-//         ...styles.profileBG,
-//         position: "absolute",
-//         top,
-//         left,
-//         width: 50,
-//         height: 50,
-//         borderRadius: 25,
-//         justifyContent: "center",
-//         alignItems: "center",
-//       }}
-//     >
-//       {children}
-//     </View>
-//   );
-// }
 
 function BackgroundAnimation({ size }: { size: number }) {
   const rotation = useSharedValue(0);
@@ -247,34 +277,23 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  // Center User Styles
   centerAvatarContainer: {
     width: CENTER_AVATAR_SIZE,
     height: CENTER_AVATAR_SIZE,
     justifyContent: "center",
     alignItems: "center",
   },
-
-  // Nearby User Styles
   nearbyAvatarContainer: {
-    position: "absolute", // Absolute relative to the container center
+    position: "absolute",
     width: AVATAR_SIZE,
     height: AVATAR_SIZE,
     justifyContent: "center",
     alignItems: "center",
-    // We don't set top/left here because we use transform in the render loop
   },
   nearbyAvatarImage: {
     width: AVATAR_SIZE,
     height: AVATAR_SIZE,
     justifyContent: "center",
     alignItems: "center",
-  },
-  nameLabel: {
-    position: "absolute",
-    bottom: -15,
-    color: "black",
-    fontSize: 10,
-    fontWeight: "600",
   },
 });

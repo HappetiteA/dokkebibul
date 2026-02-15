@@ -111,7 +111,6 @@ export default function MainScreen() {
 
       interval = setInterval(async () => {
         const loc = myLocationRef.current;
-        // console.log(loc);
         if (!loc) return;
         const data = await getNearbyUsers(loc.lat, loc.lon, 5000);
         setNearbyUsersLocations(data);
@@ -273,7 +272,6 @@ export default function MainScreen() {
       <GestureHandlerRootView style={styles.container}>
         <NearbyUserViewer
           nearbyUsersLocations={nearbyUsersLocations}
-          myLocation={myLocation}
         />
 
         <BottomSheet
