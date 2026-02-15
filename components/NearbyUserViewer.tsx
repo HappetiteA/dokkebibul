@@ -10,7 +10,6 @@ import {
   View,
   ImageBackground,
 } from "react-native";
-import * as Location from "expo-location";
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -31,24 +30,6 @@ const INNER_RING_COUNT = 6;
 const OUTER_RING_COUNT = 12;
 const INNER_RADIUS_PCT = 0.28; // Distance from center (28% of view size)
 const OUTER_RADIUS_PCT = 0.42; // Distance from center (42% of view size)
-
-export async function startTracking(
-  onUpdate: (lat: number, lon: number) => void,
-) {
-  const { status } = await Location.requestForegroundPermissionsAsync();
-  if (status !== "granted") throw new Error("Location permission denied");
-
-  return await Location.watchPositionAsync(
-    {
-      accuracy: Location.Accuracy.High,
-      timeInterval: 3000,
-    },
-    (loc) => {
-      const { latitude, longitude } = loc.coords;
-      onUpdate(latitude, longitude);
-    },
-  );
-}
 
 // Fisher-Yates Shuffle
 function shuffleArray(array: number[]) {
@@ -194,10 +175,7 @@ export default function NearbyUserViewer({
         >
           <Image
             source={getAvatarSource(profile?.color_code)}
-            style={{
-              width: CENTER_AVATAR_SIZE,
-              height: CENTER_AVATAR_SIZE,
-            }}
+            style={styles.centerAvatarImage}
             resizeMode="contain"
           />
         </TouchableOpacity>
@@ -279,21 +257,25 @@ const styles = StyleSheet.create({
   },
   centerAvatarContainer: {
     width: CENTER_AVATAR_SIZE,
-    height: CENTER_AVATAR_SIZE,
     justifyContent: "center",
     alignItems: "center",
+  },
+  centerAvatarImage: {
+    width: CENTER_AVATAR_SIZE,
+    justifyContent: "center",
+    alignItems: "center",
+    resizeMode: "contain",
   },
   nearbyAvatarContainer: {
     position: "absolute",
     width: AVATAR_SIZE,
-    height: AVATAR_SIZE,
     justifyContent: "center",
     alignItems: "center",
   },
   nearbyAvatarImage: {
     width: AVATAR_SIZE,
-    height: AVATAR_SIZE,
     justifyContent: "center",
     alignItems: "center",
+    resizeMode: "contain",
   },
 });
