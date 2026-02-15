@@ -30,7 +30,7 @@ export default function ChatListElement({
   const { width: W } = Dimensions.get("window");
 
   return (
-    <View style={[styles.container, ShadowStyle.default]}>
+    <View style={[styles.container, ShadowStyle.pill3d]}>
       <Link
         href={{
           pathname: `/(app)/(home)/chat/${conversation_id}/ChatScreen`,

@@ -1,35 +1,30 @@
-import DefaultHeader from "@/components/DefaultHeader";
-import { getBlocks } from "@/services/supabase";
-import { useEffect, useState } from "react";
-import {
-  Text,
-  TouchableOpacity,
-  View,
-  FlatList,
-  Image,
-  StyleSheet,
-  ListRenderItem,
-} from "react-native";
-import { SelectBlocksResponse } from "@/types/orm.types";
+import React, { useEffect, useState } from "react";
+import { FlatList, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+
+import { LinearGradientHeader } from "@/components/Headers";
 import { useAuth } from "@/contexts/AuthContext";
+import { getBlocks } from "@/services/supabase";
 import { supabase } from "@/lib/supabase";
+import { SelectBlocksResponse } from "@/types/orm.types";
+import { BGStyle } from "@/components/style/commonStyle";
+import useModal from "@/hooks/useModal";
 import {
   UnblockModal,
   UnblockSuccessModal,
   UnblockFailModal,
 } from "@/components/modals/UnblockModals";
-import useModal from "@/hooks/useModal";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { BGStyle } from "@/components/style/commonStyle";
-import { getAvatarSource } from "@/utils/avatarColor";
-import React from "react";
+
+// Import Shared Components
+import { UserListItem } from "@/components/user-list/UserListItem";
+import { UnblockCircleButton } from "@/components/user-list/UserListButtons";
 
 export default function BlocksList() {
   const { profile } = useAuth();
   const [blocks, setBlocks] = useState<SelectBlocksResponse>([]);
-  // We can track specific IDs being unblocked if needed, but a global lock works too
-
   const [unblockBtnEnabled, setUnblockBtnEnabled] = useState(true);
+
+  // Modals
   const { open: openUnblockModal, close: closeUnblockModal } =
     useModal(UnblockModal);
   const { open: openUnblockSuccessModal, close: closeUnblockSuccessModal } =
@@ -46,134 +41,63 @@ export default function BlocksList() {
 
   const onUnblockBtnPressed = async (block_id: string, name: string) => {
     setUnblockBtnEnabled(false);
-
     if (!profile) {
       setUnblockBtnEnabled(true);
       return;
     }
 
-    // 1. Optimistic Update: Immediately remove from UI
+    // Optimistic UI Update
     const previousBlocks = [...blocks];
     setBlocks((prev) => prev.filter((b) => b.id !== block_id));
 
-    // 2. Perform API Call
     const { error } = await supabase.from("blocks").delete().eq("id", block_id);
 
     closeUnblockModal();
     setUnblockBtnEnabled(true);
 
     if (error) {
-      // Revert if API fails
-      setBlocks(previousBlocks);
+      setBlocks(previousBlocks); // Revert
       openUnblockFailModal({ onClose: closeUnblockFailModal });
     } else {
-      openUnblockSuccessModal({
-        onClose: closeUnblockSuccessModal,
-        name: name,
-      });
+      openUnblockSuccessModal({ onClose: closeUnblockSuccessModal, name });
     }
   };
 
-  const renderItem: ListRenderItem<SelectBlocksResponse[0]> = ({ item }) => (
-    <View style={styles.cardContainer}>
-      <View style={styles.profileSection}>
-        <Image
-          source={getAvatarSource(item?.dst_color_code)}
-          style={styles.avatar}
-          resizeMode="contain"
-        />
-        <Text style={styles.nameText}>{item.dst_name}</Text>
-      </View>
-
-      {/* Minus Button: Gray Circle */}
-      <TouchableOpacity
-        style={styles.unblockButtonCircle}
-        onPress={() =>
-          openUnblockModal({
-            onClose: closeUnblockModal,
-            onUnblockBtnPressed: () =>
-              onUnblockBtnPressed(item.id, item.dst_name),
-            unblockBtnEnabled: unblockBtnEnabled,
-            name: item.dst_name,
-          })
-        }
-      >
-        {/* The White Rounded Minus Sign */}
-        <View style={styles.minusSign} />
-      </TouchableOpacity>
-    </View>
-  );
+  const handleOpenUnblockModal = (item: SelectBlocksResponse[0]) => {
+    openUnblockModal({
+      onClose: closeUnblockModal,
+      onUnblockBtnPressed: () => onUnblockBtnPressed(item.id, item.dst_name),
+      unblockBtnEnabled: unblockBtnEnabled,
+      name: item.dst_name,
+    });
+  };
 
   return (
     <SafeAreaView style={BGStyle.BG}>
-      <DefaultHeader title="차단 목록" />
-      <View style={styles.container}>
-        <FlatList
-          data={blocks}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.dst_id}
-          contentContainerStyle={styles.listContent}
-          showsVerticalScrollIndicator={false}
-        />
-      </View>
+      <LinearGradientHeader title="차단 목록" />
+      <FlatList
+        data={blocks}
+        keyExtractor={(item) => item.dst_id}
+        contentContainerStyle={styles.listContent}
+        showsVerticalScrollIndicator={false}
+        renderItem={({ item }) => (
+          <UserListItem
+            name={item.dst_name}
+            colorCode={item.dst_color_code}
+            // No onPressProfile for blocked users
+            onPressProfile={undefined}
+            RightComponent={
+              <UnblockCircleButton
+                onPress={() => handleOpenUnblockModal(item)}
+              />
+            }
+          />
+        )}
+      />
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#f9f9f9",
-  },
-  listContent: {
-    padding: 16,
-  },
-  cardContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    backgroundColor: "#ffffff",
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    borderRadius: 30,
-    marginBottom: 12,
-
-    // --- SHADOW EFFECT ---
-    shadowColor: "#000",
-    shadowOffset: { width: 7, height: 7 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  profileSection: {
-    flexDirection: "row",
-    alignItems: "center",
-    flex: 1,
-  },
-  avatar: {
-    width: 40,
-    height: 40,
-    marginRight: 12,
-  },
-  nameText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#333",
-  },
-
-  // --- MINUS BUTTON STYLES ---
-  unblockButtonCircle: {
-    width: 32,
-    height: 32,
-    borderRadius: 16, // Perfect circle
-    backgroundColor: "#D7D7E2", // Gray color from image
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  minusSign: {
-    width: 18,
-    height: 4, // Thickness of the minus line
-    borderRadius: 2, // Rounded corners for the rectangle
-    backgroundColor: "#ffffff", // White icon
-  },
+  listContent: { padding: 16 },
 });

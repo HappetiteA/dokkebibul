@@ -156,7 +156,7 @@ const Question = ({
         behavior={Platform.OS == "ios" ? "padding" : undefined}
       >
         <View>
-          <View style={[styles.textInputView, ShadowStyle.default]}>
+          <View style={[styles.textInputView, ShadowStyle.pill3d]}>
             <TextInput
               value={value}
               onChangeText={onChangeText}
@@ -269,7 +269,7 @@ const ColorPicker = ({
 
       <View style={{ position: "absolute", bottom: "30%" }}>
         <TouchableOpacity
-          style={[ShadowStyle.default, styles.saveButton]}
+          style={[ShadowStyle.pill3d, styles.saveButton]}
           onPress={onNext}
         >
           <Text style={styles.saveButtonText}>저장</Text>

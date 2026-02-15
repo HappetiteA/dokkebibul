@@ -21,6 +21,9 @@ import { NeumorphicSwitch } from "@/components/style/Switch";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ShadowStyle } from "@/components/style/Shadow";
 import { updateMyProfile } from "@/services/supabase";
+import { PillButton } from "@/components/style/Buttons";
+import { ErrorModal } from "@/components/modals/ErrorModal";
+import useModal from "@/hooks/useModal";
 
 export default function ProfileEditScreen() {
   const router = useRouter();
@@ -34,6 +37,8 @@ export default function ProfileEditScreen() {
   const [isPublic, setIsPublic] = useState(false);
   const [address, setAddress] = useState("위치 정보 불러오는 중...");
   const [canToggleLocation, setCanToggleLocation] = useState(false);
+
+  const { open: openErrorModal, close: closeErrorModal } = useModal(ErrorModal);
 
   // Load initial location
   useEffect(() => {
@@ -60,6 +65,9 @@ export default function ProfileEditScreen() {
       });
     } catch (err) {
       console.error(err);
+      openErrorModal({
+        onClose: closeErrorModal
+      })
       return;
     }
 
@@ -98,10 +106,10 @@ export default function ProfileEditScreen() {
 
             {/* Name Input */}
             <View style={styles.inputRow}>
-              <View style={[styles.labelContainer, ShadowStyle.default]}>
+              <View style={[styles.labelContainer, ShadowStyle.pill3d]}>
                 <Text style={styles.labelText}>이름</Text>
               </View>
-              <View style={[styles.inputContainer, ShadowStyle.default]}>
+              <View style={[styles.inputContainer, ShadowStyle.pill3d]}>
                 <TextInput
                   style={styles.textInput}
                   value={name}
@@ -119,14 +127,14 @@ export default function ProfileEditScreen() {
 
             {/* Bio Input */}
             <View style={styles.inputRow}>
-              <View style={[styles.labelContainer, ShadowStyle.default]}>
+              <View style={[styles.labelContainer, ShadowStyle.pill3d]}>
                 <Text style={styles.labelText}>소개</Text>
               </View>
               <View
                 style={[
                   styles.inputContainer,
                   styles.bioInputContainer,
-                  ShadowStyle.default,
+                  ShadowStyle.pill3d,
                 ]}
               >
                 <TextInput
@@ -149,44 +157,37 @@ export default function ProfileEditScreen() {
               </View>
             </View>
 
-            {/* --- LOCATION TOGGLE ROW (FIXED) --- */}
-            <View style={styles.locationRow}>
-              {/* Text Container: Uses flex: 1 to push against the switch but wrap text */}
-              <View style={styles.locationTextContainer}>
+            {/* --- LOCATION TOGGLE SECTION --- */}
+            <View style={styles.locationContainer}>
+              {/* ROW 1: Title + Switch (Aligned Center) */}
+              <View style={styles.locationHeaderRow}>
                 <Text style={styles.locationTitle}>도깨비불 공개</Text>
-                <Text style={styles.locationAddress}>{address}</Text>
+
+                <NeumorphicSwitch
+                  width={54}
+                  height={30}
+                  padding={3}
+                  value={isPublic}
+                  onValueChange={() => setIsPublic((prev) => !prev)}
+                  onColor="#99D8EE"
+                  offColor="#D7D7E2"
+                  disabled={!canToggleLocation}
+                />
               </View>
 
-              {/* Switch: Remains fixed size on the right */}
-              <NeumorphicSwitch
-                width={54}
-                height={30}
-                padding={3}
-                value={isPublic}
-                onValueChange={() => setIsPublic((prev) => !prev)}
-                onColor="#99D8EE"
-                offColor="#D7D7E2"
-                disabled={!canToggleLocation}
-              />
+              {/* ROW 2: Address (Below) */}
+              <Text style={styles.locationAddress}>{address}</Text>
             </View>
 
             {/* Save Button */}
             <View style={styles.footerContainer}>
-              <TouchableOpacity
-                style={
-                  name
-                    ? [ShadowStyle.default, styles.saveButton]
-                    : [
-                        ShadowStyle.default,
-                        styles.saveButton,
-                        styles.saveButtonDisabled,
-                      ]
-                }
+              <PillButton
+                text="저장"
                 onPress={onSavePressed}
+                variant={name ? "blue" : "gray"}
+                width={112}
                 disabled={!name}
-              >
-                <Text style={styles.saveButtonText}>저장</Text>
-              </TouchableOpacity>
+              />
             </View>
           </View>
         </TouchableWithoutFeedback>
@@ -222,7 +223,7 @@ const styles = StyleSheet.create({
   labelContainer: {
     paddingVertical: 14,
     paddingHorizontal: 16,
-    borderRadius: 20,
+    borderRadius: 30,
     marginRight: 12,
     justifyContent: "center",
     alignItems: "center",
@@ -231,7 +232,7 @@ const styles = StyleSheet.create({
   labelText: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#333",
+    color: "#8F8F9A",
   },
   inputContainer: {
     flex: 1,
@@ -244,7 +245,7 @@ const styles = StyleSheet.create({
   textInput: {
     flex: 1,
     fontSize: 16,
-    color: "#333",
+    color: "#000000",
     marginRight: 8,
     paddingVertical: 0,
   },
@@ -259,29 +260,30 @@ const styles = StyleSheet.create({
   },
 
   // --- UPDATED LOCATION STYLES ---
-  locationRow: {
+  locationContainer: {
     width: "85%",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center", // Keeps switch vertically centered with the text block
     marginTop: 20,
     marginBottom: 10,
     paddingHorizontal: 4,
   },
-  locationTextContainer: {
-    flex: 1, // Takes all width except what the Switch needs
-    marginRight: 20, // Adds gap so text doesn't touch the switch
+
+  // The Top Row (Title + Switch)
+  locationHeaderRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center", // <--- Ensures Switch is centered with Title
+    marginBottom: 4, // Spacing between Title and Address
   },
+
   locationTitle: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#999",
-    marginBottom: 4,
+    color: "#8F8F9A",
   },
+
   locationAddress: {
     fontSize: 14,
-    color: "#aaa",
-    // No explicit width needed here; 'flex: 1' on parent handles the wrapping
+    color: "#8F8F9A",
   },
 
   footerContainer: {

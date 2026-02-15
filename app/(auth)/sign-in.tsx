@@ -1,11 +1,4 @@
-import {
-  Platform,
-  TouchableOpacity,
-  View,
-  Text,
-  Alert,
-  Image,
-} from "react-native";
+import { Platform, TouchableOpacity, View, Alert, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 
@@ -17,60 +10,78 @@ export default function SignIn() {
   const { loginWithGoogle, loginWithApple } = useAuthActions();
 
   return (
-    <SafeAreaView style={BGStyle.BG}>
-      <View
-        style={{
-          alignItems: "center",
-          justifyContent: "center",
-          position: "absolute",
-          left: 0,
-          right: 0,
-          top: 0,
-          bottom: 0,
-        }}
-      >
-        <View>
-          <Text style={{ fontSize: 60 }}>LOGO</Text>
-          {
-            //"<Image source={require(...)}/>"
-          }
-        </View>
-        <TouchableOpacity
-          style={{ marginVertical: 6 }}
-          onPress={async () => {
-            try {
-              await loginWithGoogle();
-            } catch (err: any) {
-              Alert.alert("Login failed", err.message || JSON.stringify(err));
-              console.error(err);
-            }
-          }}
+    <SafeAreaView style={[BGStyle.BG, { flex: 1 }]}>
+      {/* Main Container */}
+      <View style={{ flex: 1, justifyContent: "space-between" }}>
+        {/* --- Top Section: Logo --- */}
+        {/* Centered vertically in the available upper space */}
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
         >
           <Image
-            style={{ width: 184, height: 44 }}
+            source={require("@/assets/images/logo_full.png")}
+            style={{ width: 220 }}
             resizeMode="contain"
-            source={require("../../assets/sign_in/android_light_rd_SI.png")}
           />
-        </TouchableOpacity>
-        {Platform.OS === "ios" ? (
+        </View>
+
+        {/* --- Bottom Section: Buttons --- */}
+        {/* justifyContent: 'flex-end' pushes content to the bottom. 
+            On Android, the Google button will sit at the bottom-most position. */}
+        <View
+          style={{
+            paddingBottom: 60,
+            alignItems: "center",
+            justifyContent: "flex-end",
+          }}
+        >
+          {/* Google Button */}
           <TouchableOpacity
-            style={{ marginVertical: 6 }}
+            style={{ marginVertical: 8 }}
             onPress={async () => {
               try {
-                await loginWithApple();
+                await loginWithGoogle();
               } catch (err: any) {
                 Alert.alert("Login failed", err.message || JSON.stringify(err));
                 console.error(err);
               }
             }}
           >
+            {/* Adjusted width/height to match the wide pill design */}
             <Image
               style={{ width: 184, height: 44 }}
               resizeMode="contain"
-              source={require("../../assets/sign_in/apple_light_SI.png")}
+              source={Platform.select({
+                ios: require("@/assets/sign_in/ios_light_rd_SI.png"),
+                default: require("@/assets/sign_in/android_light_rd_SI.png"),
+              })}
             />
           </TouchableOpacity>
-        ) : null}
+
+          {/* Apple Button (iOS Only) */}
+          {Platform.OS === "ios" && (
+            <TouchableOpacity
+              style={{ marginVertical: 8 }}
+              onPress={async () => {
+                try {
+                  await loginWithApple();
+                } catch (err: any) {
+                  Alert.alert(
+                    "Login failed",
+                    err.message || JSON.stringify(err),
+                  );
+                  console.error(err);
+                }
+              }}
+            >
+              <Image
+                style={{ width: 184, height: 44 }}
+                resizeMode="contain"
+                source={require("@/assets/sign_in/apple_light_SI.png")}
+              />
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
     </SafeAreaView>
   );

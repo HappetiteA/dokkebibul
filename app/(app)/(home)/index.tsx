@@ -1,15 +1,9 @@
 import {
-  Button,
-  Dimensions,
-  Image,
-  ScrollView,
   StyleSheet,
-  Text,
   TouchableOpacity,
   View,
-  Modal,
 } from "react-native";
-import { Link, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import NearbyUserViewer, { startTracking } from "@/components/NearbyUserViewer";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import headerStyle, { BGStyle } from "@/components/style/commonStyle";
@@ -18,7 +12,7 @@ import useModal from "@/hooks/useModal";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import BottomSheet, { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import { ShadowStyle } from "@/components/style/Shadow";
-import PlaceModal from "@/components/modals/PlaceModal";
+import PlaceModal, { PlaceSuccessModal } from "@/components/modals/PlaceModal";
 import {
   PlaceIcon,
   ProfilesIcon,
@@ -87,6 +81,9 @@ export default function MainScreen() {
   const { open: openGPSErrorModal, close: closeGPSErrorModal } =
     useModal(GPSErrorModal);
 
+  const { open: openPlaceSuccessModal, close: closePlaceSuccessModal } =
+    useModal(PlaceSuccessModal);
+
   const [myLocation, setMyLocation] = useState<{
     lat: number;
     lon: number;
@@ -132,7 +129,7 @@ export default function MainScreen() {
     // console.log("handleSheetChanges", index);
   }, []);
 
-  const onLeaveChatBtnPressed = async (chat_id: string, is_user1: boolean) => {
+  const onLeaveChatBtnPressed = async (other_id: string) => {
     setLeaveChatBtnEnabled(false);
 
     if (!profile) {
@@ -140,14 +137,11 @@ export default function MainScreen() {
       return;
     }
 
-    const { error } = await supabase
-      .from("conversations")
-      .update(
-        is_user1
-          ? { user1_chat_enabled: false }
-          : { user2_chat_enabled: false },
-      )
-      .eq("id", chat_id);
+    const { error } = await supabase.rpc("update_conversations_chat_enabled", {
+      u1id: profile.user_id,
+      u2id: other_id,
+      new_chat_enabled: false,
+    });
 
     closeLeaveChatModal();
     setLeaveChatBtnEnabled(true);
@@ -156,7 +150,9 @@ export default function MainScreen() {
       openLeaveChatFailModal({ onClose: closeLeaveChatFailModal });
     } else {
       openLeaveChatSuccessModal({
-        onClose: closeLeaveChatSuccessModal,
+        onClose: () => {
+          closeLeaveChatSuccessModal();
+        },
       });
     }
   };
@@ -256,6 +252,10 @@ export default function MainScreen() {
       await updateAddressCache(newAddrString);
       closePlaceModal();
       setPlaceBtnEnabled(true);
+      openPlaceSuccessModal({
+        onClose: closePlaceSuccessModal,
+        addr: newAddrString,
+      });
     };
 
     openPlaceModal({
@@ -294,7 +294,7 @@ export default function MainScreen() {
                       openLeaveChatModal({
                         onClose: closeLeaveChatModal,
                         onLeaveChatBtnPressed: () =>
-                          onLeaveChatBtnPressed(chat_id, is_user1),
+                          onLeaveChatBtnPressed(other_id),
                         leaveChatBtnEnabled: LeaveChatBtnEnabled,
                       });
                     },
@@ -342,7 +342,7 @@ export default function MainScreen() {
         }}
       >
         <TouchableOpacity
-          style={[ShadowStyle.default, { borderRadius: 35 }]}
+          style={[ShadowStyle.pill3d, { borderRadius: 35 }]}
           onPress={onPlaceIconPressed}
         >
           <PlaceIcon />
@@ -368,13 +368,13 @@ function MainScreenHeader() {
         <View style={headerStyle.left}></View>
         <View style={headerStyle.right}>
           <TouchableOpacity
-            style={[headerStyle.button, ShadowStyle.default]}
+            style={[headerStyle.button, ShadowStyle.pill3d]}
             onPress={onSettingsClick}
           >
             <SettingsIcon />
           </TouchableOpacity>
           <TouchableOpacity
-            style={[headerStyle.button, ShadowStyle.default]}
+            style={[headerStyle.button, ShadowStyle.pill3d]}
             onPress={onProfileClick}
           >
             <ProfilesIcon />
