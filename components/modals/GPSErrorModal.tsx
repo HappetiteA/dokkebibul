@@ -17,7 +17,6 @@ export function GPSErrorModal({
     >
       <View style={ModalStyles.modalOverlay}>
         <View style={ModalStyles.modalContent}>
-          {/* Username Title */}
           <Text style={ModalStyles.modalText}>
             위치 정보 수집에{"\n"}실패했습니다.
           </Text>
@@ -28,7 +27,6 @@ export function GPSErrorModal({
 
           {/* Button Group */}
           <View style={ModalStyles.buttonContainer}>
-            {/* Top Button: Leave Chat */}
             <TouchableOpacity
               style={[ModalStyles.baseButton, ModalStyles.blueButton]}
               onPress={onClose}

@@ -51,7 +51,10 @@ export default function SignIn() {
             <Image
               style={{ width: 184, height: 44 }}
               resizeMode="contain"
-              source={require("@/assets/sign_in/android_light_rd_SI.png")}
+              source={Platform.select({
+                ios: require("@/assets/sign_in/ios_light_rd_SI.png"),
+                default: require("@/assets/sign_in/android_light_rd_SI.png"),
+              })}
             />
           </TouchableOpacity>
 

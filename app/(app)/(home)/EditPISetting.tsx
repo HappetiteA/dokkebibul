@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   View,
-  SafeAreaView,
   TextInput,
 } from "react-native";
 import { useRouter } from "expo-router";
@@ -12,6 +11,7 @@ import { supabase } from "@/lib/supabase";
 import { NoticeSection, PIFieldLayout } from "@/components/PIShared";
 import { PillButton } from "@/components/style/Buttons";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function EditPISetting() {
   const router = useRouter();

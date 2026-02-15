@@ -77,14 +77,7 @@ export function ReportModal({
                     isSelected && ModalStyles.reasonButtonSelected,
                   ]}
                 >
-                  <Text
-                    style={[
-                      ModalStyles.reasonText,
-                      isSelected && ModalStyles.reasonText,
-                    ]}
-                  >
-                    {reason}
-                  </Text>
+                  <Text style={ModalStyles.reasonText}>{reason}</Text>
                 </TouchableOpacity>
               );
             })}

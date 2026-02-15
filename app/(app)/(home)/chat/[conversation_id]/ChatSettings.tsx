@@ -44,7 +44,7 @@ export default function ChatSettings() {
   const { open: openReportFailModal, close: closeReportFailModal } =
     useModal(ReportFailModal);
 
-  const [LeaveChatBtnEnabled, setLeaveChatBtnEnabled] = useState(true);
+  const [leaveChatBtnEnabled, setLeaveChatBtnEnabled] = useState(true);
   const { open: openLeaveChatModal, close: closeLeaveChatModal } =
     useModal(LeaveChatModal);
   const { open: openLeaveChatSuccessModal, close: closeLeaveChatSuccessModal } =
@@ -219,7 +219,7 @@ export default function ChatSettings() {
                   openLeaveChatModal({
                     onClose: closeLeaveChatModal,
                     onLeaveChatBtnPressed: onLeaveChatBtnPressed,
-                    leaveChatBtnEnabled: LeaveChatBtnEnabled,
+                    leaveChatBtnEnabled: leaveChatBtnEnabled,
                   })
                 }
               >
