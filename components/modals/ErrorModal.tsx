@@ -1,7 +1,7 @@
-import { Modal, View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { Modal, View, Text, TouchableOpacity } from "react-native";
 import { ModalStyles } from "./ModalStyles";
 
-export function GPSErrorModal({
+export function ErrorModal({
   isOpen,
   onClose,
 }: {
@@ -17,18 +17,16 @@ export function GPSErrorModal({
     >
       <View style={ModalStyles.modalOverlay}>
         <View style={ModalStyles.modalContent}>
-          {/* Username Title */}
           <Text style={ModalStyles.modalText}>
-            위치 정보 수집에{"\n"}실패했습니다.
+            오류가 발생했습니다.
           </Text>
 
           <Text style={ModalStyles.detailsText}>
-            GPS 권한 설정을 확인해주세요
+            잠시 후 다시 시도해주세요.
           </Text>
 
           {/* Button Group */}
           <View style={ModalStyles.buttonContainer}>
-            {/* Top Button: Leave Chat */}
             <TouchableOpacity
               style={[ModalStyles.baseButton, ModalStyles.blueButton]}
               onPress={onClose}

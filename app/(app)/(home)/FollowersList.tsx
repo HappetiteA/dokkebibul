@@ -1,101 +1,82 @@
-import DefaultHeader from "@/components/DefaultHeader";
-import { getConversationIdbyUserId, getFollowers } from "@/services/supabase";
-import { useRouter, useFocusEffect } from "expo-router";
-import { useCallback, useState } from "react";
-import {
-  Text,
-  TouchableOpacity,
-  View,
-  FlatList,
-  Image,
-  StyleSheet,
-  ListRenderItem,
-} from "react-native";
-import { SelectFollowersResponse } from "@/types/orm.types";
-import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/lib/supabase";
+import React, { useCallback, useState } from "react";
+import { FlatList, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useRouter, useFocusEffect } from "expo-router";
+
+import { LinearGradientHeader } from "@/components/Headers";
+import { useAuth } from "@/contexts/AuthContext";
+import { getConversationIdbyUserId, getFollowers } from "@/services/supabase";
+import { supabase } from "@/lib/supabase";
+import { SelectFollowersResponse } from "@/types/orm.types";
 import { BGStyle } from "@/components/style/commonStyle";
-import { getAvatarSource } from "@/utils/avatarColor";
-import React from "react";
-import { ShadowStyle } from "@/components/style/Shadow";
+
+// Import Shared Components
+import { UserListItem } from "@/components/user-list/UserListItem";
+import { ListActionButton } from "@/components/user-list/UserListButtons";
 
 export default function FollowersList() {
   const router = useRouter();
-  const { profile } = useAuth(); // To get current user's ID
+  const { profile } = useAuth();
   const [followers, setFollowers] = useState<SelectFollowersResponse>([]);
 
   useFocusEffect(
     useCallback(() => {
-      let isActive = true; // Flag to prevent setting state if screen unmounts during fetch
-
+      let isActive = true;
       const fetchFollowers = async () => {
         const followData = await getFollowers();
         if (!followData || !isActive) return;
 
-        // SORTING LOGIC
+        // Sorting: One-way first? Original logic: two_way ? 1 : -1 puts Two-way at bottom.
         const sortedData = [...followData].sort((a, b) => {
           if (a.is_two_way === b.is_two_way) return 0;
           return a.is_two_way ? 1 : -1;
         });
-
         setFollowers(sortedData);
       };
-
       fetchFollowers();
-
-      // Cleanup function
       return () => {
         isActive = false;
       };
-    }, []), // Dependency array is empty so callback is stable
+    }, []),
   );
 
   const MoveToOtherProfile = (user_id: string) => {
     router.navigate({
       pathname: "/(app)/(home)/OtherProfile",
-      params: { user_id: user_id },
+      params: { user_id },
     });
   };
 
   const handleChat = async (user_id: string) => {
-    // Navigate to chat
-    if (profile) {
-      const conversation_id = await getConversationIdbyUserId(
-        profile.user_id,
-        user_id,
-      );
-      if (!conversation_id) return;
+    if (!profile) return;
+    const conversation_id = await getConversationIdbyUserId(
+      profile.user_id,
+      user_id,
+    );
+    if (conversation_id) {
       router.navigate({
         pathname: `/(app)/(home)/chat/${conversation_id}/ChatScreen`,
       });
-    } else {
-      console.error("Cannot move to chat screen: User not authenticated");
     }
   };
 
   const handleFollowBack = async (targetUserId: string, index: number) => {
     if (!profile) return;
-
-    // Store original value for potential rollback
     const originalTwoWay = followers[index].is_two_way;
 
-    // 1. Optimistic UI Update: Immediately toggle state to "two way"
-    // This makes the button switch to "Chat" instantly
+    // Optimistic Update
     setFollowers((prev) =>
       prev.map((item, i) =>
         i === index ? { ...item, is_two_way: true } : item,
       ),
     );
 
-    // 2. API Call to follow back
     const { error } = await supabase
       .from("follows")
       .insert({ src_id: profile.user_id, dst_id: targetUserId });
 
     if (error) {
       console.error("Follow back failed:", error);
-      // Revert change if failed
       setFollowers((prev) =>
         prev.map((item, i) =>
           i === index ? { ...item, is_two_way: originalTwoWay } : item,
@@ -104,124 +85,41 @@ export default function FollowersList() {
     }
   };
 
-  const renderItem: ListRenderItem<SelectFollowersResponse[0]> = ({
-    item,
-    index,
-  }) => (
-    <View style={[styles.cardContainer, ShadowStyle.default]}>
-      {/* Left Section: Profile Click */}
-      <TouchableOpacity
-        style={styles.profileSection}
-        onPress={() => MoveToOtherProfile(item.src_id)}
-      >
-        <Image
-          source={getAvatarSource(item?.src_color_code)}
-          style={styles.avatar}
-          resizeMode="contain"
-        />
-        <Text style={styles.nameText}>{item.src_name}</Text>
-      </TouchableOpacity>
-
-      {/* Right Section: Conditional Button */}
-      {item.is_two_way ? (
-        // Case 1: Two-way follow -> Show "Chat" (White button)
-        <TouchableOpacity
-          style={styles.chatButton}
-          onPress={() => handleChat(item.src_id)}
-        >
-          <Text style={styles.chatButtonText}>대화하기</Text>
-        </TouchableOpacity>
-      ) : (
-        // Case 2: One-way follow -> Show "Follow Back" (Blue button)
-        <TouchableOpacity
-          style={styles.followBackButton}
-          onPress={() => handleFollowBack(item.src_id, index)}
-        >
-          <Text style={styles.followBackButtonText}>맞팔로우</Text>
-        </TouchableOpacity>
-      )}
-    </View>
-  );
-
   return (
     <SafeAreaView style={BGStyle.BG}>
-      <DefaultHeader title="팔로워 목록" />
-      <View style={styles.container}>
-        <FlatList
-          data={followers}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.src_id}
-          contentContainerStyle={styles.listContent}
-          showsVerticalScrollIndicator={false}
-        />
-      </View>
+      <LinearGradientHeader title="팔로워 목록" />
+      <FlatList
+        data={followers}
+        keyExtractor={(item) => item.src_id}
+        contentContainerStyle={styles.listContent}
+        showsVerticalScrollIndicator={false}
+        renderItem={({ item, index }) => (
+          <UserListItem
+            name={item.src_name}
+            colorCode={item.src_color_code}
+            onPressProfile={() => MoveToOtherProfile(item.src_id)}
+            RightComponent={
+              item.is_two_way ? (
+                <ListActionButton
+                  text="대화하기"
+                  variant="chat"
+                  onPress={() => handleChat(item.src_id)}
+                />
+              ) : (
+                <ListActionButton
+                  text="맞팔로우"
+                  variant="followBack"
+                  onPress={() => handleFollowBack(item.src_id, index)}
+                />
+              )
+            }
+          />
+        )}
+      />
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#f9f9f9",
-  },
-  listContent: {
-    padding: 16,
-  },
-  cardContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    backgroundColor: "#ffffff",
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    borderRadius: 30,
-    marginBottom: 12,
-  },
-  profileSection: {
-    flexDirection: "row",
-    alignItems: "center",
-    flex: 1,
-  },
-  avatar: {
-    width: 40,
-    height: 40,
-    // backgroundColor: "#ffffff", // Removed bg so transparent PNG looks right
-    marginRight: 12,
-  },
-  nameText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#333",
-  },
-
-  // --- BUTTON STYLES ---
-
-  // 1. Chat Button (White with Border)
-  chatButton: {
-    borderWidth: 1,
-    borderColor: "#d1d1d1",
-    borderRadius: 20,
-    paddingVertical: 6,
-    paddingHorizontal: 14,
-    backgroundColor: "#ffffff", // White bg
-  },
-  chatButtonText: {
-    fontSize: 14,
-    color: "#333",
-    fontWeight: "500",
-  },
-
-  // 2. Follow Back Button (Blue, No Border)
-  followBackButton: {
-    borderRadius: 20,
-    paddingVertical: 6,
-    paddingHorizontal: 14,
-    backgroundColor: "#89CFF0", // Light Blue matching your image
-    // You might want to adjust this hex code to match your exact theme color
-  },
-  followBackButtonText: {
-    fontSize: 14,
-    color: "#333", // Dark text on light blue
-    fontWeight: "600",
-  },
+  listContent: { padding: 16 },
 });

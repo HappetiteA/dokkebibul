@@ -156,7 +156,7 @@ export default function ChatScreen() {
           >
             <View style={{ flex: 1, backgroundColor: "#F8F8FA" }}>
               <ChatHistory chat={chat} chatRoomData={chatRoomData} />
-              <View style={[styles.textInputView, ShadowStyle.default]}>
+              <View style={[styles.textInputView, ShadowStyle.pill3d]}>
                 <TextInput
                   editable={!chatRoomData.me.ai_enabled}
                   value={text}
@@ -253,7 +253,7 @@ function ChatScreenHeader({
               disabled={!globalSetting?.ai_enabled}
             ></NeumorphicSwitch>
           </View>
-          <View style={[headerStyle.button, ShadowStyle.default]}>
+          <View style={[headerStyle.button, ShadowStyle.pill3d]}>
             <TouchableOpacity
               onPress={() => {
                 router.navigate(

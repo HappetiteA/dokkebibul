@@ -1,7 +1,8 @@
-import { StyleSheet, Text, TouchableOpacity, View, Modal } from "react-native";
+import { Text, TouchableOpacity, View, Modal } from "react-native";
 import { useState, useEffect } from "react";
+import { ModalStyles } from "./ModalStyles";
 
-const reportReasons = ["음담패설", "못생김", "짜증나게 함", "패드립 함"];
+const reportReasons = ["혐오표현", "범죄", "성희롱", "폭언, 욕설", "괴롭힘"];
 
 // --- 1. REPORT MODAL ---
 export function ReportModal({
@@ -55,14 +56,15 @@ export function ReportModal({
       animationType="fade"
       onRequestClose={onClose}
     >
-      <View style={styles.modalOverlay}>
-        <View style={styles.modalContent}>
-          <Text style={styles.modalText}>
-            {name ? name + "님을" : "이 사용자를"}{"\n"}신고하시겠습니까?
+      <View style={ModalStyles.modalOverlay}>
+        <View style={ModalStyles.modalContent}>
+          <Text style={ModalStyles.modalText}>
+            {name ? name + "님을" : "이 사용자를"}
+            {"\n"}신고하시겠습니까?
           </Text>
 
           {/* Reason List */}
-          <View style={styles.reasonListContainer}>
+          <View style={ModalStyles.reasonListContainer}>
             {reportReasons.map((reason) => {
               const isSelected = reasons[reason];
               return (
@@ -71,14 +73,14 @@ export function ReportModal({
                   onPress={() => toggleReason(reason)}
                   activeOpacity={0.7}
                   style={[
-                    styles.reasonButton,
-                    isSelected && styles.reasonButtonSelected, // Green bg
+                    ModalStyles.reasonButton,
+                    isSelected && ModalStyles.reasonButtonSelected,
                   ]}
                 >
                   <Text
                     style={[
-                      styles.reasonText,
-                      isSelected && styles.reasonTextSelected, // White text
+                      ModalStyles.reasonText,
+                      isSelected && ModalStyles.reasonText,
                     ]}
                   >
                     {reason}
@@ -89,23 +91,25 @@ export function ReportModal({
           </View>
 
           {/* Action Buttons */}
-          <View style={styles.modalBtnRow}>
+          <View style={ModalStyles.modalBtnRow}>
             <TouchableOpacity
               onPress={handleReport}
               disabled={!isAnyReasonSelected || !reportBtnEnabled}
               style={[
-                styles.baseButton,
-                isAnyReasonSelected ? styles.blueButton : styles.disabledButton,
+                ModalStyles.baseButton,
+                isAnyReasonSelected
+                  ? ModalStyles.blueButton
+                  : ModalStyles.disabledButton,
               ]}
             >
-              <Text style={styles.blueButtonText}>신고</Text>
+              <Text style={ModalStyles.buttonText}>신고하기</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               onPress={onClose}
-              style={[styles.baseButton, styles.whiteButton]}
+              style={[ModalStyles.baseButton, ModalStyles.whiteButton]}
             >
-              <Text style={styles.whiteButtonText}>취소</Text>
+              <Text style={ModalStyles.buttonText}>취소</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -131,16 +135,17 @@ export function ReportSuccessModal({
       animationType="fade"
       onRequestClose={onClose}
     >
-      <View style={styles.modalOverlay}>
-        <View style={styles.modalContent}>
-          <Text style={styles.modalText}>
-            {name ? name + "님을" : "이 사용자를"}{"\n"}신고했습니다.
+      <View style={ModalStyles.modalOverlay}>
+        <View style={ModalStyles.modalContent}>
+          <Text style={ModalStyles.modalText}>
+            {name ? name + "님을" : "이 사용자를"}
+            {"\n"}신고했습니다.
           </Text>
           <TouchableOpacity
             onPress={onClose}
-            style={[styles.baseButton, styles.whiteButton]}
+            style={[ModalStyles.baseButton, ModalStyles.whiteButton]}
           >
-            <Text style={styles.whiteButtonText}>확인</Text>
+            <Text style={ModalStyles.buttonText}>확인</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -163,124 +168,19 @@ export function ReportFailModal({
       animationType="fade"
       onRequestClose={onClose}
     >
-      <View style={styles.modalOverlay}>
-        <View style={styles.modalContent}>
-          <Text style={styles.modalText}>
+      <View style={ModalStyles.modalOverlay}>
+        <View style={ModalStyles.modalContent}>
+          <Text style={ModalStyles.modalText}>
             알 수 없는 오류로{"\n"}신고에 실패했습니다.
           </Text>
           <TouchableOpacity
             onPress={onClose}
-            style={[styles.baseButton, styles.whiteButton]}
+            style={[ModalStyles.baseButton, ModalStyles.whiteButton]}
           >
-            <Text style={styles.whiteButtonText}>확인</Text>
+            <Text style={ModalStyles.buttonText}>확인</Text>
           </TouchableOpacity>
         </View>
       </View>
     </Modal>
   );
 }
-
-
-const styles = StyleSheet.create({
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)", // Dark overlay
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalContent: {
-    backgroundColor: "white",
-    paddingVertical: 35,
-    paddingHorizontal: 30,
-    borderRadius: 20, // Rounded container
-    width: 300,
-    alignItems: "center",
-
-    // Shadow for depth
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  modalText: {
-    marginBottom: 25,
-    fontSize: 16, // Slightly smaller than 20 for better fit
-    fontWeight: "600", // Semi-bold
-    textAlign: "center",
-    lineHeight: 24, // Better spacing for newlines
-    color: "#333",
-  },
-  modalBtnRow: {
-    flexDirection: "row",
-    gap: 12, // Space between buttons
-    justifyContent: "center",
-    width: "100%",
-  },
-
-  // --- BUTTON STYLES ---
-  baseButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 24,
-    borderRadius: 20, // Fully rounded pill shape
-    minWidth: 80,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  // Blue Filled Button (For "Block" or primary actions)
-  blueButton: {
-    backgroundColor: "#89CFF0", // The light blue from your image
-    borderWidth: 0,
-  },
-  blueButtonText: {
-    color: "#ffffff",
-    fontWeight: "600",
-    fontSize: 14,
-  },
-
-  // White Bordered Button (For "Cancel" or "Confirm")
-  whiteButton: {
-    backgroundColor: "#ffffff",
-    borderWidth: 1,
-    borderColor: "#E0E0E0", // Light grey border
-  },
-  whiteButtonText: {
-    color: "#555555", // Grey text
-    fontWeight: "600",
-    fontSize: 14,
-  },
-  disabledButton: {
-    backgroundColor: "#E0E0E0", // Grayed out if nothing selected
-  },
-
-  // --- REASON BUTTON STYLES ---
-  reasonListContainer: {
-    width: "100%",
-    marginBottom: 20,
-  },
-  reasonButton: {
-    width: "100%",
-    paddingVertical: 12,
-    borderRadius: 12, // Slightly squared corners for list items
-    borderWidth: 1,
-    borderColor: "#E0E0E0",
-    backgroundColor: "#ffffff",
-    alignItems: "center",
-    marginBottom: 8,
-  },
-  reasonButtonSelected: {
-    backgroundColor: "#4CD964", // Green toggle color
-    borderColor: "#4CD964",
-  },
-  reasonText: {
-    fontSize: 14,
-    color: "#555",
-    fontWeight: "500",
-  },
-  reasonTextSelected: {
-    color: "#ffffff", // White text when selected
-    fontWeight: "600",
-  },
-});
-

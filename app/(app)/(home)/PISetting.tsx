@@ -9,11 +9,11 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter, useFocusEffect } from "expo-router";
-import { LinearGradient } from "expo-linear-gradient";
-import DefaultHeader from "@/components/DefaultHeader";
+import { LinearGradientHeader } from "@/components/Headers";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
-import { NoticeSection, PIFieldLayout, piStyles } from "@/components/PIShared";
+import { NoticeSection, PIFieldLayout } from "@/components/PIShared";
+import { ShadowStyle } from "@/components/style/Shadow";
 
 export default function PersonalInfoScreen() {
   const router = useRouter();
@@ -65,25 +65,17 @@ export default function PersonalInfoScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       {/* --- HEADER --- */}
-      <View style={styles.headerWrapper}>
-        <DefaultHeader
-          title="개인정보 설정"
-          rightComponent={
-            <TouchableOpacity
-              onPress={() => router.navigate("/(app)/(home)/EditPISetting")}
-              style={[styles.editBtnCircle, piStyles.commonShadow]}
-            >
-              <Ionicons name="pencil" size={18} color="#aaa" />
-            </TouchableOpacity>
-          }
-        />
-
-        {/* Fade Gradient */}
-        <LinearGradient
-          colors={["#F8F9FA", "rgba(248, 249, 250, 0)"]}
-          style={styles.headerFade}
-        />
-      </View>
+      <LinearGradientHeader
+        title="개인정보 설정"
+        rightComponent={
+          <TouchableOpacity
+            onPress={() => router.navigate("/(app)/(home)/EditPISetting")}
+            style={[styles.editBtnCircle, ShadowStyle.pill3d]}
+          >
+            <Ionicons name="pencil" size={18} color="#aaa" />
+          </TouchableOpacity>
+        }
+      />
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}

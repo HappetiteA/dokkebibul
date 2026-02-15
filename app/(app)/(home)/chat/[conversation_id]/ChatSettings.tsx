@@ -1,9 +1,10 @@
-import DefaultHeader from "@/components/DefaultHeader";
+import DefaultHeader from "@/components/Headers";
 import {
   BlockFailModal,
   BlockModal,
   BlockSuccessModal,
 } from "@/components/modals/BlockModals";
+import { LeaveChatModal, LeaveChatSuccessModal, LeaveChatFailModal } from "@/components/modals/LeaveChatModals";
 import {
   ReportFailModal,
   ReportModal,
@@ -18,6 +19,7 @@ import useModal from "@/hooks/useModal";
 import { supabase } from "@/lib/supabase";
 import { CommonActions } from "@react-navigation/native";
 import { useLocalSearchParams, useNavigation } from "expo-router";
+import React from "react";
 import { useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -41,6 +43,14 @@ export default function ChatSettings() {
     useModal(ReportSuccessModal);
   const { open: openReportFailModal, close: closeReportFailModal } =
     useModal(ReportFailModal);
+
+  const [LeaveChatBtnEnabled, setLeaveChatBtnEnabled] = useState(true);
+  const { open: openLeaveChatModal, close: closeLeaveChatModal } =
+    useModal(LeaveChatModal);
+  const { open: openLeaveChatSuccessModal, close: closeLeaveChatSuccessModal } =
+    useModal(LeaveChatSuccessModal);
+  const { open: openLeaveChatFailModal, close: closeLeaveChatFailModal } =
+    useModal(LeaveChatFailModal);
 
   const onBlockBtnPressed = async () => {
     setBlockBtnEnabled(false);
@@ -113,6 +123,45 @@ export default function ChatSettings() {
     }
   };
 
+  const onLeaveChatBtnPressed = async () => {
+    setLeaveChatBtnEnabled(false);
+
+    if (!profile || !chatRoomData?.other?.user_id) {
+      setLeaveChatBtnEnabled(true);
+      return;
+    }
+
+    const { error } = await supabase.rpc("update_conversations_chat_enabled", {
+      u1id: profile.user_id,
+      u2id: chatRoomData?.other?.user_id,
+      new_chat_enabled: false,
+    });
+
+    closeLeaveChatModal();
+    setLeaveChatBtnEnabled(true);
+    if (error) {
+      console.error(error);
+      openLeaveChatFailModal({ onClose: closeLeaveChatFailModal });
+    } else {
+      openLeaveChatSuccessModal({
+        onClose: () => {
+          navigation.dispatch(
+            CommonActions.reset({
+              index: 0,
+              routes: [
+                {
+                  name: "index",
+                  params: { refreshTimeStamp: Date.now() },
+                },
+              ],
+            }),
+          );
+          closeLeaveChatSuccessModal();
+        },
+      });
+    }
+  };
+
   return (
     <SafeAreaView style={BGStyle.BG}>
       <DefaultHeader title={"채팅 설정"} />
@@ -147,7 +196,7 @@ export default function ChatSettings() {
                   })
                 }
               >
-                <View style={[styles.button, ShadowStyle.default]}>
+                <View style={[styles.button, ShadowStyle.pill3d]}>
                   <Text style={styles.innerButtonText}>신고하기</Text>
                 </View>
               </TouchableOpacity>
@@ -161,12 +210,20 @@ export default function ChatSettings() {
                   })
                 }
               >
-                <View style={[styles.button, ShadowStyle.default]}>
+                <View style={[styles.button, ShadowStyle.pill3d]}>
                   <Text style={styles.innerButtonText}>차단하기</Text>
                 </View>
               </TouchableOpacity>
-              <TouchableOpacity>
-                <View style={[styles.button, ShadowStyle.default]}>
+              <TouchableOpacity
+                onPress={() =>
+                  openLeaveChatModal({
+                    onClose: closeLeaveChatModal,
+                    onLeaveChatBtnPressed: onLeaveChatBtnPressed,
+                    leaveChatBtnEnabled: LeaveChatBtnEnabled,
+                  })
+                }
+              >
+                <View style={[styles.button, ShadowStyle.pill3d]}>
                   <Text style={styles.innerButtonText}>채팅방 나가기</Text>
                 </View>
               </TouchableOpacity>

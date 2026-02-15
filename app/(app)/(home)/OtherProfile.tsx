@@ -28,6 +28,7 @@ import { CloseModal, OpenModalOptions } from "@/types/modal";
 import { BackIcon, BlockIcon, ReportIcon } from "@/components/style/Icons";
 import { ShadowStyle } from "@/components/style/Shadow";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { PillButton } from "@/components/style/Buttons";
 
 export default function OtherProfileScreen() {
   const router = useRouter();
@@ -224,12 +225,12 @@ export default function OtherProfileScreen() {
             </View>
 
             {/* Name Tag - With Shadow */}
-            <View style={[ShadowStyle.default, styles.nameTag]}>
+            <View style={[ShadowStyle.pill3d, styles.nameTag]}>
               <Text style={styles.nameText}>{userInfo?.name ?? ""}</Text>
             </View>
 
             {/* Status Message Box - With Shadow */}
-            <View style={[ShadowStyle.default, styles.statusBox]}>
+            <View style={[ShadowStyle.pill3d, styles.statusBox]}>
               <Text style={styles.statusText}>
                 {userInfo?.status_message ?? ""}
               </Text>
@@ -239,43 +240,33 @@ export default function OtherProfileScreen() {
             <View style={styles.actionButtonContainer}>
               {!follow ? (
                 // State 1: Single Button
-                <TouchableOpacity
-                  style={[
-                    styles.buttonBase,
-
-                    ShadowStyle.default,
-                    styles.followButtonWide,
-                  ]}
+                <PillButton
+                  text="팔로우"
                   onPress={onFollowBtnPressed}
+                  variant="blue"
+                  width={140}
+                  height={50}
                   disabled={!followBtnEnabled}
-                >
-                  <Text style={styles.followButtonText}>팔로우</Text>
-                </TouchableOpacity>
+                />
               ) : (
                 // State 2: Two Buttons
                 <View style={styles.doubleButtonRow}>
-                  <TouchableOpacity
-                    style={[
-                      styles.buttonBase,
-                      ShadowStyle.default,
-                      styles.unfollowButton,
-                    ]}
+                  <PillButton
+                    text="팔로우 취소"
                     onPress={onFollowBtnPressed}
+                    variant="gray"
+                    width={140}
+                    height={50}
                     disabled={!followBtnEnabled}
-                  >
-                    <Text style={styles.unfollowButtonText}>팔로우 취소</Text>
-                  </TouchableOpacity>
+                  />
 
-                  <TouchableOpacity
-                    style={[
-                      styles.buttonBase,
-                      ShadowStyle.default,
-                      styles.chatButton,
-                    ]}
+                  <PillButton
+                    text="대화하기"
                     onPress={onChatBtnPressed}
-                  >
-                    <Text style={styles.chatButtonText}>대화하기</Text>
-                  </TouchableOpacity>
+                    variant="blue"
+                    width={140}
+                    height={50}
+                  />
                 </View>
               )}
             </View>
@@ -346,7 +337,7 @@ function OtherProfileScreenHeader({
         </View>
         <View style={[headerStyle.right, { justifyContent: "center" }]}>
           <TouchableOpacity
-            style={[headerStyle.button, ShadowStyle.default]}
+            style={[headerStyle.button, ShadowStyle.pill3d]}
             onPress={() =>
               openReportModal({
                 onClose: closeReportModal,
@@ -359,7 +350,7 @@ function OtherProfileScreenHeader({
             <ReportIcon />
           </TouchableOpacity>
           <TouchableOpacity
-            style={[headerStyle.button, ShadowStyle.default]}
+            style={[headerStyle.button, ShadowStyle.pill3d]}
             onPress={() =>
               openBlockModal({
                 onClose: closeBlockModal,
@@ -411,7 +402,6 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
 
-  // Avatar (Transparent, No Shadow)
   avatarContainer: {
     marginBottom: 20,
     backgroundColor: "transparent",
@@ -420,9 +410,6 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     backgroundColor: "#f8f8fa",
-
-    // Removed borderRadius to ensure no clipping if the image is irregular
-    // If you want a circle crop, keep borderRadius: 50
   },
 
   // Name Tag
@@ -440,43 +427,27 @@ const styles = StyleSheet.create({
 
   // Status Box
   statusBox: {
-    width: "85%", // Fixed width relative to screen
-    borderRadius: 24,
+    width: "75%", // Fixed width relative to screen
+    borderRadius: 40,
     paddingVertical: 50,
     paddingHorizontal: 20,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 60,
+    backgroundColor: "#f8f8fa",
   },
   statusText: {
-    color: "#888",
+    color: "#8F8F9A",
     fontSize: 14,
   },
 
   // --- BUTTONS ---
   // Container keeps the layout width stable
   actionButtonContainer: {
-    width: "85%", // Same width as status box
-    height: 50, // Fixed height so buttons don't jump in size
-    marginBottom: 40,
+    width: "75%",
+    height: 80,
     justifyContent: "center",
-  },
-  buttonBase: {
-    justifyContent: "center",
-    alignItems: "center",
-    height: "100%", // Fill container height
-    borderRadius: 30,
-  },
-
-  followButtonWide: {
-    width: "50%",
-    alignSelf: "center",
-    backgroundColor: "#ffffff",
-  },
-  followButtonText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#333",
+    flexDirection: "row",
   },
 
   // Double Buttons (Split container)
@@ -486,139 +457,5 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
     gap: 12, // Space between buttons
-  },
-  unfollowButton: {
-    flex: 1, // Takes 50% - gap
-    backgroundColor: "#E6E6E6",
-  },
-  unfollowButtonText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#333",
-  },
-  chatButton: {
-    flex: 1, // Takes 50% - gap
-    backgroundColor: "#AEE4FF",
-  },
-  chatButtonText: {
-    fontSize: 16,
-    fontWeight: "600",
-  },
-
-  // Footer
-  footerOptions: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  footerLinkText: {
-    fontSize: 13,
-    color: "#999",
-    padding: 8,
-  },
-  footerDivider: {
-    color: "#ddd",
-    marginHorizontal: 4,
-  },
-
-  // Modal styles...
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)", // Dark overlay
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalContent: {
-    backgroundColor: "white",
-    paddingVertical: 35,
-    paddingHorizontal: 30,
-    borderRadius: 20, // Rounded container
-    width: 300,
-    alignItems: "center",
-
-    // Shadow for depth
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  modalText: {
-    marginBottom: 25,
-    fontSize: 16, // Slightly smaller than 20 for better fit
-    fontWeight: "600", // Semi-bold
-    textAlign: "center",
-    lineHeight: 24, // Better spacing for newlines
-    color: "#333",
-  },
-  modalBtnRow: {
-    flexDirection: "row",
-    gap: 12, // Space between buttons
-    justifyContent: "center",
-    width: "100%",
-  },
-
-  // --- BUTTON STYLES ---
-  baseButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 24,
-    borderRadius: 20, // Fully rounded pill shape
-    minWidth: 80,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  // Blue Filled Button (For "Block" or primary actions)
-  blueButton: {
-    backgroundColor: "#89CFF0", // The light blue from your image
-    borderWidth: 0,
-  },
-  blueButtonText: {
-    color: "#ffffff",
-    fontWeight: "600",
-    fontSize: 14,
-  },
-
-  // White Bordered Button (For "Cancel" or "Confirm")
-  whiteButton: {
-    backgroundColor: "#ffffff",
-    borderWidth: 1,
-    borderColor: "#E0E0E0", // Light grey border
-  },
-  whiteButtonText: {
-    color: "#555555", // Grey text
-    fontWeight: "600",
-    fontSize: 14,
-  },
-  disabledButton: {
-    backgroundColor: "#E0E0E0", // Grayed out if nothing selected
-  },
-
-  // --- REASON BUTTON STYLES ---
-  reasonListContainer: {
-    width: "100%",
-    marginBottom: 20,
-  },
-  reasonButton: {
-    width: "100%",
-    paddingVertical: 12,
-    borderRadius: 12, // Slightly squared corners for list items
-    borderWidth: 1,
-    borderColor: "#E0E0E0",
-    backgroundColor: "#ffffff",
-    alignItems: "center",
-    marginBottom: 8,
-  },
-  reasonButtonSelected: {
-    backgroundColor: "#4CD964", // Green toggle color
-    borderColor: "#4CD964",
-  },
-  reasonText: {
-    fontSize: 14,
-    color: "#555",
-    fontWeight: "500",
-  },
-  reasonTextSelected: {
-    color: "#ffffff", // White text when selected
-    fontWeight: "600",
   },
 });

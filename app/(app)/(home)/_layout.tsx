@@ -14,13 +14,6 @@ export default function HomeLayout() {
           }}
         />
         <Stack.Screen
-          name="avatar"
-          options={{
-            title: "avatar",
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
           name="MyProfile"
           options={{
             title: "MyProfile",
