@@ -112,7 +112,7 @@ export default function MyProfileScreen() {
       return {
         title: "도깨비불 공개",
         dotColor: "#D7D7E2",
-        address: "비공개",
+        address: locationInfo.addr,
       };
     }
   };
@@ -161,7 +161,7 @@ export default function MyProfileScreen() {
         </View>
 
         {/* 2. Name Tag */}
-        <View style={[styles.nameTag, ShadowStyle.default]}>
+        <View style={[styles.nameTag, ShadowStyle.pill3d]}>
           <Text style={styles.nameText}>{profile?.name ?? ""}</Text>
         </View>
 
@@ -187,7 +187,7 @@ export default function MyProfileScreen() {
         </View>
 
         {/* 4. Status Message Box */}
-        <View style={[styles.statusBox, ShadowStyle.default]}>
+        <View style={[styles.statusBox, ShadowStyle.pill3d]}>
           <Text style={styles.statusText}>{profile?.status_message ?? ""}</Text>
         </View>
 
@@ -252,7 +252,7 @@ function MyProfileScreenHeader({ coins }: { coins: number }) {
           <Text style={styles.cashText}>{coins}</Text>
 
           <TouchableOpacity
-            style={[styles.editButtonCircle, ShadowStyle.default]}
+            style={[styles.editButtonCircle, ShadowStyle.pill3d]}
             onPress={() => router.navigate("/(app)/(home)/EditProfile")}
           >
             <Ionicons name="pencil" size={16} color="#aaa" />
@@ -344,10 +344,10 @@ const styles = StyleSheet.create({
     marginRight: 6,
   },
   activeDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    // Background color is now handled dynamically in JSX
+    width: 13,
+    height: 13,
+    borderRadius: 10,
+    marginLeft: 5
   },
   addressText: {
     fontSize: 16,

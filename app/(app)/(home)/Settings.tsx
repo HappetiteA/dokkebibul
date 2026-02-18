@@ -1,5 +1,5 @@
 import { useRouter, useFocusEffect } from "expo-router";
-import DefaultHeader from "@/components/DefaultHeader";
+import DefaultHeader from "@/components/Headers";
 import { useAuthActions } from "@/hooks/useAuthActions";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useCallback, useEffect, useState } from "react";
@@ -115,7 +115,7 @@ export default function Settings() {
               </View>
               <View style={{ marginTop: 40 }}>
                 <TouchableOpacity
-                  style={[styles.button, ShadowStyle.default]}
+                  style={[styles.button, ShadowStyle.pill3d]}
                   onPress={async () => {
                     try {
                       await logout();

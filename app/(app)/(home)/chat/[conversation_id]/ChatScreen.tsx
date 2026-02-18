@@ -265,7 +265,7 @@ function ChatScreenHeader({
                   disabled={!globalSetting?.ai_enabled}
                 ></NeumorphicSwitch>
               </View>
-              <View style={[headerStyle.button, ShadowStyle.default]}>
+              <View style={[headerStyle.button, ShadowStyle.pill3d]}>
                 <TouchableOpacity
                   onPress={() => {
                     router.navigate(
@@ -278,7 +278,7 @@ function ChatScreenHeader({
               </View>
             </>
           ) : (
-            ""
+            <></>
           )}
         </View>
       </View>

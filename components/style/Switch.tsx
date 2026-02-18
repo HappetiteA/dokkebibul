@@ -110,7 +110,7 @@ export function NeumorphicSwitch({
       {/* white border */}
       <View
         style={[
-          ShadowStyle.default,
+          ShadowStyle.pill3d,
           styles.outerRing,
           {
             width,

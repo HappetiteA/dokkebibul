@@ -40,6 +40,17 @@ const headerStyle = StyleSheet.create({
     marginLeft: 10,
     fontSize: 26,
   },
+  headerWrapper: {
+    zIndex: 1000,
+    backgroundColor: "#F8F9FA",
+  },
+  headerFade: {
+    position: "absolute",
+    bottom: -20,
+    left: 0,
+    right: 0,
+    height: 20,
+  },
 });
 
 export default headerStyle;

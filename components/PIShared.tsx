@@ -1,6 +1,7 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { ShadowStyle } from "./style/Shadow";
 
 // --- Shared Styles ---
 export const piStyles = StyleSheet.create({
@@ -15,7 +16,7 @@ export const piStyles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: 20,
     marginBottom: 10,
-    backgroundColor: "#fff",
+    backgroundColor: "#f8f8fa",
   },
   labelText: {
     fontSize: 16,
@@ -24,20 +25,12 @@ export const piStyles = StyleSheet.create({
   },
   // Content Box (Used for both Text and TextInput)
   contentBox: {
-    backgroundColor: "#fff",
+    backgroundColor: "#f8f8fa",
     borderRadius: 20,
     paddingVertical: 18,
     paddingHorizontal: 20,
     minHeight: 60,
     justifyContent: "center",
-  },
-  // Shadow
-  commonShadow: {
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 3,
   },
 });
 
@@ -51,7 +44,7 @@ export function NoticeSection() {
           name="information-circle-outline"
           size={18}
           color="#888"
-          style={{ marginRight: 4, marginTop: 1 }}
+          style={{ marginRight: 4, marginTop: 1, marginLeft: -5 }}
         />
         <Text style={styles.noticeTitle}>유의사항</Text>
       </View>
@@ -85,12 +78,10 @@ export function PIFieldLayout({
 }) {
   return (
     <View style={piStyles.fieldContainer}>
-      <View style={[piStyles.labelPill, piStyles.commonShadow]}>
+      <View style={[piStyles.labelPill, ShadowStyle.pill3d]}>
         <Text style={piStyles.labelText}>{label}</Text>
       </View>
-      <View style={[piStyles.contentBox, piStyles.commonShadow]}>
-        {children}
-      </View>
+      <View style={[piStyles.contentBox, ShadowStyle.pill3d]}>{children}</View>
     </View>
   );
 }
