@@ -162,11 +162,7 @@ export default function ChatScreen() {
               ) : (
                 <SelfChatHistory chat={chat} chatRoomData={chatRoomData} />
               )}
-<<<<<<< HEAD
-              <View style={[styles.textInputView, ShadowStyle.default]}>
-=======
               <View style={[styles.textInputView, ShadowStyle.pill3d]}>
->>>>>>> 74a0cc0 (merge conflict resolved)
                 <TextInput
                   editable={!chatRoomData.me.ai_enabled}
                   value={text}
