@@ -132,7 +132,7 @@ export default function MyProfileScreen() {
     );
 
     if (conversationError) {
-      console.log(conversationError.message);
+      console.log("Self Chat Error : ", conversationError.message);
       return;
     }
 
