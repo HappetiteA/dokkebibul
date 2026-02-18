@@ -2,7 +2,11 @@ import { useState } from "react";
 import { Text, TouchableOpacity, View, StyleSheet, Image } from "react-native";
 import { useRouter, useFocusEffect } from "expo-router";
 import { useAuth } from "@/contexts/AuthContext";
-import { getFollowers, getFollowings } from "@/services/supabase";
+import {
+  getConversationIdbyUserId,
+  getFollowers,
+  getFollowings,
+} from "@/services/supabase";
 import { Ionicons } from "@expo/vector-icons";
 import { getAvatarSource } from "@/utils/avatarColor";
 import { getAddressPublicity } from "@/services/geocode"; // Adjust path as needed
@@ -10,6 +14,7 @@ import React from "react";
 import headerStyle, { BGStyle } from "@/components/style/commonStyle";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ShadowStyle } from "@/components/style/Shadow";
+import { supabase } from "@/lib/supabase";
 
 // Define the type here if not imported
 type LocationInfo = {
@@ -24,17 +29,55 @@ export default function MyProfileScreen() {
   // Stats State
   const [followingNumber, setFollowingNumber] = useState<number>(0);
   const [followerNumber, setFollowerNumber] = useState<number>(0);
+  const [isSelfFollowing, setSelfFollowing] = useState<boolean>(false);
 
   // Location State
   const [locationInfo, setLocationInfo] = useState<LocationInfo | null>(null);
 
   useFocusEffect(() => {
     async function start() {
-      // 1. Fetch Follow Stats
+      if (!profile) return;
+      // 1. Fetch Follow Stats & Check if user follows itself
       (async () => {
-        const followingData = await getFollowings();
-        setFollowingNumber(followingData?.length ?? 0);
+        const { data: followingData, error } = await supabase
+          .from("follows")
+          .select("*")
+          .eq("src_id", profile.user_id);
+
+        if (error) {
+          console.log(error.message);
+          return;
+        }
+
+        if (!followingData) {
+          setFollowingNumber(0);
+          return;
+        }
+
+        const self_following = followingData.find((value) => {
+          return value.dst_id == profile.user_id;
+        });
+
+        if (self_following) {
+          setFollowingNumber(followingData.length - 1);
+          setSelfFollowing(true);
+        } else {
+          setFollowingNumber(followingData.length);
+
+          // Try self following
+          const { error: followError } = await supabase
+            .from("follows")
+            .insert({ src_id: profile.user_id, dst_id: profile.user_id });
+
+          if (followError) {
+            setSelfFollowing(false);
+            console.log(followError.message);
+            return;
+          }
+          setSelfFollowing(true);
+        }
       })();
+
       (async () => {
         const followerData = await getFollowers();
         setFollowerNumber(followerData?.length ?? 0);
@@ -75,6 +118,38 @@ export default function MyProfileScreen() {
   };
 
   const { title, dotColor, address } = getLocationUI();
+
+  const onChatBtnPressed = async () => {
+    if (profile == null) return;
+
+    const { error: conversationError } = await supabase.rpc(
+      "update_conversations_chat_enabled",
+      {
+        u1id: profile.user_id,
+        u2id: profile.user_id,
+        new_chat_enabled: true,
+      },
+    );
+
+    if (conversationError) {
+      console.log("Self Chat Error : ", conversationError.message);
+      return;
+    }
+
+    const conversation_id = await getConversationIdbyUserId(
+      profile.user_id,
+      profile.user_id,
+    );
+
+    if (!conversation_id) {
+      console.log("Self Chat Error : Cannot find conversation_id");
+      return;
+    }
+
+    router.navigate({
+      pathname: `/(app)/(home)/chat/${conversation_id}/ChatScreen`,
+    });
+  };
 
   return (
     <SafeAreaView style={BGStyle.BG}>
@@ -129,6 +204,19 @@ export default function MyProfileScreen() {
           </View>
           <Text style={styles.addressText}>{address}</Text>
         </View>
+      </View>
+
+      <View style={styles.footerContainer}>
+        {isSelfFollowing ? (
+          <TouchableOpacity
+            style={[ShadowStyle.default, styles.selfTalkButton]}
+            onPress={onChatBtnPressed}
+          >
+            <Text style={styles.selfTalkButtonText}>대화하기</Text>
+          </TouchableOpacity>
+        ) : (
+          <></>
+        )}
       </View>
     </SafeAreaView>
   );
@@ -264,7 +352,11 @@ const styles = StyleSheet.create({
     width: 13,
     height: 13,
     borderRadius: 10,
+<<<<<<< feat/self-chat
+    marginLeft: 5,
+=======
     marginLeft: 5
+>>>>>>> main
   },
   addressText: {
     fontSize: 16,
@@ -284,5 +376,25 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     alignItems: "center",
     justifyContent: "center",
+  },
+
+  // -- Button Style --
+  footerContainer: {
+    marginTop: 80,
+    width: "100%",
+    alignItems: "center",
+  },
+  selfTalkButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 50,
+    borderRadius: 30,
+    backgroundColor: "#99D8EE",
+    borderWidth: 3,
+    borderColor: "#FFFFFF",
+  },
+  selfTalkButtonText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#555",
   },
 });
