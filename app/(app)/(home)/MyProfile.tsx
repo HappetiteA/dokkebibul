@@ -141,6 +141,11 @@ export default function MyProfileScreen() {
       profile.user_id,
     );
 
+    if (!conversation_id) {
+      console.log("Self Chat Error : Cannot find conversation_id");
+      return;
+    }
+
     router.navigate({
       pathname: `/(app)/(home)/chat/${conversation_id}/ChatScreen`,
     });
@@ -347,7 +352,7 @@ const styles = StyleSheet.create({
     width: 13,
     height: 13,
     borderRadius: 10,
-    marginLeft: 5
+    marginLeft: 5,
   },
   addressText: {
     fontSize: 16,
