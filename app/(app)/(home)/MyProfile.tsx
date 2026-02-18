@@ -352,7 +352,11 @@ const styles = StyleSheet.create({
     width: 13,
     height: 13,
     borderRadius: 10,
+<<<<<<< feat/self-chat
     marginLeft: 5,
+=======
+    marginLeft: 5
+>>>>>>> main
   },
   addressText: {
     fontSize: 16,

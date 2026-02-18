@@ -272,6 +272,7 @@ function ChatScreenHeader({
                       `/(app)/(home)/chat/${conversation_id}/ChatSettings`,
                     );
                   }}
+<<<<<<< feat/self-chat
                 >
                   <SettingsIcon />
                 </TouchableOpacity>
@@ -280,6 +281,24 @@ function ChatScreenHeader({
           ) : (
             <></>
           )}
+=======
+                />
+              )}
+              disabled={!globalSetting?.ai_enabled}
+            ></NeumorphicSwitch>
+          </View>
+          <View style={[headerStyle.button, ShadowStyle.pill3d]}>
+            <TouchableOpacity
+              onPress={() => {
+                router.navigate(
+                  `/(app)/(home)/chat/${conversation_id}/ChatSettings`,
+                );
+              }}
+            >
+              <SettingsIcon />
+            </TouchableOpacity>
+          </View>
+>>>>>>> main
         </View>
       </View>
     </View>
