@@ -4,7 +4,8 @@ import {
   View,
 } from "react-native";
 import { useRouter } from "expo-router";
-import NearbyUserViewer, { startTracking } from "@/components/NearbyUserViewer";
+import * as Location from "expo-location";
+import NearbyUserViewer from "@/components/NearbyUserViewer";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import headerStyle, { BGStyle } from "@/components/style/commonStyle";
 import ChatRoomList from "@/components/ChatRoomList";
@@ -101,27 +102,41 @@ export default function MainScreen() {
   }, [myLocation]);
 
   useEffect(() => {
-    let watcher: any;
-    let interval: any;
+    let watcher: Location.LocationSubscription | null = null;
 
     async function start() {
-      watcher = await startTracking(async (lat, lon) => {
-        setMyLocation({ lat, lon });
-      });
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") return;
 
-      interval = setInterval(async () => {
-        const loc = myLocationRef.current;
-        // console.log(loc);
-        if (!loc) return;
-        const data = await getNearbyUsers(loc.lat, loc.lon, 5000);
-        setNearbyUsersLocations(data);
-      }, 3000);
+      const startLoc = await Location.getCurrentPositionAsync();
+      setMyLocation({
+        lat: startLoc.coords.latitude,
+        lon: startLoc.coords.longitude,
+      });
+      const initialData = await getNearbyUsers(
+        startLoc.coords.latitude,
+        startLoc.coords.longitude,
+        2000,
+      );
+      setNearbyUsersLocations(initialData);
+
+      watcher = await Location.watchPositionAsync(
+        {
+          accuracy: Location.Accuracy.Balanced,
+          timeInterval: 30000,
+        },
+        async (loc) => {
+          const { latitude, longitude } = loc.coords;
+          setMyLocation({ lat: latitude, lon: longitude });
+          const data = await getNearbyUsers(latitude, longitude, 2000);
+          setNearbyUsersLocations(data);
+        },
+      );
     }
 
     start();
     return () => {
       watcher?.remove?.();
-      clearInterval(interval);
     };
   }, []);
 
@@ -273,7 +288,6 @@ export default function MainScreen() {
       <GestureHandlerRootView style={styles.container}>
         <NearbyUserViewer
           nearbyUsersLocations={nearbyUsersLocations}
-          myLocation={myLocation}
         />
 
         <BottomSheet
