@@ -113,7 +113,12 @@ export default function MainScreen() {
         lat: startLoc.coords.latitude,
         lon: startLoc.coords.longitude,
       });
-      await getNearbyUsers(startLoc.coords.latitude, startLoc.coords.longitude, 2000);
+      const initialData = await getNearbyUsers(
+        startLoc.coords.latitude,
+        startLoc.coords.longitude,
+        2000,
+      );
+      setNearbyUsersLocations(initialData);
 
       watcher = await Location.watchPositionAsync(
         {
