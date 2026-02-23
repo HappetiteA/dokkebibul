@@ -3,7 +3,6 @@ import {
   StyleSheet,
   Text,
   View,
-  SafeAreaView,
   ScrollView,
   TouchableOpacity,
 } from "react-native";
@@ -14,6 +13,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
 import { NoticeSection, PIFieldLayout } from "@/components/PIShared";
 import { ShadowStyle } from "@/components/style/Shadow";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function PersonalInfoScreen() {
   const router = useRouter();

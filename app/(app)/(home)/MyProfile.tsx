@@ -205,7 +205,6 @@ export default function MyProfileScreen() {
           <Text style={styles.addressText}>{address}</Text>
         </View>
       </View>
-
       <View style={styles.footerContainer}>
         {isSelfFollowing ? (
           <TouchableOpacity
@@ -376,7 +375,8 @@ const styles = StyleSheet.create({
 
   // -- Button Style --
   footerContainer: {
-    marginTop: 80,
+    position: "absolute",
+    bottom: "10%",
     width: "100%",
     alignItems: "center",
   },

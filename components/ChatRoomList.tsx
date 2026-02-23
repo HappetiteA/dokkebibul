@@ -42,6 +42,7 @@ export default function ChatRoomList({ openModal }: IChatRoomListProp) {
     let vm = toChatRoomVM(value, profile?.user_id);
     if (!vm) return <></>;
     if (!vm.me.chat_enabled) return <></>;
+    if (vm.me.user_id == vm.other.user_id) return <></>;
 
     var time_string =
       value.last_msg == undefined

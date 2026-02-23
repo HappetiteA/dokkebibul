@@ -6,6 +6,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from "react-native";
 import { Message } from "@/types/model.types";
@@ -17,6 +18,7 @@ import {
 } from "@/utils/time_converter";
 import { getAvatarSource } from "@/utils/avatarColor";
 import { ChatRoomVM } from "./interfaces";
+import { router } from "expo-router";
 
 type Chat = Omit<Message, "conversation_id">;
 
@@ -118,11 +120,20 @@ export default function ChatHistory({ chat, chatRoomData }: ChatHistoryProp) {
             }}
           >
             {ShowName ? (
-              <Image
-                source={getAvatarSource(chatRoomData.other.color_code)}
-                style={{ width: 40, height: 40, backgroundColor: "#f8f8fa" }}
-                resizeMethod="resize"
-              />
+              <TouchableOpacity
+                onPress={() => {
+                  router.navigate({
+                    pathname: "/(app)/(home)/OtherProfile",
+                    params: { user_id: chatRoomData.other.user_id },
+                  });
+                }}
+              >
+                <Image
+                  source={getAvatarSource(chatRoomData.other.color_code)}
+                  style={{ width: 40, height: 40, backgroundColor: "#f8f8fa" }}
+                  resizeMethod="resize"
+                />
+              </TouchableOpacity>
             ) : (
               <></>
             )}
