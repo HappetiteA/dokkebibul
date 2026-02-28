@@ -3,17 +3,17 @@ import {
   StyleSheet,
   Text,
   View,
-  SafeAreaView,
   ScrollView,
   TouchableOpacity,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import { useRouter, useFocusEffect } from "expo-router";
 import { LinearGradientHeader } from "@/components/Headers";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
 import { NoticeSection, PIFieldLayout } from "@/components/PIShared";
 import { ShadowStyle } from "@/components/style/Shadow";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { EditIcon } from "@/components/style/Icons";
 
 export default function PersonalInfoScreen() {
   const router = useRouter();
@@ -72,7 +72,7 @@ export default function PersonalInfoScreen() {
             onPress={() => router.navigate("/(app)/(home)/EditPISetting")}
             style={[styles.editBtnCircle, ShadowStyle.pill3d]}
           >
-            <Ionicons name="pencil" size={18} color="#aaa" />
+            <EditIcon />
           </TouchableOpacity>
         }
       />

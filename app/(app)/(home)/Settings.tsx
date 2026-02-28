@@ -109,7 +109,11 @@ export default function Settings() {
 
               <View style={styles.settingListElement}>
                 <Text style={styles.h1}>계정 관리</Text>
-                <TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    router.navigate("/(app)/(home)/DeleteAccount");
+                  }}
+                >
                   <Text style={styles.textButton}>회원탈퇴</Text>
                 </TouchableOpacity>
               </View>
