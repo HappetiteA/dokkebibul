@@ -99,17 +99,6 @@ export default function ChatScreen() {
       })();
 
       navigation.setOptions({ title: `Chat #${conversation_id}` });
-      (async () => {
-        const { data, error } = await supabase
-          .from("messages")
-          .select("id, sender_id, content, created_at, is_read, is_human")
-          .eq("conversation_id", conversation_id)
-          .order("created_at", { ascending: true });
-        if (error) {
-          console.log(error);
-        }
-        setChat(data ?? []);
-      })();
 
       //set realtime chatting
       const channel = supabase.channel(`chatroom:${conversation_id}`).on(
