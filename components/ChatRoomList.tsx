@@ -1,5 +1,5 @@
 import { Button, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { getChatRooms } from "@/services/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 import ChatListElement from "./ChatListElement";
@@ -7,6 +7,7 @@ import { convertTimestampToTime } from "@/utils/time_converter";
 import { ChatRoom } from "@/types/model.types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ChatRoomVM, toChatRoomVM } from "./interfaces";
+import { useFocusEffect } from "expo-router";
 
 interface IChatRoomListProp {
   openModal: (
@@ -21,20 +22,22 @@ export default function ChatRoomList({ openModal }: IChatRoomListProp) {
   const { profile } = useAuth();
   const [chatRooms, setChatRooms] = useState<ChatRoom[]>([]);
 
-  useEffect(() => {
-    (async () => {
-      const chatRoomData = (await getChatRooms()) ?? [];
+  useFocusEffect(
+    useCallback(() => {
+      (async () => {
+        const chatRoomData = (await getChatRooms()) ?? [];
 
-      const pairs: [string, string][] = chatRoomData.map((room) => [
-        `ChatRoomData:${room.id}`,
-        JSON.stringify(room),
-      ]);
+        const pairs: [string, string][] = chatRoomData.map((room) => [
+          `ChatRoomData:${room.id}`,
+          JSON.stringify(room),
+        ]);
 
-      await AsyncStorage.multiSet(pairs);
+        await AsyncStorage.multiSet(pairs);
 
-      setChatRooms(chatRoomData);
-    })();
-  }, []);
+        setChatRooms(chatRoomData);
+      })();
+    }, []),
+  );
 
   const ChatList = (value: ChatRoom | undefined) => {
     if (!value) return <></>;
