@@ -24,6 +24,7 @@ import { updateMyProfile } from "@/services/supabase";
 import { PillButton } from "@/components/style/Buttons";
 import { ErrorModal } from "@/components/modals/ErrorModal";
 import useModal from "@/hooks/useModal";
+import { BackIcon } from "@/components/style/Icons";
 
 export default function ProfileEditScreen() {
   const router = useRouter();
@@ -66,8 +67,8 @@ export default function ProfileEditScreen() {
     } catch (err) {
       console.error(err);
       openErrorModal({
-        onClose: closeErrorModal
-      })
+        onClose: closeErrorModal,
+      });
       return;
     }
 
@@ -82,7 +83,7 @@ export default function ProfileEditScreen() {
         <View style={headerStyle.content}>
           <View style={headerStyle.left}>
             <TouchableOpacity onPress={() => router.back()}>
-              <Ionicons name="chevron-back" size={28} color="#aaa" />
+              <BackIcon />
             </TouchableOpacity>
           </View>
           <View style={headerStyle.right} />

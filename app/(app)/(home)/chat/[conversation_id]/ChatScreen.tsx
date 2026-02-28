@@ -13,11 +13,12 @@ import headerStyle, { BGStyle } from "@/components/style/commonStyle";
 import { ShadowStyle } from "@/components/style/Shadow";
 import {
   Link,
+  useFocusEffect,
   useLocalSearchParams,
   useNavigation,
   useRouter,
 } from "expo-router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   Alert,
   Image,
@@ -79,66 +80,66 @@ export default function ChatScreen() {
     setText("");
   };
 
-  useEffect(() => {
-    if (!conversation_id) return;
-    if (!profile?.user_id) return;
+  useFocusEffect(
+    useCallback(() => {
+      if (!conversation_id) return;
+      if (!profile?.user_id) return;
 
-    // get messages
-    (async () => {
-      const { data, error } = await supabase
-        .from("messages")
-        .select("id, sender_id, content, created_at, is_read, is_human")
-        .eq("conversation_id", conversation_id)
-        .order("created_at", { ascending: true });
-      if (error) {
-        console.log(error);
-      }
-      setChat(data ?? []);
-    })();
+      // get messages
+      (async () => {
+        const { data, error } = await supabase
+          .from("messages")
+          .select("id, sender_id, content, created_at, is_read, is_human")
+          .eq("conversation_id", conversation_id)
+          .order("created_at", { ascending: true });
+        if (error) {
+          console.log(error);
+        }
+        setChat(data ?? []);
+      })();
 
-    navigation.setOptions({ title: `Chat #${conversation_id}` });
-    (async () => {
-      const { data, error } = await supabase
-        .from("messages")
-        .select("id, sender_id, content, created_at, is_read, is_human")
-        .eq("conversation_id", conversation_id)
-        .order("created_at", { ascending: true });
-      if (error) {
-        console.log(error);
-      }
-      setChat(data ?? []);
-    })();
+      navigation.setOptions({ title: `Chat #${conversation_id}` });
+      (async () => {
+        const { data, error } = await supabase
+          .from("messages")
+          .select("id, sender_id, content, created_at, is_read, is_human")
+          .eq("conversation_id", conversation_id)
+          .order("created_at", { ascending: true });
+        if (error) {
+          console.log(error);
+        }
+        setChat(data ?? []);
+      })();
 
-    //set realtime chatting
-    const channel = supabase.channel(`chatroom:${conversation_id}`).on(
-      "postgres_changes",
-      {
-        event: "INSERT",
-        schema: "public",
-        table: "messages",
-        filter: `conversation_id=eq.${conversation_id}`,
-      },
-      (payload) => {
-        const new_chat: Chat = {
-          id: payload.new.id,
-          sender_id: payload.new.sender_id,
-          content: payload.new.content,
-          created_at: payload.new.created_at,
-          is_read: payload.new.is_read,
-          is_human: payload.new.is_human,
-        };
-        setChat((c) => [...c, new_chat]);
-      },
-    );
+      //set realtime chatting
+      const channel = supabase.channel(`chatroom:${conversation_id}`).on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "messages",
+          filter: `conversation_id=eq.${conversation_id}`,
+        },
+        (payload) => {
+          const new_chat: Chat = {
+            id: payload.new.id,
+            sender_id: payload.new.sender_id,
+            content: payload.new.content,
+            created_at: payload.new.created_at,
+            is_read: payload.new.is_read,
+            is_human: payload.new.is_human,
+          };
+          setChat((c) => [...c, new_chat]);
+        },
+      );
 
-    channel.subscribe();
+      channel.subscribe();
 
-    return () => {
-      channel.unsubscribe();
-    };
-  }, [profile?.user_id, conversation_id]);
-
-  // Change Asyncstorage & Server DB when chatRoomData modified
+      return () => {
+        channel.unsubscribe();
+      };
+    }, [conversation_id]),
+  );
 
   return (
     <SafeAreaView style={BGStyle.BG}>

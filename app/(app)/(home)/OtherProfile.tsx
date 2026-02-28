@@ -11,7 +11,6 @@ import {
 import useModal from "@/hooks/useModal";
 import { useAuth } from "@/contexts/AuthContext";
 import { Profile } from "@/types/model.types";
-import { Ionicons } from "@expo/vector-icons";
 import {
   BlockModal,
   BlockSuccessModal,
@@ -332,7 +331,7 @@ function OtherProfileScreenHeader({
       <View style={headerStyle.content}>
         <View style={headerStyle.left}>
           <TouchableOpacity onPress={() => router.back()}>
-            <Ionicons name="chevron-back" size={28} color="#aaa" />
+            <BackIcon />
           </TouchableOpacity>
         </View>
         <View style={[headerStyle.right, { justifyContent: "center" }]}>
