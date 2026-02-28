@@ -3,8 +3,8 @@ import { ShadowStyle } from "@/components/style/Shadow";
 import { useAuthActions } from "@/hooks/useAuthActions";
 import { supabase } from "@/lib/supabase";
 import { router } from "expo-router";
-import { useEffect } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useEffect, useState } from "react";
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Animated, {
   cancelAnimation,
   Easing,
@@ -16,6 +16,7 @@ import Animated, {
 
 export default function DeleteAccount() {
   const { logout } = useAuthActions();
+  const [loading, setLoading] = useState(false);
   const amplitude = useSharedValue(5);
   const periodSec = 1.6;
   const theta = useSharedValue(0);
@@ -41,7 +42,14 @@ export default function DeleteAccount() {
   }, [amplitude]);
 
   const onPressDeleteAccount = async () => {
-    await supabase.rpc("delete_me");
+    setLoading(true);
+    const { error } = await supabase.rpc("delete_me");
+    if (error) {
+      Alert.alert(`회원탈퇴 도중 오류가 발생했습니다. 다시 시도해주세요`);
+      setLoading(false);
+      return;
+    }
+    setLoading(false);
     await logout();
   };
 
@@ -82,6 +90,7 @@ export default function DeleteAccount() {
           <TouchableOpacity
             style={[styles.button, { backgroundColor: "#E4E4EA" }]}
             onPress={onPressCancel}
+            disabled={loading}
           >
             <Text style={styles.buttonText}>아니오</Text>
           </TouchableOpacity>
