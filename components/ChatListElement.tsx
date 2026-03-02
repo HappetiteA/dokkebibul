@@ -3,12 +3,12 @@ import {
   Dimensions,
   Image,
   StyleSheet,
-  Text,
   TouchableOpacity,
   View,
 } from "react-native";
 import { ShadowStyle } from "./style/Shadow";
 import { getAvatarSource } from "@/utils/avatarColor";
+import { Text } from "@/components/Text";
 
 interface IChatListElementProp {
   conversation_id: string;

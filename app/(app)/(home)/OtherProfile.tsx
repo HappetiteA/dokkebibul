@@ -1,4 +1,4 @@
-import { StyleSheet, Text, TouchableOpacity, View, Image } from "react-native";
+import { StyleSheet, TouchableOpacity, View, Image } from "react-native";
 import { useLocalSearchParams, useRouter, useNavigation } from "expo-router";
 import { CommonActions } from "@react-navigation/native";
 import { useEffect, useState } from "react";
@@ -28,6 +28,7 @@ import { BackIcon, BlockIcon, ReportIcon } from "@/components/style/Icons";
 import { ShadowStyle } from "@/components/style/Shadow";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { PillButton } from "@/components/style/Buttons";
+import { Text } from "@/components/Text";
 
 export default function OtherProfileScreen() {
   const router = useRouter();

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   View,
-  TextInput,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { LinearGradientHeader } from "@/components/Headers";
@@ -12,6 +11,7 @@ import { NoticeSection, PIFieldLayout } from "@/components/PIShared";
 import { PillButton } from "@/components/style/Buttons";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { TextInput } from "@/components/TextInput";
 
 export default function EditPISetting() {
   const router = useRouter();
@@ -20,11 +20,10 @@ export default function EditPISetting() {
   const [data, setData] = useState({
     age: "",
     job: "",
-    notes: "",
+    memo: "",
     memory: "",
   });
 
-  // Fetch logic ... (Same as before)
   useEffect(() => {
     const fetchData = async () => {
       if (!profile?.user_id) return;
@@ -38,7 +37,7 @@ export default function EditPISetting() {
         setData({
           age: personaData.age ? String(personaData.age) : "",
           job: personaData.job ?? "",
-          notes: personaData.memo ?? "",
+          memo: personaData.memo ?? "",
           memory: "",
         });
       }
@@ -47,14 +46,14 @@ export default function EditPISetting() {
   }, [profile?.user_id]);
 
   const onSave = async () => {
-    // ... Save logic (Same as before)
     if (!profile?.user_id) return;
-    const ageInt = data.age ? parseInt(data.age, 10) : null;
     const { error } = await supabase.from("personas").upsert({
       user_id: profile.user_id,
-      age: ageInt,
+      name: profile.name,
+      age: data.age,
       job: data.job,
-      memo: data.notes,
+      memo: data.memo,
+      memory: data.memory,
     });
     if (!error) router.back();
   };
@@ -73,6 +72,7 @@ export default function EditPISetting() {
         scrollEnabled={true}
         keyboardShouldPersistTaps={"handled"}
         enableResetScrollToCoords={false}
+        enableOnAndroid={true}
       >
         <NoticeSection />
 
@@ -90,8 +90,8 @@ export default function EditPISetting() {
         />
         <InfoInputField
           label="특이사항"
-          value={data.notes}
-          onChangeText={(t) => handleChange("notes", t)}
+          value={data.memo}
+          onChangeText={(t) => handleChange("memo", t)}
           placeholder="예: MBTI는 INTJ..."
         />
         <InfoInputField

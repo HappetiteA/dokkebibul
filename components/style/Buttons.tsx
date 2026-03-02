@@ -7,9 +7,8 @@ import {
   TextStyle,
   DimensionValue,
 } from "react-native";
-import { ShadowStyle } from "@/components/style/Shadow"; // Your existing shadow style
+import { ShadowStyle } from "@/components/style/Shadow";
 
-// Define the supported color variants
 export type PillButtonVariant = "blue" | "gray" | "white";
 
 interface PillButtonProps {

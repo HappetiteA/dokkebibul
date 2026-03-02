@@ -1,7 +1,8 @@
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { ShadowStyle } from "./style/Shadow";
+import { Text } from "@/components/Text";
 
 // --- Shared Styles ---
 export const piStyles = StyleSheet.create({

@@ -1,6 +1,7 @@
-import { Modal, View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { Modal, View, TouchableOpacity, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { ModalStyles } from "./ModalStyles";
+import { Text } from "@/components/Text";
 
 export function DetailsModal({
   isOpen,

@@ -9,7 +9,6 @@ import { getConversationIdbyUserId, getFollowings } from "@/services/supabase";
 import { SelectFollowingsResponse } from "@/types/orm.types";
 import { BGStyle } from "@/components/style/commonStyle";
 
-// Import Shared Components
 import { UserListItem } from "@/components/user-list/UserListItem";
 import { ListActionButton } from "@/components/user-list/UserListButtons";
 

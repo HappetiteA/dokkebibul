@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
-  Text,
   TouchableOpacity,
   View,
   Image,
-  TextInput,
   Keyboard,
   TouchableWithoutFeedback,
   KeyboardAvoidingView,
@@ -25,6 +23,8 @@ import { PillButton } from "@/components/style/Buttons";
 import { ErrorModal } from "@/components/modals/ErrorModal";
 import useModal from "@/hooks/useModal";
 import { BackIcon } from "@/components/style/Icons";
+import { Text } from "@/components/Text";
+import { TextInput } from "@/components/TextInput";
 
 export default function ProfileEditScreen() {
   const router = useRouter();

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Text, TouchableOpacity, View, StyleSheet, Image } from "react-native";
+import { TouchableOpacity, View, StyleSheet, Image } from "react-native";
 import { useRouter, useFocusEffect } from "expo-router";
 import { useAuth } from "@/contexts/AuthContext";
 import {
@@ -8,15 +8,15 @@ import {
   getFollowings,
 } from "@/services/supabase";
 import { getAvatarSource } from "@/utils/avatarColor";
-import { getAddressPublicity } from "@/services/geocode"; // Adjust path as needed
+import { getAddressPublicity } from "@/services/geocode";
 import React from "react";
 import headerStyle, { BGStyle } from "@/components/style/commonStyle";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ShadowStyle } from "@/components/style/Shadow";
 import { supabase } from "@/lib/supabase";
 import { BackIcon, EditIcon } from "@/components/style/Icons";
+import { Text } from "@/components/Text";
 
-// Define the type here if not imported
 type LocationInfo = {
   addr: string;
   is_public: boolean;

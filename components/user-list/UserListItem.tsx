@@ -1,7 +1,8 @@
 import React, { ReactNode } from "react";
-import { StyleSheet, Text, TouchableOpacity, View, Image } from "react-native";
+import { StyleSheet, TouchableOpacity, View, Image } from "react-native";
 import { ShadowStyle } from "@/components/style/Shadow";
 import { getAvatarSource } from "@/utils/avatarColor";
+import { Text } from "@/components/Text";
 
 interface UserListItemProps {
   name: string;

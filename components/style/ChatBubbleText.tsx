@@ -1,5 +1,6 @@
 import React from "react";
-import { View, Text, StyleSheet, ViewStyle, TextStyle } from "react-native";
+import { View, StyleSheet, ViewStyle, TextStyle } from "react-native";
+import { Text } from "@/components/Text";
 
 type ChatBubbleProps = {
   text: string;
