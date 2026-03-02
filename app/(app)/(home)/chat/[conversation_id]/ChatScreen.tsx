@@ -25,11 +25,11 @@ import {
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
-  Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+import { Text } from "@/components/Text";
+import { TextInput } from "@/components/TextInput";
 import { NeumorphicSwitch } from "@/components/style/Switch";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useChatRoom } from "@/contexts/ChatRoomContext";

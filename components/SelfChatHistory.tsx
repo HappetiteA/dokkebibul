@@ -5,7 +5,6 @@ import {
   ListRenderItemInfo,
   ScrollView,
   StyleSheet,
-  Text,
   View,
 } from "react-native";
 import { Message } from "@/types/model.types";
@@ -17,6 +16,7 @@ import {
 } from "@/utils/time_converter";
 import { getAvatarSource } from "@/utils/avatarColor";
 import { ChatRoomVM } from "./interfaces";
+import { Text } from "@/components/Text";
 
 type Chat = Omit<Message, "conversation_id">;
 

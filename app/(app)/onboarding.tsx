@@ -1,11 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import {
   StyleSheet,
-  Text,
   View,
   Button,
   Alert,
-  TextInput,
   Image,
   TouchableOpacity,
   KeyboardAvoidingView,
@@ -34,6 +32,8 @@ import Animated, {
 } from "react-native-reanimated";
 import { getAvatarSource } from "@/utils/avatarColor";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Text } from "@/components/Text";
+import { TextInput } from "@/components/TextInput";
 
 type NoInputProps = {
   topic: string;

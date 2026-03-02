@@ -1,6 +1,7 @@
-import { Text, TouchableOpacity, View, Modal } from "react-native";
+import { TouchableOpacity, View, Modal } from "react-native";
 import { useState, useEffect } from "react";
 import { ModalStyles } from "./ModalStyles";
+import { Text } from "@/components/Text";
 
 const reportReasons = ["혐오표현", "범죄", "성희롱", "폭언, 욕설", "괴롭힘"];
 

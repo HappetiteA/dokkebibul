@@ -10,7 +10,6 @@ import { supabase } from "@/lib/supabase";
 import { SelectFollowersResponse } from "@/types/orm.types";
 import { BGStyle } from "@/components/style/commonStyle";
 
-// Import Shared Components
 import { UserListItem } from "@/components/user-list/UserListItem";
 import { ListActionButton } from "@/components/user-list/UserListButtons";
 

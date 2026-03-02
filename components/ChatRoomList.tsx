@@ -1,4 +1,4 @@
-import { Button, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Button, StyleSheet, TouchableOpacity, View } from "react-native";
 import { useCallback, useEffect, useState } from "react";
 import { getChatRooms } from "@/services/supabase";
 import { useAuth } from "@/contexts/AuthContext";
@@ -8,6 +8,7 @@ import { ChatRoom } from "@/types/model.types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ChatRoomVM, toChatRoomVM } from "./interfaces";
 import { useFocusEffect } from "expo-router";
+import { Text } from "@/components/Text";
 
 interface IChatRoomListProp {
   openModal: (

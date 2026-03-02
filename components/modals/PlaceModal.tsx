@@ -1,5 +1,6 @@
-import { StyleSheet, Text, TouchableOpacity, View, Modal } from "react-native";
+import { StyleSheet, TouchableOpacity, View, Modal } from "react-native";
 import { ModalStyles } from "./ModalStyles";
+import { Text } from "@/components/Text";
 
 export default function PlaceModal({
   isOpen,

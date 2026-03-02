@@ -1,8 +1,9 @@
 import { useRouter } from "expo-router";
-import { Text, TouchableOpacity, View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 import headerStyle from "@/components/style/commonStyle";
 import { BackIcon } from "./style/Icons";
 import { LinearGradient } from "expo-linear-gradient";
+import { Text } from "@/components/Text";
 
 type Prop = {
   title?: string;

@@ -1,5 +1,6 @@
-import { Modal, View, Text, TouchableOpacity } from "react-native";
+import { Modal, View, TouchableOpacity } from "react-native";
 import { ModalStyles } from "./ModalStyles";
+import { Text } from "@/components/Text";
 
 export function ErrorModal({
   isOpen,

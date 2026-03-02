@@ -3,7 +3,7 @@ import DefaultHeader from "@/components/Headers";
 import { useAuthActions } from "@/hooks/useAuthActions";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useCallback, useEffect, useState } from "react";
-import { Alert, Image, StyleSheet, Switch, Text, View } from "react-native";
+import { Alert, Image, StyleSheet, Switch, View } from "react-native";
 import { TouchableOpacity } from "react-native";
 import { ShadowStyle } from "@/components/style/Shadow";
 import { NeumorphicSwitch } from "@/components/style/Switch";
@@ -11,6 +11,7 @@ import { getBlocks } from "@/services/supabase";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { BGStyle } from "@/components/style/commonStyle";
 import { useGlobalSetting } from "@/contexts/GlobalSettingContext";
+import { Text } from "@/components/Text";
 
 export default function Settings() {
   const { logout } = useAuthActions();

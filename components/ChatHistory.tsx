@@ -1,17 +1,13 @@
 import {
   FlatList,
   Image,
-  InteractionManager,
   ListRenderItemInfo,
-  ScrollView,
   StyleSheet,
-  Text,
   TouchableOpacity,
   View,
 } from "react-native";
 import { Message } from "@/types/model.types";
-import { useEffect, useMemo, useRef } from "react";
-import { useAuth } from "@/contexts/AuthContext";
+import { useMemo, useRef } from "react";
 import {
   convertTimestampToDate,
   convertTimestampToTime,
@@ -19,6 +15,7 @@ import {
 import { getAvatarSource } from "@/utils/avatarColor";
 import { ChatRoomVM } from "./interfaces";
 import { router } from "expo-router";
+import { Text } from "@/components/Text";
 
 type Chat = Omit<Message, "conversation_id">;
 

@@ -30,7 +30,9 @@ Notifications.setNotificationHandler({
 
 export default function RootLayout() {
   const [fontLoaded, fontError] = useFonts({
-    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
+    IBMPlexSansKRBold: require("@/assets/fonts/IBMPlexSansKR-Bold.otf"),
+    IBMPlexSansKRRegular: require("@/assets/fonts/IBMPlexSansKR-Regular.otf"),
+    IBMPlexSansKRSemiBold: require("@/assets/fonts/IBMPlexSansKR-SemiBold.otf"),
     ...FontAwesome.font,
   });
 

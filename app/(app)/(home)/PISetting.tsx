@@ -1,7 +1,6 @@
 import React, { useState, useCallback } from "react";
 import {
   StyleSheet,
-  Text,
   View,
   ScrollView,
   TouchableOpacity,
@@ -14,6 +13,7 @@ import { NoticeSection, PIFieldLayout } from "@/components/PIShared";
 import { ShadowStyle } from "@/components/style/Shadow";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { EditIcon } from "@/components/style/Icons";
+import { Text } from "@/components/Text";
 
 export default function PersonalInfoScreen() {
   const router = useRouter();

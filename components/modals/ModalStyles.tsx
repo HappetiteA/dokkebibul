@@ -64,7 +64,7 @@ export const ModalStyles = StyleSheet.create({
 
   // --- BUTTON STYLES ---
   baseButton: {
-    borderRadius: 20, // Pill shape
+    borderRadius: 40, // Pill shape
     paddingVertical: 10,
     paddingHorizontal: 20,
     minWidth: 100,
@@ -106,7 +106,7 @@ export const ModalStyles = StyleSheet.create({
   reasonButton: {
     paddingVertical: 10,
     paddingHorizontal: 16,
-    borderRadius: 20, // Rounded Pill Shape
+    borderRadius: 40, // Rounded Pill Shape
     minWidth: 50,
     alignItems: "center",
     justifyContent: "center",

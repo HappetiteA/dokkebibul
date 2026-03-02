@@ -4,7 +4,7 @@ import { useAuthActions } from "@/hooks/useAuthActions";
 import { supabase } from "@/lib/supabase";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Alert, StyleSheet, TouchableOpacity, View } from "react-native";
 import Animated, {
   cancelAnimation,
   Easing,
@@ -13,6 +13,8 @@ import Animated, {
   withRepeat,
   withTiming,
 } from "react-native-reanimated";
+import { Text } from "@/components/Text";
+import { PillButton } from "@/components/style/Buttons";
 
 export default function DeleteAccount() {
   const { logout } = useAuthActions();
@@ -79,21 +81,25 @@ export default function DeleteAccount() {
             flexDirection: "row",
             position: "absolute",
             bottom: "10%",
+            justifyContent: "space-between",
+            width: "75%",
           }}
         >
-          <TouchableOpacity
-            style={[styles.button, { backgroundColor: "#99D8EE" }]}
+          <PillButton
+            text="예"
             onPress={onPressDeleteAccount}
-          >
-            <Text style={styles.buttonText}>예</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.button, { backgroundColor: "#E4E4EA" }]}
+            variant="blue"
+            width={140}
+            height={50}
+          />
+          <PillButton
+            text="아니오"
             onPress={onPressCancel}
+            variant="gray"
+            width={140}
+            height={50}
             disabled={loading}
-          >
-            <Text style={styles.buttonText}>아니오</Text>
-          </TouchableOpacity>
+          />
         </View>
       </View>
     </>
@@ -121,7 +127,7 @@ const styles = StyleSheet.create({
     borderRadius: 40,
     bottom: "30%",
     paddingHorizontal: 20,
-    paddingVertical: 30,
+    paddingVertical: 20,
   },
 
   // Button Design

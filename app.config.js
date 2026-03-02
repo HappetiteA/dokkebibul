@@ -28,7 +28,7 @@ export default {
           certificateHash: process.env.ANDROID_GOOGLE_SHA1,
         },
       },
-      softwareKeyboardLayoutMode: "resize",
+      softwareKeyboardLayoutMode: "pan",
       edgeToEdgeEnabled: true,
       package: "com.happetite.dokkebibul",
       googleServicesFile: "./credentials/android/google-services.json",
