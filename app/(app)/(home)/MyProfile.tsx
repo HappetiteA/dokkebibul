@@ -7,7 +7,6 @@ import {
   getFollowers,
   getFollowings,
 } from "@/services/supabase";
-import { Ionicons } from "@expo/vector-icons";
 import { getAvatarSource } from "@/utils/avatarColor";
 import { getAddressPublicity } from "@/services/geocode"; // Adjust path as needed
 import React from "react";
@@ -15,6 +14,7 @@ import headerStyle, { BGStyle } from "@/components/style/commonStyle";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ShadowStyle } from "@/components/style/Shadow";
 import { supabase } from "@/lib/supabase";
+import { BackIcon, EditIcon } from "@/components/style/Icons";
 
 // Define the type here if not imported
 type LocationInfo = {
@@ -205,7 +205,6 @@ export default function MyProfileScreen() {
           <Text style={styles.addressText}>{address}</Text>
         </View>
       </View>
-
       <View style={styles.footerContainer}>
         {isSelfFollowing ? (
           <TouchableOpacity
@@ -233,7 +232,7 @@ function MyProfileScreenHeader({ coins }: { coins: number }) {
         {/* Left: Back Button */}
         <View style={headerStyle.left}>
           <TouchableOpacity onPress={() => router.canGoBack() && router.back()}>
-            <Ionicons name="chevron-back" size={28} color="#aaa" />
+            <BackIcon />
           </TouchableOpacity>
         </View>
         {/* Right: Cash Amount + Edit Button */}
@@ -260,7 +259,7 @@ function MyProfileScreenHeader({ coins }: { coins: number }) {
             style={[styles.editButtonCircle, ShadowStyle.pill3d]}
             onPress={() => router.navigate("/(app)/(home)/EditProfile")}
           >
-            <Ionicons name="pencil" size={16} color="#aaa" />
+            <EditIcon />
           </TouchableOpacity>
         </View>
       </View>
@@ -376,7 +375,8 @@ const styles = StyleSheet.create({
 
   // -- Button Style --
   footerContainer: {
-    marginTop: 80,
+    position: "absolute",
+    bottom: "10%",
     width: "100%",
     alignItems: "center",
   },
