@@ -79,7 +79,7 @@ function AppContent() {
     return () => {
       responseListener.remove();
     };
-  }, []);
+  }, [router]);
 
   return (
     <View style={BGStyle.BG}>

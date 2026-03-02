@@ -91,6 +91,7 @@ export default function DeleteAccount() {
             variant="blue"
             width={140}
             height={50}
+            disabled={loading}
           />
           <PillButton
             text="아니오"
@@ -98,7 +99,6 @@ export default function DeleteAccount() {
             variant="gray"
             width={140}
             height={50}
-            disabled={loading}
           />
         </View>
       </View>
