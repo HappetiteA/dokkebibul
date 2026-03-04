@@ -361,7 +361,7 @@ const Onboarding = () => {
       const { error: personaError } = await supabase.from("personas").insert({
         user_id: user.id,
         name: answers["name"]?.trim(),
-        age: answers["name"]?.trim(),
+        age: answers["age"]?.trim(),
         job: answers["job"]?.trim(),
         memo: answers["memo"]?.trim(),
       });
