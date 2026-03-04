@@ -311,7 +311,6 @@ const Onboarding = () => {
     { key: "no_input", label: `${answers["name"]}! 반가워!` },
     { key: "age", label: "넌 몇 살이야?" },
     { key: "job", label: "너는 무슨 일을 해?" },
-    { key: "hobby", label: "취미는 뭐야?" },
     {
       key: "memo",
       label: "마지막으로... 너에 대해 꼭 알아줬으면 하는 게 있어?",
@@ -359,17 +358,11 @@ const Onboarding = () => {
         return;
       }
 
-      let age = Number(answers["age"]?.trim());
-      if (Number.isNaN(age)) {
-        age = 0;
-      }
-
       const { error: personaError } = await supabase.from("personas").insert({
         user_id: user.id,
         name: answers["name"]?.trim(),
-        age: age,
+        age: answers["name"]?.trim(),
         job: answers["job"]?.trim(),
-        hobby: answers["hobby"]?.trim(),
         memo: answers["memo"]?.trim(),
       });
 

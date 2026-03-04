@@ -16,6 +16,7 @@ import { ShadowStyle } from "@/components/style/Shadow";
 import { supabase } from "@/lib/supabase";
 import { BackIcon, EditIcon } from "@/components/style/Icons";
 import { Text } from "@/components/Text";
+import { PillButton } from "@/components/style/Buttons";
 
 type LocationInfo = {
   addr: string;
@@ -207,12 +208,13 @@ export default function MyProfileScreen() {
       </View>
       <View style={styles.footerContainer}>
         {isSelfFollowing ? (
-          <TouchableOpacity
-            style={[ShadowStyle.default, styles.selfTalkButton]}
+          <PillButton
+            text="대화하기"
             onPress={onChatBtnPressed}
-          >
-            <Text style={styles.selfTalkButtonText}>대화하기</Text>
-          </TouchableOpacity>
+            variant={"blue"}
+            width={155}
+            height={44}
+          />
         ) : (
           <></>
         )}

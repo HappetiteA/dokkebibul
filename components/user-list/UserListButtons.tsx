@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
   baseButton: {
     borderWidth: 2,
     borderRadius: 20,
-    paddingTop: 7, // Adjusting centering based on your original code
+    paddingTop: 3, // Adjusting centering based on your original code
     alignItems: "center",
     height: 32,
     width: 85,

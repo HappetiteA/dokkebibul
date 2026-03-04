@@ -257,11 +257,13 @@ const styles = StyleSheet.create({
   },
   centerAvatarContainer: {
     width: CENTER_AVATAR_SIZE,
+    height: CENTER_AVATAR_SIZE,
     justifyContent: "center",
     alignItems: "center",
   },
   centerAvatarImage: {
     width: CENTER_AVATAR_SIZE,
+    height: CENTER_AVATAR_SIZE,
     justifyContent: "center",
     alignItems: "center",
     resizeMode: "contain",
@@ -269,11 +271,13 @@ const styles = StyleSheet.create({
   nearbyAvatarContainer: {
     position: "absolute",
     width: AVATAR_SIZE,
+    height: AVATAR_SIZE,
     justifyContent: "center",
     alignItems: "center",
   },
   nearbyAvatarImage: {
     width: AVATAR_SIZE,
+    height: AVATAR_SIZE,
     justifyContent: "center",
     alignItems: "center",
     resizeMode: "contain",
