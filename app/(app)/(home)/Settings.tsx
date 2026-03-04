@@ -3,7 +3,7 @@ import DefaultHeader from "@/components/Headers";
 import { useAuthActions } from "@/hooks/useAuthActions";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useCallback, useEffect, useState } from "react";
-import { Alert, Image, StyleSheet, Switch, View } from "react-native";
+import { Alert, Image, StyleSheet, Linking, View } from "react-native";
 import { TouchableOpacity } from "react-native";
 import { ShadowStyle } from "@/components/style/Shadow";
 import { NeumorphicSwitch } from "@/components/style/Switch";
@@ -12,6 +12,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { BGStyle } from "@/components/style/commonStyle";
 import { useGlobalSetting } from "@/contexts/GlobalSettingContext";
 import { Text } from "@/components/Text";
+import { PRIVACY_URL, USE_URL } from "@/dev/constants";
 
 export default function Settings() {
   const { logout } = useAuthActions();
@@ -145,10 +146,10 @@ export default function Settings() {
                   { justifyContent: "space-evenly", marginTop: 20 },
                 ]}
               >
-                <TouchableOpacity>
+                <TouchableOpacity onPress={() => Linking.openURL(USE_URL)}>
                   <Text style={styles.legalLinkText}>이용 약관</Text>
                 </TouchableOpacity>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={() => Linking.openURL(PRIVACY_URL)}>
                   <Text style={styles.legalLinkText}>개인정보처리방침</Text>
                 </TouchableOpacity>
               </View>

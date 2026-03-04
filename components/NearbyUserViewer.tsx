@@ -18,12 +18,11 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { getAvatarSource } from "@/utils/avatarColor";
+import { MAX_RADIUS_METERS, MAX_VISIBLE_USERS } from "@/dev/constants"
 
 // --- CONFIGURATION ---
-const MAX_RADIUS_METERS = 2000; // 2km limit
 const AVATAR_SIZE = 40;
 const CENTER_AVATAR_SIZE = 60;
-const MAX_VISIBLE_USERS = 6; // Display top 6 closest people
 
 // Slot Configuration
 const INNER_RING_COUNT = 6;
@@ -257,11 +256,13 @@ const styles = StyleSheet.create({
   },
   centerAvatarContainer: {
     width: CENTER_AVATAR_SIZE,
+    height: CENTER_AVATAR_SIZE,
     justifyContent: "center",
     alignItems: "center",
   },
   centerAvatarImage: {
     width: CENTER_AVATAR_SIZE,
+    height: CENTER_AVATAR_SIZE,
     justifyContent: "center",
     alignItems: "center",
     resizeMode: "contain",
@@ -269,11 +270,13 @@ const styles = StyleSheet.create({
   nearbyAvatarContainer: {
     position: "absolute",
     width: AVATAR_SIZE,
+    height: AVATAR_SIZE,
     justifyContent: "center",
     alignItems: "center",
   },
   nearbyAvatarImage: {
     width: AVATAR_SIZE,
+    height: AVATAR_SIZE,
     justifyContent: "center",
     alignItems: "center",
     resizeMode: "contain",
