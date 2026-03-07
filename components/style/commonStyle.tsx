@@ -26,7 +26,7 @@ const headerStyle = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    marginLeft: 15,
+    marginLeft: 25,
   },
   button: {
     width: 40,
@@ -37,8 +37,8 @@ const headerStyle = StyleSheet.create({
     alignItems: "center",
   },
   title: {
-    marginLeft: 10,
-    fontSize: 26,
+    marginLeft: 20,
+    fontSize: 22,
   },
   headerWrapper: {
     zIndex: 1000,

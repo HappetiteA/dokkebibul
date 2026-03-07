@@ -2,7 +2,7 @@ import { Modal, View, TouchableOpacity } from "react-native";
 import { ModalStyles } from "./ModalStyles";
 import { Text } from "@/components/Text";
 
-export function ErrorModal({
+export function AISettingErrorModal({
   isOpen,
   onClose,
 }: {
@@ -19,12 +19,10 @@ export function ErrorModal({
       <View style={ModalStyles.modalOverlay}>
         <View style={ModalStyles.modalContent}>
           <Text style={ModalStyles.titleText}>
-            오류가 발생했습니다.
+            백그라운드 AI 채팅{"\n"}비활성화 상태입니다.
           </Text>
 
-          <Text style={ModalStyles.detailsText}>
-            잠시 후 다시 시도해주세요.
-          </Text>
+          <Text style={ModalStyles.detailsText}>전체 설정을 확인해주세요.</Text>
 
           {/* Button Group */}
           <View style={ModalStyles.buttonContainer}>

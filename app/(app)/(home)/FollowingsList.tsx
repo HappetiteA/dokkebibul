@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { FlatList, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useRouter } from "expo-router";
+import { useRouter, useFocusEffect } from "expo-router";
 
 import { LinearGradientHeader } from "@/components/Headers";
 import { useAuth } from "@/contexts/AuthContext";
@@ -17,12 +17,24 @@ export default function FollowingsList() {
   const { profile } = useAuth();
   const [followings, setFollowings] = useState<SelectFollowingsResponse>([]);
 
-  useEffect(() => {
-    (async () => {
-      const followData = await getFollowings();
-      setFollowings(followData ?? []);
-    })();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      let isActive = true;
+      const fetchFollowings = async () => {
+        try {
+          const followData = await getFollowings();
+          if (!followData || !isActive) return;
+          setFollowings(followData ?? []);
+        } catch (error) {
+          return;
+        }
+      };
+      fetchFollowings();
+      return () => {
+        isActive = false;
+      };
+    }, []),
+  );
 
   const MoveToOtherProfile = (user_id: string) => {
     router.navigate({

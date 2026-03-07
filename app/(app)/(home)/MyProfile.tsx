@@ -40,15 +40,7 @@ export default function MyProfileScreen() {
       if (!profile) return;
       // 1. Fetch Follow Stats & Check if user follows itself
       (async () => {
-        const { data: followingData, error } = await supabase
-          .from("follows")
-          .select("*")
-          .eq("src_id", profile.user_id);
-
-        if (error) {
-          console.log(error.message);
-          return;
-        }
+        const followingData = await getFollowings();
 
         if (!followingData) {
           setFollowingNumber(0);
@@ -177,7 +169,9 @@ export default function MyProfileScreen() {
             style={styles.statItem}
             onPress={() => router.navigate("/FollowingsList")}
           >
-            <Text style={styles.statNumber}>{followingNumber}</Text>
+            <Text style={styles.statNumber} weight="bold">
+              {followingNumber}
+            </Text>
             <Text style={styles.statLabel}>팔로잉</Text>
           </TouchableOpacity>
 
@@ -187,20 +181,30 @@ export default function MyProfileScreen() {
             style={styles.statItem}
             onPress={() => router.navigate("/FollowersList")}
           >
-            <Text style={styles.statNumber}>{followerNumber}</Text>
+            <Text style={styles.statNumber} weight="bold">
+              {followerNumber}
+            </Text>
             <Text style={styles.statLabel}>팔로워</Text>
           </TouchableOpacity>
         </View>
 
         {/* 4. Status Message Box */}
         <View style={[styles.statusBox, ShadowStyle.pill3d]}>
-          <Text style={styles.statusText}>{profile?.status_message ?? ""}</Text>
+          <Text
+            numberOfLines={3}
+            ellipsizeMode="tail"
+            style={styles.statusText}
+          >
+            {profile?.status_message ?? ""}
+          </Text>
         </View>
 
         {/* 5. Bottom Location Info (UPDATED) */}
         <View style={styles.locationContainer}>
           <View style={styles.locationTitleRow}>
-            <Text style={styles.locationTitle}>{title}</Text>
+            <Text weight="bold" style={styles.locationTitle}>
+              {title}
+            </Text>
             <View style={[styles.activeDot, { backgroundColor: dotColor }]} />
           </View>
           <Text style={styles.addressText}>{address}</Text>
@@ -212,7 +216,7 @@ export default function MyProfileScreen() {
             text="대화하기"
             onPress={onChatBtnPressed}
             variant={"blue"}
-            width={155}
+            width={145}
             height={44}
           />
         ) : (
@@ -251,11 +255,11 @@ function MyProfileScreenHeader({ coins }: { coins: number }) {
               width: 20,
               height: 20,
               marginRight: 4,
-              tintColor: "#C0C0C0",
+              tintColor: "#B4B4B8",
             }}
             resizeMode="contain"
           />
-          <Text style={styles.cashText}>{coins}</Text>
+          <Text weight="bold" style={styles.cashText}>{coins}</Text>
 
           <TouchableOpacity
             style={[styles.editButtonCircle, ShadowStyle.pill3d]}
@@ -278,6 +282,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingTop: 40,
     paddingBottom: 40,
+    height: "100%",
   },
   avatarContainer: {
     marginBottom: 20,
@@ -288,15 +293,15 @@ const styles = StyleSheet.create({
     backgroundColor: "#f8f8fa",
   },
   nameTag: {
-    paddingVertical: 10,
+    paddingVertical: 5,
     paddingHorizontal: 30,
-    borderRadius: 25,
+    borderRadius: 40,
     marginBottom: 30,
   },
   nameText: {
     fontSize: 20,
     fontWeight: "bold",
-    color: "#333",
+    color: "#535361",
   },
   statsContainer: {
     flexDirection: "row",
@@ -310,32 +315,35 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
   },
   statNumber: {
-    fontSize: 22,
-    fontWeight: "600",
-    color: "#000",
-    marginBottom: 4,
+    fontSize: 24,
+    color: "#535361",
   },
   statLabel: {
     fontSize: 14,
-    color: "#888",
+    color: "#8F8F9A",
   },
   statSpacer: {
     width: 40,
   },
   statusBox: {
+    position: "absolute",
+    bottom: "47%",
     width: "80%",
+    height: "14%",
     borderRadius: 50,
-    paddingVertical: 40,
-    paddingHorizontal: 20,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 60,
+    paddingHorizontal: 25,
   },
   statusText: {
     color: "#888",
     fontSize: 16,
+    textAlign: "center",
   },
   locationContainer: {
+    position: "absolute",
+    bottom: "25%",
+    width: "100%",
     alignItems: "center",
   },
   locationTitleRow: {
@@ -345,8 +353,7 @@ const styles = StyleSheet.create({
   },
   locationTitle: {
     fontSize: 18,
-    fontWeight: "bold",
-    color: "#999",
+    color: "#8F8F9A",
     marginRight: 6,
   },
   activeDot: {
@@ -357,14 +364,13 @@ const styles = StyleSheet.create({
   },
   addressText: {
     fontSize: 16,
-    color: "#aaa",
+    color: "#8F8F9A",
   },
 
   // -- Header Styles --
   cashText: {
     fontSize: 18,
-    fontWeight: "bold",
-    color: "#C0C0C0",
+    color: "#B4B4B8",
     marginRight: 12,
   },
   editButtonCircle: {
@@ -381,18 +387,5 @@ const styles = StyleSheet.create({
     bottom: "10%",
     width: "100%",
     alignItems: "center",
-  },
-  selfTalkButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 50,
-    borderRadius: 30,
-    backgroundColor: "#99D8EE",
-    borderWidth: 3,
-    borderColor: "#FFFFFF",
-  },
-  selfTalkButtonText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#555",
   },
 });

@@ -118,8 +118,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#F8F9FA",
   },
   editBtnCircle: {
-    width: 40,
-    height: 40,
+    width: 36,
+    height: 36,
     borderRadius: 20,
     backgroundColor: "#fff",
     alignItems: "center",

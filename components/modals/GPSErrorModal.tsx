@@ -18,7 +18,7 @@ export function GPSErrorModal({
     >
       <View style={ModalStyles.modalOverlay}>
         <View style={ModalStyles.modalContent}>
-          <Text style={ModalStyles.modalText}>
+          <Text style={ModalStyles.titleText}>
             위치 정보 수집에{"\n"}실패했습니다.
           </Text>
 

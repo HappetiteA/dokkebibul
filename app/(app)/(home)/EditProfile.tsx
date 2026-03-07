@@ -108,7 +108,9 @@ export default function ProfileEditScreen() {
             {/* Name Input */}
             <View style={styles.inputRow}>
               <View style={[styles.labelContainer, ShadowStyle.pill3d]}>
-                <Text style={styles.labelText}>이름</Text>
+                <Text weight="bold" style={styles.labelText}>
+                  이름
+                </Text>
               </View>
               <View style={[styles.inputContainer, ShadowStyle.pill3d]}>
                 <TextInput
@@ -120,7 +122,7 @@ export default function ProfileEditScreen() {
                 />
                 {name.length > 0 && (
                   <TouchableOpacity onPress={() => setName("")}>
-                    <Ionicons name="close" size={18} color="#aaa" />
+                    <Ionicons name="close" size={18} color="#D9D9D9" />
                   </TouchableOpacity>
                 )}
               </View>
@@ -129,7 +131,9 @@ export default function ProfileEditScreen() {
             {/* Bio Input */}
             <View style={styles.inputRow}>
               <View style={[styles.labelContainer, ShadowStyle.pill3d]}>
-                <Text style={styles.labelText}>소개</Text>
+                <Text weight="bold" style={styles.labelText}>
+                  소개
+                </Text>
               </View>
               <View
                 style={[
@@ -152,7 +156,7 @@ export default function ProfileEditScreen() {
                     onPress={() => setStatusMessage("")}
                     style={{ marginTop: 4 }}
                   >
-                    <Ionicons name="close" size={18} color="#aaa" />
+                    <Ionicons name="close" size={18} color="#D9D9D9" />
                   </TouchableOpacity>
                 )}
               </View>
@@ -162,7 +166,7 @@ export default function ProfileEditScreen() {
             <View style={styles.locationContainer}>
               {/* ROW 1: Title + Switch (Aligned Center) */}
               <View style={styles.locationHeaderRow}>
-                <Text style={styles.locationTitle}>도깨비불 공개</Text>
+                <Text weight="bold" style={styles.locationTitle}>도깨비불 공개</Text>
 
                 <NeumorphicSwitch
                   width={54}
@@ -222,17 +226,15 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
   },
   labelContainer: {
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    borderRadius: 30,
+    height: 40,
+    borderRadius: 40,
     marginRight: 12,
     justifyContent: "center",
     alignItems: "center",
-    minWidth: 70,
+    minWidth: 65,
   },
   labelText: {
     fontSize: 16,
-    fontWeight: "bold",
     color: "#8F8F9A",
   },
   inputContainer: {
@@ -240,20 +242,19 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 16,
-    paddingVertical: 14,
     borderRadius: 20,
+    height: 40,
   },
   textInput: {
     flex: 1,
     fontSize: 16,
     color: "#000000",
     marginRight: 8,
-    paddingVertical: 0,
   },
   bioInputContainer: {
-    height: 100,
+    height: 90,
     alignItems: "flex-start",
-    paddingTop: 14,
+    paddingTop: 10,
   },
   multilineInput: {
     height: "100%",
@@ -278,7 +279,6 @@ const styles = StyleSheet.create({
 
   locationTitle: {
     fontSize: 18,
-    fontWeight: "bold",
     color: "#8F8F9A",
   },
 

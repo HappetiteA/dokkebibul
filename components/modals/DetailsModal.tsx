@@ -32,7 +32,7 @@ export function DetailsModal({
             style={ModalStyles.closeButtonWrapper}
             onPress={onClose}
           >
-            <Ionicons name="close" size={30} color="#C4C4C4" />
+            <Ionicons name="close" size={30} color="#D9D9D9" />
           </TouchableOpacity>
 
           {/* Username Title */}

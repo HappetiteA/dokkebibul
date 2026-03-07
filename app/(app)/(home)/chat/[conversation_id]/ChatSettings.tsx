@@ -24,6 +24,7 @@ import { useState } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Text } from "@/components/Text";
+import { PillButton } from "@/components/style/Buttons";
 
 export default function ChatSettings() {
   const navigation = useNavigation();
@@ -168,26 +169,42 @@ export default function ChatSettings() {
       <DefaultHeader title={"채팅 설정"} />
       <View style={styles.container}>
         {chatRoomData ? (
-          <>
-            <View>
-              <View style={styles.settingListElement}>
-                <Text style={styles.h2}>채팅 알림</Text>
-                <NeumorphicSwitch
-                  width={54}
-                  height={30}
-                  padding={3}
-                  value={chatRoomData?.me.noti_enabled}
-                  onValueChange={() => {
-                    setNotiEnabled(!chatRoomData?.me.noti_enabled);
-                  }}
-                  onColor="#93D7EA"
-                  offColor="#D7D7E2"
-                />
-              </View>
+          <View style={{ height: "100%" }}>
+            <View style={[styles.settingListElement, { marginTop: 40 }]}>
+              <Text weight="bold" style={styles.h1}>
+                알림 설정
+              </Text>
+            </View>
+            <View style={styles.settingListElement}>
+              <Text style={styles.h2}>채팅 알림</Text>
+              <NeumorphicSwitch
+                width={54}
+                height={30}
+                padding={3}
+                value={chatRoomData?.me.noti_enabled}
+                onValueChange={() => {
+                  setNotiEnabled(!chatRoomData?.me.noti_enabled);
+                }}
+                onColor="#93D7EA"
+                offColor="#D7D7E2"
+              />
             </View>
 
-            <View>
-              <TouchableOpacity
+            <View
+              style={[
+                styles.settingListElement,
+                {
+                  position: "absolute",
+                  justifyContent: "space-between",
+                  bottom: "10%",
+                  alignSelf: "center",
+                  flexDirection: "column",
+                  gap: 12,
+                },
+              ]}
+            >
+              <PillButton
+                text="신고하기"
                 onPress={() =>
                   openReportModal({
                     onClose: closeReportModal,
@@ -196,12 +213,12 @@ export default function ChatSettings() {
                     reportBtnEnabled: reportBtnEnabled,
                   })
                 }
-              >
-                <View style={[styles.button, ShadowStyle.pill3d]}>
-                  <Text style={styles.innerButtonText}>신고하기</Text>
-                </View>
-              </TouchableOpacity>
-              <TouchableOpacity
+                variant={"white"}
+                width={170}
+                height={40}
+              />
+              <PillButton
+                text="차단하기"
                 onPress={() =>
                   openBlockModal({
                     onClose: closeBlockModal,
@@ -210,12 +227,12 @@ export default function ChatSettings() {
                     blockBtnEnabled: blockBtnEnabled,
                   })
                 }
-              >
-                <View style={[styles.button, ShadowStyle.pill3d]}>
-                  <Text style={styles.innerButtonText}>차단하기</Text>
-                </View>
-              </TouchableOpacity>
-              <TouchableOpacity
+                variant={"white"}
+                width={170}
+                height={40}
+              />
+              <PillButton
+                text="채팅방 나가기"
                 onPress={() =>
                   openLeaveChatModal({
                     onClose: closeLeaveChatModal,
@@ -223,13 +240,12 @@ export default function ChatSettings() {
                     leaveChatBtnEnabled: leaveChatBtnEnabled,
                   })
                 }
-              >
-                <View style={[styles.button, ShadowStyle.pill3d]}>
-                  <Text style={styles.innerButtonText}>채팅방 나가기</Text>
-                </View>
-              </TouchableOpacity>
+                variant={"gray"}
+                width={170}
+                height={40}
+              />
             </View>
-          </>
+          </View>
         ) : (
           <></>
         )}
@@ -260,9 +276,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
     paddingVertical: 10,
   },
+  h1: {
+    fontSize: 20,
+    color: "#8F8F9A",
+  },
   h2: {
-    fontSize: 24,
-    paddingHorizontal: 5,
+    fontSize: 20,
+    paddingHorizontal: 10,
     color: "#8F8F9A",
   },
   innerButtonText: { textAlign: "center", fontSize: 20, color: "#8F8F9A" },
