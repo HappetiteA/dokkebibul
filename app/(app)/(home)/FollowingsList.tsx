@@ -20,12 +20,16 @@ export default function FollowingsList() {
   useFocusEffect(
     useCallback(() => {
       let isActive = true;
-      const fetchFollowers = async () => {
-        const followData = await getFollowings();
-        if (!followData || !isActive) return;
-        setFollowings(followData ?? []);
+      const fetchFollowings = async () => {
+        try {
+          const followData = await getFollowings();
+          if (!followData || !isActive) return;
+          setFollowings(followData ?? []);
+        } catch (error) {
+          return;
+        }
       };
-      fetchFollowers();
+      fetchFollowings();
       return () => {
         isActive = false;
       };

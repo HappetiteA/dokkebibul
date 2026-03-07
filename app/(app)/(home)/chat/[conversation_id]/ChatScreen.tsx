@@ -35,6 +35,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useChatRoom } from "@/contexts/ChatRoomContext";
 import { useGlobalSetting } from "@/contexts/GlobalSettingContext";
 import SelfChatHistory from "@/components/SelfChatHistory";
+import { AISettingErrorModal } from "@/components/modals/AISettingError";
+import useModal from "@/hooks/useModal";
 
 type Chat = Omit<Message, "conversation_id">;
 
@@ -127,7 +129,7 @@ export default function ChatScreen() {
       return () => {
         channel.unsubscribe();
       };
-    }, [conversation_id]),
+    }, [conversation_id, profile?.user_id]),
   );
 
   return (
@@ -160,7 +162,7 @@ export default function ChatScreen() {
                   placeholder={
                     chatRoomData.me.ai_enabled
                       ? "도깨비불 모드 사용 중입니다."
-                      : "Say Something..."
+                      : ""
                   }
                   style={{ flex: 5, fontSize: 16 }}
                 />
@@ -203,6 +205,8 @@ function ChatScreenHeader({
 }: ChatScreenHeaderProp) {
   const router = useRouter();
   const { globalSetting } = useGlobalSetting();
+  const { open: openAISettingErrorModal, close: closeAISettingErrorModal } =
+    useModal(AISettingErrorModal);
 
   const onPressBackBtn = () => {
     if (router.canGoBack()) {
@@ -230,30 +234,39 @@ function ChatScreenHeader({
           {!is_self_chat ? (
             <>
               <View style={{ justifyContent: "center" }}>
-                <NeumorphicSwitch
-                  width={54}
-                  height={30}
-                  padding={3}
-                  value={AIenabled}
-                  onValueChange={onSwitchChange}
-                  onColor="#93D7EA"
-                  offColor="#D7D7E2"
-                  renderThumbContent={({ value, size }) => (
-                    <Image
-                      source={
-                        value
-                          ? require("@/assets/from_figma/fire_on.png")
-                          : require("@/assets/from_figma/fire_off.png")
-                      }
-                      style={{
-                        width: size,
-                        height: size,
-                        resizeMode: "contain",
-                      }}
-                    />
-                  )}
-                  disabled={!globalSetting?.ai_enabled}
-                ></NeumorphicSwitch>
+                <TouchableOpacity
+                  activeOpacity={1.0}
+                  onPress={() =>
+                    openAISettingErrorModal({
+                      onClose: closeAISettingErrorModal,
+                    })
+                  }
+                >
+                  <NeumorphicSwitch
+                    width={54}
+                    height={30}
+                    padding={3}
+                    value={AIenabled}
+                    onValueChange={onSwitchChange}
+                    onColor="#93D7EA"
+                    offColor="#D7D7E2"
+                    renderThumbContent={({ value, size }) => (
+                      <Image
+                        source={
+                          value
+                            ? require("@/assets/from_figma/fire_on.png")
+                            : require("@/assets/from_figma/fire_off.png")
+                        }
+                        style={{
+                          width: size,
+                          height: size,
+                          resizeMode: "contain",
+                        }}
+                      />
+                    )}
+                    disabled={!globalSetting?.ai_enabled}
+                  ></NeumorphicSwitch>
+                </TouchableOpacity>
               </View>
               <View style={[headerStyle.button, ShadowStyle.pill3d]}>
                 <TouchableOpacity

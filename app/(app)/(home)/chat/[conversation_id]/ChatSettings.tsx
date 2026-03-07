@@ -197,10 +197,9 @@ export default function ChatSettings() {
                   position: "absolute",
                   justifyContent: "space-between",
                   bottom: "10%",
-                  alignItems: "center",
-                  height: "20%",
                   alignSelf: "center",
                   flexDirection: "column",
+                  gap: 12,
                 },
               ]}
             >
