@@ -236,11 +236,12 @@ function ChatScreenHeader({
               <View style={{ justifyContent: "center" }}>
                 <TouchableOpacity
                   activeOpacity={1.0}
-                  onPress={() =>
-                    openAISettingErrorModal({
-                      onClose: closeAISettingErrorModal,
-                    })
-                  }
+                  onPress={() => {
+                    if (!globalSetting?.ai_enabled)
+                      openAISettingErrorModal({
+                        onClose: closeAISettingErrorModal,
+                      });
+                  }}
                 >
                   <NeumorphicSwitch
                     width={54}
