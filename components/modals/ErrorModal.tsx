@@ -18,7 +18,7 @@ export function ErrorModal({
     >
       <View style={ModalStyles.modalOverlay}>
         <View style={ModalStyles.modalContent}>
-          <Text style={ModalStyles.modalText}>
+          <Text style={ModalStyles.titleText}>
             오류가 발생했습니다.
           </Text>
 

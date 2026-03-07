@@ -26,7 +26,7 @@ export default function PlaceModal({
     >
       <View style={ModalStyles.modalOverlay}>
         <View style={ModalStyles.modalContent}>
-          <Text style={ModalStyles.modalText}>
+          <Text style={ModalStyles.titleText}>
             현 위치에 도깨비불을{"\n"}데려다 놓을까요?
           </Text>
           <Text style={ModalStyles.detailsText}>기존 위치: {origAddr}</Text>
@@ -71,7 +71,7 @@ export function PlaceSuccessModal({
       <View style={ModalStyles.modalOverlay}>
         <View style={ModalStyles.modalContent}>
           {/* Username Title */}
-          <Text style={ModalStyles.modalText}>
+          <Text style={ModalStyles.titleText}>
             도깨비불을 현 위치에{"\n"}데려다 놓았습니다
           </Text>
 

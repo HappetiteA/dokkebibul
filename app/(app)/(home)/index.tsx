@@ -48,7 +48,7 @@ import { GPSErrorModal } from "@/components/modals/GPSErrorModal";
 export default function MainScreen() {
   const { profile } = useAuth();
   const bottomSheetRef = useRef<BottomSheet>(null);
-  const snapPoints = useMemo(() => ["20%", "60%", "90%"], []);
+  const snapPoints = useMemo(() => ["40%", "85%"], []);
 
   const { open: openDetailsModal, close: closeDetailsModal } =
     useModal(DetailsModal);

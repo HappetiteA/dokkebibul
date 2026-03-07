@@ -48,7 +48,7 @@ export function BackIcon() {
   return (
     <View>
       <Image
-        style={{ width: 15, height: 28 }}
+        style={{ width: 12, height: 22 }}
         source={require("@/assets/from_figma/back_btn.png")}
       />
     </View>

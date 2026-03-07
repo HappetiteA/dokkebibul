@@ -9,22 +9,31 @@ export const ModalStyles = StyleSheet.create({
   },
   modalContent: {
     backgroundColor: "white",
-    paddingVertical: 35,
+    paddingTop: 50,
+    paddingBottom: 40,
     paddingHorizontal: 40,
-    borderRadius: 20, // Rounded container
-    width: 300,
+    borderRadius: 30, // Rounded container
+    width: "85%",
     alignItems: "center",
   },
   modalText: {
-    marginBottom: 15,
-    fontSize: 18, // Slightly smaller than 20 for better fit
+    marginBottom: 40,
+    fontSize: 20, // Slightly smaller than 20 for better fit
     fontWeight: "600", // Semi-bold
     textAlign: "center",
     lineHeight: 28, // Better spacing for newlines
-    color: "#333",
+    color: "#000000",
+  },
+  titleText: {
+    marginBottom: 20,
+    fontSize: 20, // Slightly smaller than 20 for better fit
+    fontWeight: "600", // Semi-bold
+    textAlign: "center",
+    lineHeight: 28, // Better spacing for newlines
+    color: "#000000",
   },
   detailsText: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: "400",
     color: "#909090",
     marginBottom: 20,
@@ -49,7 +58,7 @@ export const ModalStyles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "600",
     color: "#000",
-    marginBottom: 20,
+    marginBottom: 30,
     textAlign: "center",
   },
   buttonContainer: {
@@ -65,9 +74,9 @@ export const ModalStyles = StyleSheet.create({
   // --- BUTTON STYLES ---
   baseButton: {
     borderRadius: 40, // Pill shape
-    paddingVertical: 10,
+    paddingVertical: 5,
     paddingHorizontal: 20,
-    minWidth: 100,
+    minWidth: 120,
     minHeight: 40,
     alignItems: "center",
     justifyContent: "center",
@@ -81,7 +90,7 @@ export const ModalStyles = StyleSheet.create({
   buttonText: {
     color: "#000000",
     fontWeight: "600",
-    fontSize: 14,
+    fontSize: 18,
   },
 
   // White Bordered Button (For "Cancel" or "Confirm")
@@ -104,7 +113,7 @@ export const ModalStyles = StyleSheet.create({
     width: "80%",
   },
   reasonButton: {
-    paddingVertical: 10,
+    paddingVertical: 5,
     paddingHorizontal: 16,
     borderRadius: 40, // Rounded Pill Shape
     minWidth: 50,
@@ -119,7 +128,7 @@ export const ModalStyles = StyleSheet.create({
     borderWidth: 2,
   },
   reasonText: {
-    fontSize: 14,
+    fontSize: 18,
     color: "#000000",
     fontWeight: "500",
   },

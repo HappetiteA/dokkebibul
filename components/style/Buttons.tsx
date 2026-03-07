@@ -1,13 +1,13 @@
 import React from "react";
 import {
   StyleSheet,
-  Text,
   TouchableOpacity,
   ViewStyle,
   TextStyle,
   DimensionValue,
 } from "react-native";
 import { ShadowStyle } from "@/components/style/Shadow";
+import { Text } from "@/components/Text";
 
 export type PillButtonVariant = "blue" | "gray" | "white";
 
