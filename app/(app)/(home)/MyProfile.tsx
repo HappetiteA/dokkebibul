@@ -40,15 +40,7 @@ export default function MyProfileScreen() {
       if (!profile) return;
       // 1. Fetch Follow Stats & Check if user follows itself
       (async () => {
-        const { data: followingData, error } = await supabase
-          .from("follows")
-          .select("*")
-          .eq("src_id", profile.user_id);
-
-        if (error) {
-          console.log(error.message);
-          return;
-        }
+        const followingData = await getFollowings();
 
         if (!followingData) {
           setFollowingNumber(0);
