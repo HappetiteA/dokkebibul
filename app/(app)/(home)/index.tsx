@@ -156,7 +156,7 @@ export default function MainScreen() {
         const data = (await getChatRooms()) ?? [];
         let chatRoomData: { [key: string]: ChatRoom } = {};
 
-        data.map((value) => {
+        data.forEach((value) => {
           chatRoomData[value.id] = value;
         });
         setChatRooms(chatRoomData);
@@ -170,71 +170,67 @@ export default function MainScreen() {
   useEffect(() => {
     // AsyncStorage.clear();
     // Load Data & Save to asyncstorage
-    (async () => {
-      // Realtime subscription
-      if (!profile) {
-        console.error("Accessing Not Permitted");
-        return;
-      }
-      if (!chatRooms) {
-        console.error("chat room data doesn't exists");
-        return;
-      }
+    if (!profile) {
+      console.error("Accessing Not Permitted");
+      return;
+    }
+    if (!chatRooms) {
+      console.error("chat room data doesn't exists");
+      return;
+    }
 
-      supabase.removeAllChannels();
-      await new Promise((resolve) => setTimeout(resolve, 200));
+    const ids = Object.keys(chatRooms).join(",");
+    if (!ids) {
+      console.log("not ready");
+      return;
+    }
 
-      const ids = Object.keys(chatRooms).join(",");
-      if (!ids) {
-        console.log("not ready");
-        return;
-      }
+    const channel = supabase
+      .channel(`chatroomlist:${profile.user_id}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "messages",
+          filter: `conversation_id=in.(${ids})`,
+        },
+        (payload) => {
+          //console.log(payload);
+          const new_chat = {
+            id: payload.new.id,
+            conversation_id: payload.new.conversation_id,
+            sender_id: payload.new.sender_id,
+            content: payload.new.content,
+            created_at: payload.new.created_at,
+            is_read: payload.new.is_read,
+            is_human: payload.new.is_human,
+          };
 
-      const channel = supabase
-        .channel(`chatroomlist:${profile.user_id}`)
-        .on(
-          "postgres_changes",
-          {
-            event: "INSERT",
-            schema: "public",
-            table: "messages",
-            filter: `conversation_id=in.(${ids})`,
-          },
-          (payload) => {
-            console.log(payload);
-            const new_chat = {
-              id: payload.new.id,
-              conversation_id: payload.new.conversation_id,
-              sender_id: payload.new.sender_id,
-              content: payload.new.content,
-              created_at: payload.new.created_at,
-              is_read: payload.new.is_read,
-              is_human: payload.new.is_human,
+          setChatRooms((c) => {
+            return {
+              ...c,
+              [new_chat.conversation_id]: {
+                ...c[new_chat.conversation_id],
+                last_msg: new_chat.content,
+                last_msg_created_at: new_chat.created_at,
+              },
             };
+          });
+        },
+      )
+      .subscribe((status, err) => {
+        //console.log(status);
+        if (status === "CHANNEL_ERROR") {
+          console.error("연결 실패 - 권한이나 설정을 확인하세요.");
+          console.log(err);
+        }
+      });
 
-            setChatRooms((c) => {
-              return {
-                ...c,
-                [new_chat.conversation_id]: {
-                  ...c[new_chat.conversation_id],
-                  last_msg: new_chat.content,
-                  last_msg_created_at: new_chat.created_at,
-                },
-              };
-            });
-          },
-        )
-        .subscribe((status, err) => {
-          if (status === "CHANNEL_ERROR") {
-            console.error("연결 실패 - 권한이나 설정을 확인하세요.");
-            console.log(err);
-          }
-        });
-
-      return () => {
-        supabase.removeChannel(channel);
-      };
-    })();
+    return () => {
+      supabase.removeChannel(channel);
+      console.log("removed");
+    };
   }, [profile, reconnectTrigger]);
 
   useEffect(() => {

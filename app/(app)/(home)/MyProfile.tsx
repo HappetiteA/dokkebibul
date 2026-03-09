@@ -83,7 +83,7 @@ export default function MyProfileScreen() {
         })();
       }
       start();
-    }, []),
+    }, [profile]),
   );
 
   // --- Helper to determine Location UI Status ---

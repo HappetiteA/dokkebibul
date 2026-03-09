@@ -114,7 +114,7 @@ export default function ChatScreen() {
             filter: `conversation_id=eq.${conversation_id}`,
           },
           (payload) => {
-            console.log(payload);
+            //console.log(payload);
             const new_chat: Chat = {
               id: payload.new.id,
               sender_id: payload.new.sender_id,

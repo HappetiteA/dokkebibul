@@ -50,10 +50,14 @@ export default function ChatRoomList({
 
         AsyncStorage.multiGet(chatRoomKeys, (err, stores) => {
           let chatRoomData: ChatRoom[] = [];
-          stores?.map((result, i, store) => {
+          stores?.forEach((result) => {
             // get at each store's key/value so you can work with it
             if (!result[1]) return "";
-            chatRoomData.push(JSON.parse(result[1]) as ChatRoom);
+            try {
+              chatRoomData.push(JSON.parse(result[1]) as ChatRoom);
+            } catch (parseErr) {
+              console.error("Failed to parse ChatRoom data:", parseErr);
+            }
           });
 
           setChatRooms(chatRoomData);
