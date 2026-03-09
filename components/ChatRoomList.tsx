@@ -11,6 +11,7 @@ import { useFocusEffect } from "expo-router";
 import { Text } from "@/components/Text";
 
 interface IChatRoomListProp {
+  updateTrigger: boolean;
   openModal: (
     name: string,
     id: string,
@@ -19,26 +20,51 @@ interface IChatRoomListProp {
   ) => void;
 }
 
-export default function ChatRoomList({ openModal }: IChatRoomListProp) {
+export default function ChatRoomList({
+  updateTrigger,
+  openModal,
+}: IChatRoomListProp) {
   const { profile } = useAuth();
   const [chatRooms, setChatRooms] = useState<ChatRoom[]>([]);
 
-  useFocusEffect(
-    useCallback(() => {
-      (async () => {
-        const chatRoomData = (await getChatRooms()) ?? [];
+  useEffect(() => {
+    (async () => {
+      AsyncStorage.getAllKeys((err, keys) => {
+        if (err) {
+          console.error(
+            "Asyncstorage Error when rendering Chat room list : ",
+            err.message,
+          );
+        }
+        if (!keys) {
+          setChatRooms([]);
+          return;
+        }
 
-        const pairs: [string, string][] = chatRoomData.map((room) => [
-          `ChatRoomData:${room.id}`,
-          JSON.stringify(room),
-        ]);
+        let chatRoomKeys: string[] = [];
+        keys.forEach((value) => {
+          if (value.startsWith("ChatRoomData:")) {
+            chatRoomKeys.push(value);
+          }
+        });
 
-        await AsyncStorage.multiSet(pairs);
+        AsyncStorage.multiGet(chatRoomKeys, (err, stores) => {
+          let chatRoomData: ChatRoom[] = [];
+          stores?.forEach((result) => {
+            // get at each store's key/value so you can work with it
+            if (!result[1]) return "";
+            try {
+              chatRoomData.push(JSON.parse(result[1]) as ChatRoom);
+            } catch (parseErr) {
+              console.error("Failed to parse ChatRoom data:", parseErr);
+            }
+          });
 
-        setChatRooms(chatRoomData);
-      })();
-    }, []),
-  );
+          setChatRooms(chatRoomData);
+        });
+      });
+    })();
+  }, [updateTrigger]);
 
   const ChatList = (value: ChatRoom | undefined) => {
     if (!value) return <></>;
