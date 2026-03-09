@@ -1,9 +1,5 @@
-import {
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import { useRouter } from "expo-router";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { useFocusEffect, useRouter } from "expo-router";
 import * as Location from "expo-location";
 import NearbyUserViewer from "@/components/NearbyUserViewer";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -39,16 +35,18 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
 import React from "react";
 import { SelectNearbyUsersResponse } from "@/types/orm.types";
-import { getNearbyUsers } from "@/services/supabase";
+import { getChatRooms, getNearbyUsers } from "@/services/supabase";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { getOriginalAddress, updateAddressCache } from "@/services/geocode";
 import { reverseGeocode } from "@/services/supabase";
 import { GPSErrorModal } from "@/components/modals/GPSErrorModal";
+import { ChatRoom } from "@/types/model.types";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function MainScreen() {
   const { profile } = useAuth();
   const bottomSheetRef = useRef<BottomSheet>(null);
-  const snapPoints = useMemo(() => ["40%", "85%"], []);
+  const snapPoints = useMemo(() => ["50%", "97%"], []);
 
   const { open: openDetailsModal, close: closeDetailsModal } =
     useModal(DetailsModal);
@@ -140,11 +138,127 @@ export default function MainScreen() {
     };
   }, []);
 
+  // Chat List Part
+  const [chatRooms, setChatRooms] = useState<{ [key: string]: ChatRoom }>({});
+  const [reconnectTrigger, setReconnectTrigger] = useState(true);
+  const [updateTrigger, setUpdateTrigger] = useState(true);
+
+  useFocusEffect(
+    useCallback(() => {
+      //AsyncStorage.clear();
+      // Load Data & Save to asyncstorage
+      (async () => {
+        if (!profile) {
+          console.error("Accessing Not Permitted");
+          return;
+        }
+
+        const data = (await getChatRooms()) ?? [];
+        let chatRoomData: { [key: string]: ChatRoom } = {};
+
+        data.map((value) => {
+          chatRoomData[value.id] = value;
+        });
+        setChatRooms(chatRoomData);
+        setReconnectTrigger((c) => !c);
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        setReconnectTrigger((c) => !c);
+      })();
+    }, [profile?.user_id]),
+  );
+
+  useEffect(() => {
+    // AsyncStorage.clear();
+    // Load Data & Save to asyncstorage
+    (async () => {
+      // Realtime subscription
+      if (!profile) {
+        console.error("Accessing Not Permitted");
+        return;
+      }
+      if (!chatRooms) {
+        console.error("chat room data doesn't exists");
+        return;
+      }
+
+      supabase.removeAllChannels();
+      await new Promise((resolve) => setTimeout(resolve, 200));
+
+      const ids = Object.keys(chatRooms).join(",");
+      if (!ids) {
+        console.log("not ready");
+        return;
+      }
+
+      const channel = supabase
+        .channel(`chatroomlist:${profile.user_id}`)
+        .on(
+          "postgres_changes",
+          {
+            event: "INSERT",
+            schema: "public",
+            table: "messages",
+            filter: `conversation_id=in.(${ids})`,
+          },
+          (payload) => {
+            console.log(payload);
+            const new_chat = {
+              id: payload.new.id,
+              conversation_id: payload.new.conversation_id,
+              sender_id: payload.new.sender_id,
+              content: payload.new.content,
+              created_at: payload.new.created_at,
+              is_read: payload.new.is_read,
+              is_human: payload.new.is_human,
+            };
+
+            setChatRooms((c) => {
+              return {
+                ...c,
+                [new_chat.conversation_id]: {
+                  ...c[new_chat.conversation_id],
+                  last_msg: new_chat.content,
+                  last_msg_created_at: new_chat.created_at,
+                },
+              };
+            });
+          },
+        )
+        .subscribe((status, err) => {
+          if (status === "CHANNEL_ERROR") {
+            console.error("연결 실패 - 권한이나 설정을 확인하세요.");
+            console.log(err);
+          }
+        });
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    })();
+  }, [profile, reconnectTrigger]);
+
+  useEffect(() => {
+    // Update Asyncstorage
+    (async () => {
+      const pairs: [string, string][] = Object.entries(chatRooms).map(
+        ([key, value]) => [`ChatRoomData:${key}`, JSON.stringify(value)],
+      );
+      await AsyncStorage.multiSet(pairs);
+    })();
+
+    // Update Trig.
+    setUpdateTrigger((c) => !c);
+  }, [chatRooms]);
+
   const handleSheetChanges = useCallback((index: number) => {
     // console.log("handleSheetChanges", index);
   }, []);
 
-  const onLeaveChatBtnPressed = async (other_id: string) => {
+  const onLeaveChatBtnPressed = async (
+    chat_id: string,
+    other_id: string,
+    is_user1: boolean,
+  ) => {
     setLeaveChatBtnEnabled(false);
 
     if (!profile) {
@@ -157,6 +271,17 @@ export default function MainScreen() {
       u2id: other_id,
       new_chat_enabled: false,
     });
+
+    setChatRooms((c) => {
+      return {
+        ...c,
+        [chat_id]: {
+          ...c[chat_id],
+          [is_user1 ? "user1_chat_enabled" : "user2_chat_enabled"]: false,
+        },
+      };
+    });
+    setReconnectTrigger((c) => !c);
 
     closeLeaveChatModal();
     setLeaveChatBtnEnabled(true);
@@ -172,7 +297,12 @@ export default function MainScreen() {
     }
   };
 
-  const onBlockBtnPressed = async (other_name: string, other_id: string) => {
+  const onBlockBtnPressed = async (
+    chat_id: string,
+    other_name: string,
+    other_id: string,
+    is_user1: boolean,
+  ) => {
     setBlockBtnEnabled(false);
 
     if (!profile) {
@@ -183,6 +313,17 @@ export default function MainScreen() {
     const { error } = await supabase
       .from("blocks")
       .insert({ src_id: profile.user_id, dst_id: other_id });
+
+    setChatRooms((c) => {
+      return {
+        ...c,
+        [chat_id]: {
+          ...c[chat_id],
+          [is_user1 ? "user1_chat_enabled" : "user2_chat_enabled"]: false,
+        },
+      };
+    });
+    setReconnectTrigger((c) => !c);
 
     closeBlockModal();
     setBlockBtnEnabled(true);
@@ -286,19 +427,29 @@ export default function MainScreen() {
     <SafeAreaView style={BGStyle.BG}>
       <MainScreenHeader />
       <GestureHandlerRootView style={styles.container}>
-        <NearbyUserViewer
-          nearbyUsersLocations={nearbyUsersLocations}
-        />
+        <NearbyUserViewer nearbyUsersLocations={nearbyUsersLocations} />
 
         <BottomSheet
           ref={bottomSheetRef}
           onChange={handleSheetChanges}
+          backgroundStyle={{ backgroundColor: "#F8F8FA" }}
+          handleStyle={{
+            backgroundColor: "#F8F8FA",
+            borderRadius: 20,
+            boxShadow: "#dfdfdf 0px -6px 6px 0px",
+          }}
+          handleIndicatorStyle={{
+            backgroundColor: "#D7D7E2",
+            width: 33,
+            height: 6,
+          }}
           snapPoints={snapPoints}
           index={1}
         >
           <BottomSheetScrollView>
             <View style={styles.contentContainer}>
               <ChatRoomList
+                updateTrigger={updateTrigger}
                 openModal={(other_name, other_id, chat_id, is_user1) =>
                   openDetailsModal({
                     onClose: closeDetailsModal,
@@ -308,7 +459,7 @@ export default function MainScreen() {
                       openLeaveChatModal({
                         onClose: closeLeaveChatModal,
                         onLeaveChatBtnPressed: () =>
-                          onLeaveChatBtnPressed(other_id),
+                          onLeaveChatBtnPressed(chat_id, other_id, is_user1),
                         leaveChatBtnEnabled: LeaveChatBtnEnabled,
                       });
                     },
@@ -318,7 +469,12 @@ export default function MainScreen() {
                         onClose: closeBlockModal,
                         name: other_name,
                         onBlockBtnPressed: () =>
-                          onBlockBtnPressed(other_name, other_id),
+                          onBlockBtnPressed(
+                            chat_id,
+                            other_name,
+                            other_id,
+                            is_user1,
+                          ),
                         blockBtnEnabled: blockBtnEnabled,
                       });
                     },

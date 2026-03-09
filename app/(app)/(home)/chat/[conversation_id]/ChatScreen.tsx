@@ -103,31 +103,37 @@ export default function ChatScreen() {
       navigation.setOptions({ title: `Chat #${conversation_id}` });
 
       //set realtime chatting
-      const channel = supabase.channel(`chatroom:${conversation_id}`).on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "messages",
-          filter: `conversation_id=eq.${conversation_id}`,
-        },
-        (payload) => {
-          const new_chat: Chat = {
-            id: payload.new.id,
-            sender_id: payload.new.sender_id,
-            content: payload.new.content,
-            created_at: payload.new.created_at,
-            is_read: payload.new.is_read,
-            is_human: payload.new.is_human,
-          };
-          setChat((c) => [...c, new_chat]);
-        },
-      );
-
-      channel.subscribe();
+      const channel = supabase
+        .channel(`chatroom:${conversation_id}`)
+        .on(
+          "postgres_changes",
+          {
+            event: "INSERT",
+            schema: "public",
+            table: "messages",
+            filter: `conversation_id=eq.${conversation_id}`,
+          },
+          (payload) => {
+            console.log(payload);
+            const new_chat: Chat = {
+              id: payload.new.id,
+              sender_id: payload.new.sender_id,
+              content: payload.new.content,
+              created_at: payload.new.created_at,
+              is_read: payload.new.is_read,
+              is_human: payload.new.is_human,
+            };
+            setChat((c) => [...c, new_chat]);
+          },
+        )
+        .subscribe((status) => {
+          if (status === "CHANNEL_ERROR") {
+            console.error("연결 실패 - 권한이나 설정을 확인하세요.");
+          }
+        });
 
       return () => {
-        channel.unsubscribe();
+        supabase.removeChannel(channel);
       };
     }, [conversation_id, profile?.user_id]),
   );

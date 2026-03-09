@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { TouchableOpacity, View, StyleSheet, Image } from "react-native";
 import { useRouter, useFocusEffect } from "expo-router";
 import { useAuth } from "@/contexts/AuthContext";
@@ -35,55 +35,56 @@ export default function MyProfileScreen() {
   // Location State
   const [locationInfo, setLocationInfo] = useState<LocationInfo | null>(null);
 
-  useFocusEffect(() => {
-    async function start() {
-      if (!profile) return;
-      // 1. Fetch Follow Stats & Check if user follows itself
-      (async () => {
-        const followingData = await getFollowings();
+  useFocusEffect(
+    useCallback(() => {
+      async function start() {
+        if (!profile) return;
+        // 1. Fetch Follow Stats & Check if user follows itself
+        (async () => {
+          const followingData = await getFollowings();
+          setFollowingNumber(followingData?.length ?? 0);
+        })();
 
-        if (!followingData) {
-          setFollowingNumber(0);
-          return;
-        }
+        (async () => {
+          const followerData = await getFollowers();
+          setFollowerNumber(followerData?.length ?? 0);
+        })();
 
-        const self_following = followingData.find((value) => {
-          return value.dst_id == profile.user_id;
-        });
-
-        if (self_following) {
-          setFollowingNumber(followingData.length - 1);
-          setSelfFollowing(true);
-        } else {
-          setFollowingNumber(followingData.length);
-
-          // Try self following
-          const { error: followError } = await supabase
+        // 2. Check Self following / Call Self following if not
+        (async () => {
+          const { data } = await supabase
             .from("follows")
-            .insert({ src_id: profile.user_id, dst_id: profile.user_id });
+            .select("*")
+            .eq("src_id", profile.user_id)
+            .eq("dst_id", profile.user_id)
+            .maybeSingle();
 
-          if (followError) {
-            setSelfFollowing(false);
-            console.log(followError.message);
-            return;
+          const isSelfFollowing = data ? true : false;
+          if (isSelfFollowing) {
+            setSelfFollowing(true);
+          } else {
+            const { error: followError } = await supabase
+              .from("follows")
+              .insert({ src_id: profile.user_id, dst_id: profile.user_id });
+
+            if (followError) {
+              setSelfFollowing(false);
+              console.log(followError.message);
+              return;
+            }
+            setSelfFollowing(true);
           }
-          setSelfFollowing(true);
-        }
-      })();
+        })();
 
-      (async () => {
-        const followerData = await getFollowers();
-        setFollowerNumber(followerData?.length ?? 0);
-      })();
-
-      // 2. Fetch Location Info
-      (async () => {
-        const data = await getAddressPublicity();
-        setLocationInfo(data);
-      })();
-    }
-    start();
-  });
+        // 3. Fetch Location Info
+        (async () => {
+          const data = await getAddressPublicity();
+          setLocationInfo(data);
+        })();
+      }
+      start();
+    }, []),
+  );
 
   // --- Helper to determine Location UI Status ---
   const getLocationUI = () => {
@@ -259,7 +260,9 @@ function MyProfileScreenHeader({ coins }: { coins: number }) {
             }}
             resizeMode="contain"
           />
-          <Text weight="bold" style={styles.cashText}>{coins}</Text>
+          <Text weight="bold" style={styles.cashText}>
+            {coins}
+          </Text>
 
           <TouchableOpacity
             style={[styles.editButtonCircle, ShadowStyle.pill3d]}
