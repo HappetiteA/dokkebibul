@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
   chat: {
     color: "#909090",
     fontSize: 14,
-    width: 250,
+    width: "70%",
   },
   time: { color: "#909090", fontSize: 12, textAlign: "right" },
 });
