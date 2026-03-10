@@ -51,7 +51,9 @@ export default function ChatListElement({
                 <Text style={styles.name}>{other_name}</Text>
                 <Text style={styles.time}>{time_string}</Text>
               </View>
-              <Text style={styles.chat}>{last_msg}</Text>
+              <Text style={styles.chat} numberOfLines={1} ellipsizeMode="tail">
+                {last_msg}
+              </Text>
             </View>
           </View>
         </TouchableOpacity>
@@ -92,6 +94,10 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   name: { fontSize: 16 },
-  chat: { color: "#909090", fontSize: 14 },
+  chat: {
+    color: "#909090",
+    fontSize: 14,
+    width: 250,
+  },
   time: { color: "#909090", fontSize: 12, textAlign: "right" },
 });

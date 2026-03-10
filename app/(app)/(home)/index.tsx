@@ -503,7 +503,7 @@ export default function MainScreen() {
           justifyContent: "center",
           alignItems: "center",
           position: "absolute",
-          top: 35,
+          top: 50,
           left: 10,
         }}
       >
