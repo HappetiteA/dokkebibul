@@ -11,16 +11,14 @@ import {
   FlatList,
   Dimensions,
   ListRenderItem,
+  TextInput as RNTextInput,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
 import ChatBubbleText from "@/components/style/ChatBubbleText";
-import headerStyle, {
-  BGStyle,
-  headerHeight,
-} from "@/components/style/commonStyle";
-import { BackIcon, SendIcon } from "@/components/style/Icons";
+import headerStyle, { BGStyle } from "@/components/style/commonStyle";
+import { BackIcon, SendDisabledIcon, SendIcon } from "@/components/style/Icons";
 import { ShadowStyle } from "@/components/style/Shadow";
 import Animated, {
   cancelAnimation,
@@ -113,6 +111,7 @@ const Question = ({
   onChangeText,
   onNext,
 }: QuestionProps) => {
+  const inputRef = useRef<RNTextInput | null>(null);
   const amplitude = useSharedValue(5);
   const periodSec = 1.6;
   const theta = useSharedValue(0);
@@ -153,18 +152,26 @@ const Question = ({
           flexDirection: "column-reverse",
           marginBottom: "55%",
         }}
-        behavior={Platform.OS == "ios" ? "padding" : undefined}
+        behavior={Platform.OS == "ios" ? "padding" : "height"}
       >
         <View>
           <View style={[styles.textInputView, ShadowStyle.pill3d]}>
             <TextInput
+              ref={inputRef}
               value={value}
               onChangeText={onChangeText}
               placeholder="Type your answer..."
               style={{ flex: 5, fontSize: 20 }}
+              onLayout={() => {
+                inputRef.current?.focus();
+              }}
             />
-            <TouchableOpacity onPress={onNext} disabled={!value.trim()}>
-              <SendIcon />
+            <TouchableOpacity
+              onPress={onNext}
+              disabled={!value.trim()}
+              style={{ marginVertical: "auto" }}
+            >
+              {!value.trim() ? <SendDisabledIcon /> : <SendIcon />}
             </TouchableOpacity>
           </View>
         </View>
@@ -202,7 +209,7 @@ const ColorPicker = ({
             width: IMAGE_SIZE,
             height: IMAGE_SIZE,
           }}
-          resizeMode="stretch"
+          resizeMode="contain"
         />
       </View>
     );
@@ -255,11 +262,7 @@ const ColorPicker = ({
               },
               value == v
                 ? {
-                    shadowColor: "#3BA6C9",
-                    shadowOffset: { width: 0, height: 1 },
-                    shadowOpacity: 0.7,
-                    shadowRadius: 4,
-                    elevation: 4,
+                    boxShadow: "#A3E7FF 0px 0px 3px 1px",
                   }
                 : {},
             ]}

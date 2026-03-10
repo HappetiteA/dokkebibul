@@ -15,8 +15,11 @@ import Animated, {
 } from "react-native-reanimated";
 import { Text } from "@/components/Text";
 import { PillButton } from "@/components/style/Buttons";
+import { useAuth } from "@/contexts/AuthContext";
+import { getAvatarSource } from "@/utils/avatarColor";
 
 export default function DeleteAccount() {
+  const { profile } = useAuth();
   const { logout } = useAuthActions();
   const [loading, setLoading] = useState(false);
   const amplitude = useSharedValue(5);
@@ -64,7 +67,7 @@ export default function DeleteAccount() {
       <View style={styles.container}>
         <ChatBubbleText text={"정말 탈퇴하실건가요?"} bubbleColor="#E4E4EA" />
         <Animated.Image
-          source={require("@/assets/from_figma/icon-wisp-list.png")} // Placeholder
+          source={getAvatarSource(profile?.color_code)} // Placeholder
           style={[styles.avatarImage, animStyle]}
           resizeMode="contain"
         />

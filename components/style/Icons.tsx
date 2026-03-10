@@ -65,6 +65,18 @@ export function SendIcon() {
     </View>
   );
 }
+
+export function SendDisabledIcon() {
+  return (
+    <View>
+      <Image
+        style={{ width: 40, height: 40 }}
+        source={require("@/assets/from_figma/send_disabled.png")}
+      />
+    </View>
+  );
+}
+
 export function LockIcon() {
   return (
     <View>

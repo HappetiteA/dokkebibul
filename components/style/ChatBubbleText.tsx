@@ -13,7 +13,8 @@ type ChatBubbleProps = {
   radius?: number;
   tailSize?: number;
   paddingHorizontal?: number;
-  paddingVertical?: number;
+  paddingTop?: number;
+  paddingBottom?: number;
 };
 
 export default function ChatBubbleText({
@@ -23,13 +24,14 @@ export default function ChatBubbleText({
 
   radius = 22,
   tailSize = 18,
-  paddingHorizontal = 18,
-  paddingVertical = 10,
+  paddingHorizontal = 20,
+  paddingTop = 20,
+  paddingBottom = 15,
 }: ChatBubbleProps) {
   const tailVisualHeight = tailSize / 2;
 
   return (
-    <View style={{ position: "absolute", bottom: "70%", maxWidth: 300 }}>
+    <View style={{ position: "absolute", bottom: "73%", maxWidth: 260 }}>
       <View
         style={[
           styles.bubble,
@@ -44,7 +46,8 @@ export default function ChatBubbleText({
             styles.text,
             {
               paddingHorizontal,
-              paddingVertical,
+              paddingTop,
+              paddingBottom,
             },
           ]}
         >
