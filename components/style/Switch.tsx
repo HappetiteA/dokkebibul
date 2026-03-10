@@ -87,14 +87,7 @@ export function NeumorphicSwitch({
       backgroundColor: thumbColor,
       alignItems: "center",
       justifyContent: "center",
-      ...(Platform.OS === "android"
-        ? { elevation: 10 }
-        : {
-            shadowColor: "#000",
-            shadowOffset: { width: 6, height: 8 },
-            shadowOpacity: 0.25,
-            shadowRadius: 10,
-          }),
+      ...ShadowStyle.pill3dSwitch,
     }),
     [thumbSize, thumbColor],
   );

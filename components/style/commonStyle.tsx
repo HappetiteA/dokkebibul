@@ -1,7 +1,7 @@
 import { StyleSheet } from "react-native";
 
-export const headerHeight = 50;
-export const headerMargin = 50;
+export const headerHeight = 60;
+//export const headerMargin = 50;
 
 export const BGStyle = StyleSheet.create({
   BG: { flex: 1, backgroundColor: "#F8F8FA" },
@@ -35,6 +35,7 @@ const headerStyle = StyleSheet.create({
     marginHorizontal: 5,
     justifyContent: "center",
     alignItems: "center",
+    marginVertical: "auto",
   },
   title: {
     marginLeft: 20,

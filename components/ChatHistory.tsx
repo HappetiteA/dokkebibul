@@ -58,10 +58,11 @@ export default function ChatHistory({ chat, chatRoomData }: ChatHistoryProp) {
           width: "auto",
           maxWidth: 250,
           backgroundColor: color,
-          padding: 8,
+          paddingHorizontal: 15,
+          paddingVertical: 9,
           marginVertical: 5,
           marginHorizontal: 5,
-          borderRadius: 15,
+          borderRadius: 25,
         }}
       >
         <Text style={{ textAlign: "justify", fontSize: 16 }}>
@@ -75,8 +76,7 @@ export default function ChatHistory({ chat, chatRoomData }: ChatHistoryProp) {
     if (value.sender_id == chatRoomData.me.user_id) {
       //Right Aligned
       const HasRightBottomTail = hasRightBottomTail(chat, value, index);
-      const BGcolor =
-        chatRoomData.me.ai_enabled && !value.is_human ? "#C5EDD2" : "#99D8EE";
+      const BGcolor = !value.is_human ? "#C5EDD2" : "#99D8EE";
 
       return (
         <View key={index} style={{ flexDirection: "row" }}>
@@ -227,8 +227,8 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 5,
     left: 5,
-    width: 15,
-    height: 15,
+    width: 20,
+    height: 20,
     backgroundColor: "#E4E4EA",
   },
 
@@ -236,8 +236,8 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: 5,
     bottom: 5,
-    width: 15,
-    height: 15,
+    width: 20,
+    height: 20,
     backgroundColor: "#E4E4EA",
   },
 });

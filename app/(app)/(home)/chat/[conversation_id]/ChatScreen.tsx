@@ -47,6 +47,7 @@ export default function ChatScreen() {
   const conversation_id = params.conversation_id as string;
 
   const { profile } = useAuth();
+  const { globalSetting } = useGlobalSetting();
   const { chatRoomData, setAIenabled } = useChatRoom();
   const [chat, setChat] = useState<Array<Chat>>([]);
   const [text, setText] = useState<string>("");
@@ -160,25 +161,33 @@ export default function ChatScreen() {
               ) : (
                 <SelfChatHistory chat={chat} chatRoomData={chatRoomData} />
               )}
-              <View style={[styles.textInputView, ShadowStyle.pill3d]}>
-                <TextInput
-                  editable={!chatRoomData.me.ai_enabled}
-                  value={text}
-                  onChangeText={onChangeText}
-                  placeholder={
-                    chatRoomData.me.ai_enabled
-                      ? "도깨비불 모드 사용 중입니다."
-                      : ""
-                  }
-                  style={{ flex: 5, fontSize: 16 }}
-                />
-                <TouchableOpacity
-                  onPress={onSubmit}
-                  disabled={chatRoomData.me.ai_enabled}
-                >
-                  {chatRoomData.me.ai_enabled ? <LockIcon /> : <SendIcon />}
-                </TouchableOpacity>
-              </View>
+              {chatRoomData.me.ai_enabled && globalSetting?.ai_enabled ? (
+                <View style={[styles.textInputView, ShadowStyle.pill3d]}>
+                  <TextInput
+                    editable={false}
+                    value={text}
+                    onChangeText={onChangeText}
+                    placeholder={"도깨비불 모드 사용 중입니다."}
+                    style={{ flex: 5, fontSize: 16 }}
+                  />
+                  <TouchableOpacity onPress={onSubmit} disabled={true}>
+                    <LockIcon />
+                  </TouchableOpacity>
+                </View>
+              ) : (
+                <View style={[styles.textInputView, ShadowStyle.pill3d]}>
+                  <TextInput
+                    editable={true}
+                    value={text}
+                    onChangeText={onChangeText}
+                    placeholder={""}
+                    style={{ flex: 5, fontSize: 16 }}
+                  />
+                  <TouchableOpacity onPress={onSubmit} disabled={false}>
+                    <SendIcon />
+                  </TouchableOpacity>
+                </View>
+              )}
             </View>
           </KeyboardAvoidingView>
         </>
@@ -239,7 +248,7 @@ function ChatScreenHeader({
         <View style={headerStyle.right}>
           {!is_self_chat ? (
             <>
-              <View style={{ justifyContent: "center" }}>
+              <View style={{ marginHorizontal: 10, marginVertical: "auto" }}>
                 <TouchableOpacity
                   activeOpacity={1.0}
                   onPress={() => {
@@ -250,8 +259,8 @@ function ChatScreenHeader({
                   }}
                 >
                   <NeumorphicSwitch
-                    width={54}
-                    height={30}
+                    width={59}
+                    height={36}
                     padding={3}
                     value={AIenabled}
                     onValueChange={onSwitchChange}

@@ -3,7 +3,10 @@ import { useCallback, useEffect, useState } from "react";
 import { getChatRooms } from "@/services/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 import ChatListElement from "./ChatListElement";
-import { convertTimestampToTime } from "@/utils/time_converter";
+import {
+  convertTimestampToTime,
+  formatTimestamp,
+} from "@/utils/time_converter";
 import { ChatRoom } from "@/types/model.types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ChatRoomVM, toChatRoomVM } from "./interfaces";
@@ -77,7 +80,7 @@ export default function ChatRoomList({
     var time_string =
       value.last_msg == undefined
         ? ""
-        : convertTimestampToTime(vm.last_msg_created_at);
+        : formatTimestamp(vm.last_msg_created_at);
 
     return (
       <ChatListElement
